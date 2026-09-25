@@ -1,14 +1,24 @@
-run/
+
+# TLS/private runtime material
+*.pem
+*.key
+*.p12
+*.pfx
+
+# ROS generated output
+**/build/
+**/install/
+**/log/
+
+# Backup / historical snapshots
+backups/
+**/backups/
 backup_*/
-__pycache__/
-*.pyc
-*.pyo
-*.log
-*.pid
-*.sock
-*.tmp
+**/backup_*/
+backup-*/
+**/backup-*/
+backup_*
+backup-*
 *.bak
+*.before_*
 *.broken_*
-.env
-.env.*
-*action_token*

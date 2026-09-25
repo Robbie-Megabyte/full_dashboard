@@ -18,10 +18,13 @@ Safety boundary:
 from __future__ import annotations
 
 import argparse
+import http.client
+import select
 import json
 import math
 import mimetypes
 import os
+import signal
 import socket
 import threading
 import time
@@ -41,6 +44,16 @@ BRIDGE_VERSION = "g1_dashboard_bridge.v1.11.0-camera-multiview"
 SYSTEM_SCHEMA = "g1_dashboard.system.v1"
 ROBOT_SCHEMA = "g1_dashboard.robot_telemetry.v1"
 STATIC_DIR = Path(__file__).resolve().parent / "static"
+
+SLAM_RUNTIME_HOST = os.environ.get("G1_SLAM_RUNTIME_HOST", "127.0.0.1")
+SLAM_RUNTIME_PORT = int(os.environ.get("G1_SLAM_RUNTIME_PORT", "3003"))
+SLAM_RUNTIME_TOKEN_FILE = Path(
+    os.environ.get(
+        "G1_SLAM_RUNTIME_TOKEN_FILE",
+        str(Path(__file__).resolve().parent / "run" / "slam_runtime_token"),
+    )
+)
+SLAM_RUNTIME_PROXY_PREFIX = "/slam-runtime"
 
 SLAM_STATE_DIR = Path(
     os.environ.get(
@@ -1595,6 +1608,172 @@ class DashboardHandler(BaseHTTPRequestHandler):
         body = json.dumps(payload, separators=(",", ":"), allow_nan=False).encode("utf-8")
         self._send_bytes(status, body, "application/json; charset=utf-8", cache=False)
 
+    def _proxy_slam_runtime_events(self) -> None:
+        """Tunnel the runtime's display-only /ws event stream to the browser.
+
+        The runtime token is added here, as for the HTTP proxy; after the 101
+        handshake the connection is relayed byte for byte until either side
+        closes.
+        """
+        if self.headers.get("Upgrade", "").lower() != "websocket":
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "WebSocket upgrade required"})
+            return
+        if not self._trusted_request_origin_ok():
+            self._send_json(HTTPStatus.FORBIDDEN, {"error": "same-origin private-network browser required"})
+            return
+        key = self.headers.get("Sec-WebSocket-Key", "")
+        if not key:
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "missing Sec-WebSocket-Key"})
+            return
+        try:
+            token = SLAM_RUNTIME_TOKEN_FILE.read_text(encoding="utf-8").strip()
+            upstream = socket.create_connection((SLAM_RUNTIME_HOST, SLAM_RUNTIME_PORT), timeout=5)
+        except OSError as exc:
+            self._send_json(HTTPStatus.SERVICE_UNAVAILABLE, {"error": f"SLAM runtime unavailable: {exc}"})
+            return
+        from urllib.parse import quote
+
+        request = [
+            f"GET /ws?token={quote(token)} HTTP/1.1",
+            f"Host: {SLAM_RUNTIME_HOST}:{SLAM_RUNTIME_PORT}",
+            "Upgrade: websocket",
+            "Connection: Upgrade",
+            f"Sec-WebSocket-Key: {key}",
+            f"Sec-WebSocket-Version: {self.headers.get('Sec-WebSocket-Version', '13')}",
+        ]
+        extensions = self.headers.get("Sec-WebSocket-Extensions")
+        if extensions:
+            request.append(f"Sec-WebSocket-Extensions: {extensions}")
+        self.close_connection = True
+        client = self.connection
+        try:
+            upstream.sendall(("\r\n".join(request) + "\r\n\r\n").encode("latin-1"))
+            response = b""
+            while b"\r\n\r\n" not in response:
+                chunk = upstream.recv(4096)
+                if not chunk or len(response) > 16384:
+                    raise OSError("runtime closed the WebSocket handshake")
+                response += chunk
+            client.sendall(response)
+            if not response.startswith(b"HTTP/1.1 101"):
+                return
+            upstream.settimeout(None)
+            client.settimeout(None)
+            peers = {client: upstream, upstream: client}
+            while True:
+                readable, _, broken = select.select(list(peers), [], list(peers), 1.0)
+                if broken:
+                    return
+                for source in readable:
+                    data = source.recv(65536)
+                    if not data:
+                        return
+                    peers[source].sendall(data)
+        except OSError:
+            return
+        finally:
+            upstream.close()
+
+    def _proxy_slam_runtime(self, parsed) -> None:
+        """Forward one HTTP request to the runtime copy over loopback."""
+        upstream_path = parsed.path[len(SLAM_RUNTIME_PROXY_PREFIX):] or "/"
+        if not upstream_path.startswith("/"):
+            self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid SLAM runtime path"})
+            return
+        if parsed.query:
+            upstream_path += "?" + parsed.query
+
+        if self.command not in {"GET", "HEAD"} and not self._trusted_session_authorized():
+            self._send_json(
+                HTTPStatus.UNAUTHORIZED,
+                {"error": "trusted dashboard session is required for SLAM actions"},
+            )
+            return
+
+        try:
+            token = SLAM_RUNTIME_TOKEN_FILE.read_text(encoding="utf-8").strip()
+        except OSError as exc:
+            self._send_json(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                {"error": f"SLAM runtime token is unavailable: {exc}"},
+            )
+            return
+        if len(token) < 16:
+            self._send_json(
+                HTTPStatus.SERVICE_UNAVAILABLE,
+                {"error": "SLAM runtime token is invalid"},
+            )
+            return
+
+        body = None
+        if self.command not in {"GET", "HEAD"}:
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+            except ValueError:
+                self._send_json(HTTPStatus.BAD_REQUEST, {"error": "invalid Content-Length"})
+                return
+            if length < 0 or length > 4_000_000:
+                self._send_json(HTTPStatus.REQUEST_ENTITY_TOO_LARGE, {"error": "SLAM request body is too large"})
+                return
+            body = self.rfile.read(length) if length else b""
+
+        headers = {
+            "Accept": self.headers.get("Accept", "application/json"),
+            "X-Dashboard-Token": token,
+            "Connection": "close",
+        }
+        content_type = self.headers.get("Content-Type")
+        if content_type:
+            headers["Content-Type"] = content_type
+        if body is not None:
+            headers["Content-Length"] = str(len(body))
+
+        connection = http.client.HTTPConnection(
+            SLAM_RUNTIME_HOST,
+            SLAM_RUNTIME_PORT,
+            timeout=30,
+        )
+        response_started = False
+        try:
+            connection.request(self.command, upstream_path, body=body, headers=headers)
+            response = connection.getresponse()
+            self.send_response(response.status, response.reason)
+            response_started = True
+            blocked = {
+                "connection", "keep-alive", "proxy-authenticate",
+                "proxy-authorization", "te", "trailers", "transfer-encoding",
+                "upgrade", "set-cookie",
+            }
+            received_headers = {name.lower(): value for name, value in response.getheaders()}
+            for name, value in response.getheaders():
+                if name.lower() not in blocked:
+                    self.send_header(name, value)
+            if "content-length" not in received_headers:
+                payload = response.read()
+                self.send_header("Content-Length", str(len(payload)))
+                self.end_headers()
+                if self.command != "HEAD":
+                    self.wfile.write(payload)
+                return
+            self.end_headers()
+            if self.command != "HEAD":
+                while True:
+                    chunk = response.read(64 * 1024)
+                    if not chunk:
+                        break
+                    self.wfile.write(chunk)
+        except (OSError, http.client.HTTPException) as exc:
+            if not response_started and not self.wfile.closed:
+                try:
+                    self._send_json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": f"SLAM runtime is unavailable: {exc}"},
+                    )
+                except (BrokenPipeError, ConnectionResetError, OSError):
+                    pass
+        finally:
+            connection.close()
+
     def _read_json_body(self, *, max_bytes: int = 65536) -> Any:
         content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
         if content_type != "application/json":
@@ -1894,6 +2073,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
         state: BridgeState = self.server.state  # type: ignore[attr-defined]
         system_state: SystemState = self.server.system_state  # type: ignore[attr-defined]
 
+        if path == SLAM_RUNTIME_PROXY_PREFIX + "/ws":
+            self._proxy_slam_runtime_events()
+            return
+
+        if path == SLAM_RUNTIME_PROXY_PREFIX or path.startswith(SLAM_RUNTIME_PROXY_PREFIX + "/"):
+            self._proxy_slam_runtime(parsed)
+            return
+
         if path == "/":
             self._serve_file(STATIC_DIR / "index.html")
             return
@@ -1920,6 +2107,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
             return
         # FULL_DASH_BROWSER_STREAM_ROUTE_V21_2B
         if path == "/api/session/stream":
+
+            if getattr(
+                self.server,
+                "dashboard_shutdown_requested",
+                False,
+            ):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    {"error": "Full Dashboard is shutting down"},
+                )
+                return
+
 
             query = urlparse(
                 self.path
@@ -2230,6 +2429,7 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     "slam_live_cloud_endpoint": "/api/slam/cloud",
                     "slam_status_endpoint": "/api/slam/status",
                     "slam_map": str(SLAM_MAP_PATH),
+                    "slam_runtime_proxy_endpoint": SLAM_RUNTIME_PROXY_PREFIX,
                     "unitree_service_actions": bool(self.server.service_actions_enabled),  # type: ignore[attr-defined]
                     "unitree_service_actions_authenticated": True,
                     "unitree_service_actions_allowlisted": True,
@@ -2252,6 +2452,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
         parsed = urlparse(self.path)
         path = parsed.path
         manager: ControllerProcessManager = self.server.process_manager  # type: ignore[attr-defined]
+
+        if path == SLAM_RUNTIME_PROXY_PREFIX or path.startswith(SLAM_RUNTIME_PROXY_PREFIX + "/"):
+            self._proxy_slam_runtime(parsed)
+            return
 
         # FULL DASH CAMERA PASSIVE ROUTES V2
         #
@@ -2383,6 +2587,70 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
 
         # ------------------------------------------------
+        # FULL_DASH_EXPLICIT_SHUTDOWN_V1
+        if path == "/api/session/shutdown":
+
+            if not self._trusted_request_origin_ok():
+                self._send_json(
+                    HTTPStatus.FORBIDDEN,
+                    {
+                        "error":
+                        "dashboard shutdown requires a same-origin private-network browser"
+                    },
+                )
+                return
+
+            shutdown = getattr(
+                self.server,
+                "explicit_dashboard_shutdown",
+                None,
+            )
+
+            if not callable(shutdown):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    {"error": "dashboard shutdown handler unavailable"},
+                )
+                return
+
+            result = shutdown()
+
+            if not result.get("ok"):
+                self._send_json(
+                    HTTPStatus.CONFLICT,
+                    result,
+                )
+                return
+
+            self._send_json(
+                HTTPStatus.OK,
+                result,
+            )
+
+            shutdown_server = self.server
+
+            def _exit_after_reply():
+                time.sleep(0.35)
+
+                try:
+                    # FULL_DASH_GRACEFUL_SERVER_EXIT_V2
+                    #
+                    # Called from a different thread, so serve_forever()
+                    # returns normally and the bridge's final cleanup closes
+                    # HTTP/UDP sockets before the Python process exits.
+                    shutdown_server.shutdown()
+                except Exception:
+                    # Last-resort deterministic bridge termination.
+                    os._exit(0)
+
+            threading.Thread(
+                target=_exit_after_reply,
+                daemon=True,
+                name="full-dash-explicit-exit",
+            ).start()
+            return
+
+
         # FULL_DASH_BROWSER_LEASE_V20_7
         #
         # Browser/session lifecycle only.
@@ -2391,6 +2659,18 @@ class DashboardHandler(BaseHTTPRequestHandler):
         # FULL_DASH_LEGACY_LEASE_INERT_V21_3
         # Compatibility only: no process ownership side effects.
         if path == "/api/session/lease":
+
+            if getattr(
+                self.server,
+                "dashboard_shutdown_requested",
+                False,
+            ):
+                self._send_json(
+                    HTTPStatus.SERVICE_UNAVAILABLE,
+                    {"error": "Full Dashboard is shutting down"},
+                )
+                return
+
 
             if not self._trusted_request_origin_ok():
                 self._send_json(
@@ -2880,6 +3160,14 @@ class DashboardHandler(BaseHTTPRequestHandler):
         except Exception as exc:
             self._send_json(HTTPStatus.INTERNAL_SERVER_ERROR, {"error": f"dashboard action failed: {exc}"})
 
+    def do_DELETE(self) -> None:
+        parsed = urlparse(self.path)
+        path = parsed.path
+        if path == SLAM_RUNTIME_PROXY_PREFIX or path.startswith(SLAM_RUNTIME_PROXY_PREFIX + "/"):
+            self._proxy_slam_runtime(parsed)
+            return
+        self._send_json(HTTPStatus.METHOD_NOT_ALLOWED, {"error": "unsupported DELETE"})
+
 
 def parse_args() -> argparse.Namespace:
     p = argparse.ArgumentParser(description="Dependency-free read-only G1 dashboard telemetry bridge")
@@ -3207,6 +3495,331 @@ def main() -> int:
     server.start_unity_compat = _start_unity_compat  # type: ignore[attr-defined]
     server.stop_unity_compat = _stop_unity_compat  # type: ignore[attr-defined]
 
+    # FULL_DASH_EXPLICIT_SHUTDOWN_OWNER_V1
+    server.dashboard_shutdown_requested = False  # type: ignore[attr-defined]
+    server.dashboard_shutdown_lock = threading.Lock()  # type: ignore[attr-defined]
+
+    def _stop_recorded_dashboard_process(
+        name: str,
+        expected_fragment: str,
+        timeout_s: float = 6.0,
+    ) -> dict[str, Any]:
+
+        pid_path = (
+            Path(__file__).resolve().parent
+            / "run"
+            / f"{name}.pid"
+        )
+
+        try:
+            pid = int(pid_path.read_text().strip())
+        except Exception:
+            return {"state": "not-running", "pid": None}
+
+        proc = Path(f"/proc/{pid}")
+        cmd_path = proc / "cmdline"
+
+        if not proc.exists():
+            pid_path.unlink(missing_ok=True)
+            return {"state": "not-running", "pid": pid}
+
+        try:
+            cmd = cmd_path.read_bytes().replace(
+                b"\0",
+                b" ",
+            ).decode(errors="replace")
+        except Exception as exc:
+            return {
+                "state": f"error:{exc}",
+                "pid": pid,
+            }
+
+        if expected_fragment not in cmd:
+            pid_path.unlink(missing_ok=True)
+            return {
+                "state": "not-owned",
+                "pid": pid,
+            }
+
+        try:
+            os.kill(pid, signal.SIGTERM)
+        except ProcessLookupError:
+            pid_path.unlink(missing_ok=True)
+            return {"state": "stopped", "pid": pid}
+
+        deadline = time.monotonic() + timeout_s
+
+        while time.monotonic() < deadline:
+            if not Path(f"/proc/{pid}").exists():
+                pid_path.unlink(missing_ok=True)
+                return {"state": "stopped", "pid": pid}
+            time.sleep(0.10)
+
+        return {"state": f"timeout:{pid}", "pid": pid}
+
+
+    # Environment variables set only for processes started by the Full
+    # Dashboard launchers (bridge children, SLAM runtime, its Nav2 nodes,
+    # teleop keyboard and the ros2 daemon spawned by its startup checks).
+    DASHBOARD_ENV_MARKERS = (
+        b"G1_SLAM_RUNTIME_ROOT=",
+        b"G1_DASHBOARD_SERVICE_SOCKET=",
+    )
+
+    def _sweep_dashboard_leftovers(timeout_s: float = 3.0) -> list[dict[str, Any]]:
+        """Stop every remaining process owned by this dashboard instance."""
+        own_pid = os.getpid()
+        uid = os.getuid()
+        found: list[dict[str, Any]] = []
+        for entry in Path("/proc").iterdir():
+            if not entry.name.isdigit() or int(entry.name) == own_pid:
+                continue
+            try:
+                if entry.stat().st_uid != uid:
+                    continue
+                environ = (entry / "environ").read_bytes()
+                if not any(marker in environ for marker in DASHBOARD_ENV_MARKERS):
+                    continue
+                cmd = (entry / "cmdline").read_bytes().replace(b"\0", b" ")
+            except OSError:
+                continue
+            pid = int(entry.name)
+            found.append({"pid": pid, "cmd": cmd.decode(errors="replace").strip()[:160]})
+            try:
+                os.kill(pid, signal.SIGTERM)
+            except ProcessLookupError:
+                pass
+        deadline = time.monotonic() + timeout_s
+        while time.monotonic() < deadline and any(
+            Path(f"/proc/{item['pid']}").exists() for item in found
+        ):
+            time.sleep(0.10)
+        for item in found:
+            if Path(f"/proc/{item['pid']}").exists():
+                try:
+                    os.kill(item["pid"], signal.SIGKILL)
+                    item["killed"] = True
+                except ProcessLookupError:
+                    pass
+        return found
+
+    def _explicit_dashboard_shutdown() -> dict[str, Any]:
+
+        with server.dashboard_shutdown_lock:  # type: ignore[attr-defined]
+
+            if server.dashboard_shutdown_requested:  # type: ignore[attr-defined]
+                return {
+                    "ok": False,
+                    "error": "Full Dashboard shutdown already in progress",
+                }
+
+            server.dashboard_shutdown_requested = True  # type: ignore[attr-defined]
+
+        result: dict[str, Any] = {
+            "ok": False,
+            "managed": None,
+            "unity": None,
+            "slam": None,
+            "monitor": None,
+        }
+
+        try:
+            managed = process_manager.shutdown_dashboard_managed(
+                timeout_s=15.0
+            )
+            result["managed"] = managed
+
+            if any(
+                str(value).startswith(("timeout:", "error:"))
+                for value in managed.values()
+            ):
+                result["error"] = (
+                    "managed dashboard resource did not stop cleanly"
+                )
+                return result
+
+            try:
+                result["unity"] = _stop_unity_compat()
+            except Exception as exc:
+                result["unity"] = f"error:{exc}"
+                result["error"] = (
+                    "Unity compatibility listener did not stop cleanly"
+                )
+                return result
+
+            target = Path(__file__).resolve().parent
+
+            result["slam"] = _stop_recorded_dashboard_process(
+                "slam_runtime",
+                str(target / "start_slam_runtime_proxy_target.sh"),
+            )
+
+            # Backward-compatible cleanup for a recorded observer from the
+            # pre-integration dashboard. The cmdline check prevents broad kills.
+            result["slam_observer"] = _stop_recorded_dashboard_process(
+                "slam",
+                str(target / "g1_dashboard_slam_worker.py"),
+            )
+
+            result["monitor"] = _stop_recorded_dashboard_process(
+                "monitor",
+                str(target / "g1_dashboard_system_monitor.py"),
+            )
+
+            result["robot_sender"] = _stop_recorded_dashboard_process(
+                "robot_sender",
+                "g1_quest_fullbody_sender.py",
+            )
+
+            for key in ("slam", "slam_observer", "monitor", "robot_sender"):
+                state = str(
+                    (result.get(key) or {}).get("state", "")
+                )
+                if state.startswith(("timeout:", "error:")):
+                    result["error"] = (
+                        f"{key} did not stop cleanly"
+                    )
+                    return result
+
+            # FULL_DASH_SERVICE_SHUTDOWN_V2
+            #
+            # Return lidar_driver / unitree_slam to the state recorded by
+            # start_readonly_dashboard.sh before the first Full Dash start, so
+            # closing the dashboard leaves the robot as other tools expect it.
+            # Without a record the services are left unchanged.
+            result["services"] = {}
+            services_record = target / "run" / "services_before_start.json"
+            try:
+                services_before = json.loads(
+                    services_record.read_text(encoding="utf-8")
+                )
+            except Exception:
+                services_before = {}
+            client = server.service_action_client  # type: ignore[attr-defined]
+            # unitree_slam depends on lidar_driver: stop it first, start it last.
+            order = sorted(
+                ("unitree_slam", "lidar_driver"),
+                key=lambda name: services_before.get(name) is True,
+            )
+            for service in order:
+                desired = services_before.get(service)
+                if not isinstance(desired, bool):
+                    continue
+                try:
+                    response = client.request(
+                        "SET_SERVICE",
+                        service=service,
+                        enabled=desired,
+                    )
+                except Exception as exc:
+                    response = {
+                        "status": "ERROR",
+                        "error": str(exc),
+                    }
+                result["services"][service] = response
+                completed = (
+                    isinstance(response, dict)
+                    and response.get("status") == "COMPLETED"
+                    and response.get("verified") is True
+                )
+                if not completed:
+                    # ServiceSwitch may return before ServiceList reflects the
+                    # transition; record it without leaving the dashboard
+                    # half-shut-down.
+                    state = "ON" if desired else "OFF"
+                    result.setdefault("warnings", []).append(
+                        f"{service}={state} was requested but not verified: "
+                        f"{response.get('reason') or response.get('error') or response}"
+                    )
+            services_record.unlink(missing_ok=True)
+
+            result["service_worker"] = (
+                _stop_recorded_dashboard_process(
+                    "service",
+                    str(
+                        target
+                        / "g1_dashboard_service_worker.py"
+                    ),
+                )
+            )
+
+            service_worker_state = str(
+                (
+                    result.get("service_worker")
+                    or {}
+                ).get("state", "")
+            )
+
+            if service_worker_state.startswith(
+                ("timeout:", "error:")
+            ):
+                result["error"] = (
+                    "service worker did not stop cleanly"
+                )
+                return result
+
+            service_socket = os.environ.get(
+                "G1_DASHBOARD_SERVICE_SOCKET",
+                "",
+            )
+
+            if service_socket:
+                try:
+                    Path(service_socket).unlink(
+                        missing_ok=True
+                    )
+                except Exception:
+                    pass
+
+            state_dir = Path(
+                f"/tmp/g1_dashboard_slam_{os.getuid()}"
+            )
+
+            for name in (
+                "status.json",
+                "live_cloud_f32.bin",
+                "initialize_request.json",
+            ):
+                try:
+                    (state_dir / name).unlink(
+                        missing_ok=True
+                    )
+                except Exception:
+                    pass
+
+            run_dir = target / "run"
+
+            for name in (
+                "bridge.pid",
+                "robot_sender.pid",
+            ):
+                try:
+                    (run_dir / name).unlink(
+                        missing_ok=True
+                    )
+                except Exception:
+                    pass
+
+            result["leftovers"] = _sweep_dashboard_leftovers()
+            with server.dashboard_stream_lock:  # type: ignore[attr-defined]
+                server.dashboard_streams.clear()  # type: ignore[attr-defined]
+
+            with server.dashboard_lease_lock:  # type: ignore[attr-defined]
+                server.dashboard_leases.clear()  # type: ignore[attr-defined]
+
+            result["ok"] = True
+            result["state"] = "FULL_DASHBOARD_STOPPED"
+            return result
+
+        finally:
+            if not result.get("ok"):
+                server.dashboard_shutdown_requested = False  # type: ignore[attr-defined]
+
+
+    server.explicit_dashboard_shutdown = (  # type: ignore[attr-defined]
+        _explicit_dashboard_shutdown
+    )
+
 
     def _dashboard_lease_watchdog() -> None:
 
@@ -3219,6 +3832,13 @@ def main() -> int:
         CLOSE_GRACE_S = 4.0
 
         while True:
+
+            if getattr(
+                server,
+                "dashboard_shutdown_requested",
+                False,
+            ):
+                return
 
             time.sleep(
                 0.5

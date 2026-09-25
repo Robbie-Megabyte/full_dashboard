@@ -32,7 +32,7 @@ CONTROLLER_BASENAME = (
 )
 MANAGER_SCHEMA = "g1_dashboard.controller_process.v1"
 MANAGER_VERSION = "g1_dashboard_process_manager.v1.9.2-tracking-reentry-defaults"
-CONTROLLER_SHA256 = "86af5c1be94e2b96d294b376f7070a5c152c889dd1e50f6f556b99fc495ab2e8"
+CONTROLLER_SHA256 = "df53901e7c581d7c9734b27d226e377e318da0549cfc604819d403f5374dafc8"
 
 ACTION_REQUEST_SCHEMA = "g1_dashboard.action_request.v1"
 ACTION_RESPONSE_SCHEMA = "g1_dashboard.action_response.v1"

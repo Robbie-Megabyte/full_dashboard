@@ -1,0 +1,1447 @@
+/* Requested V18 adjustments only. The V17 theme remains authoritative. */
+
+/* Live tab outer geometry: 8px around and between all three major sections. */
+.app-shell {
+  padding: 0 !important;
+  gap: 8px !important;
+}
+
+.app-shell > .control-panel,
+.app-shell > .workspace {
+  margin: 0 !important;
+}
+
+.app-shell > .control-panel.car-side {
+  margin-right: 0 !important;
+}
+
+/* Center content begins after the same 30px handle lane used by Live. */
+.app-shell > .workspace {
+  padding-top: 30px !important;
+}
+
+/* The old decorative grips are replaced by the single functional grip below. */
+.app-shell > .control-panel::after,
+.app-shell > .workspace::after {
+  display: none !important;
+}
+
+/* The first center bar uses the rendered left-sidebar surface color. */
+.workspace > .topbar {
+  background: var(--fd18-left-sidebar-bg, #171918) !important;
+}
+
+/* Car map / Car scan: exact Live Command ghost / Joint markers typography. */
+#fd17-top-left {
+  gap: 14px !important;
+}
+
+#fd17-top-left .fd17-layer-toggle {
+  height: 16px !important;
+  min-height: 16px !important;
+  gap: 5px !important;
+  color: #a1a1aa !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+}
+
+#fd17-top-left .fd17-layer-toggle input[type="checkbox"] {
+  appearance: auto !important;
+  flex: 0 0 14px !important;
+  width: 14px !important;
+  min-width: 14px !important;
+  height: 14px !important;
+  min-height: 14px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  accent-color: #98d982 !important;
+}
+
+/* Native selects remain the functional authorities behind Live-style menus. */
+select.fd18-native-select {
+  position: absolute !important;
+  width: 1px !important;
+  min-width: 1px !important;
+  height: 1px !important;
+  min-height: 1px !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  clip: rect(0 0 0 0) !important;
+  overflow: hidden !important;
+}
+
+.fd18-dropdown {
+  position: relative !important;
+  display: block !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 32px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.fd18-dropdown.fd18-dropdown-top {
+  display: inline-flex !important;
+  flex: 0 0 auto !important;
+  width: 128px !important;
+  min-width: 128px !important;
+}
+
+.fd18-dropdown-trigger {
+  box-sizing: border-box !important;
+  position: relative !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  height: 32px !important;
+  min-height: 32px !important;
+  margin: 0 !important;
+  padding: 0 34px 0 11px !important;
+  border: 1px solid rgba(142,203,127,.38) !important;
+  border-radius: 6px !important;
+  background: rgba(142,203,127,.055) !important;
+  color: #8ecb7f !important;
+  box-shadow: none !important;
+  outline: none !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  transition: background 120ms ease, border-color 120ms ease, box-shadow 120ms ease !important;
+}
+
+.fd18-dropdown-trigger:hover,
+.fd18-dropdown.open .fd18-dropdown-trigger {
+  background: #1e211e !important;
+  border-color: #4c7448 !important;
+  box-shadow: 0 0 0 2px rgba(142,203,127,.08) !important;
+}
+
+.fd18-dropdown-label {
+  display: block !important;
+  min-width: 0 !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  white-space: nowrap !important;
+  color: inherit !important;
+  font: inherit !important;
+}
+
+.fd18-dropdown-chevron {
+  position: absolute !important;
+  right: 11px !important;
+  top: 50% !important;
+  width: 7px !important;
+  height: 7px !important;
+  border-right: 1.5px solid #8ecb7f !important;
+  border-bottom: 1.5px solid #8ecb7f !important;
+  transform: translateY(-68%) rotate(45deg) !important;
+  transform-origin: 50% 50% !important;
+  transition: transform 140ms ease !important;
+  pointer-events: none !important;
+}
+
+.fd18-dropdown.open .fd18-dropdown-chevron {
+  transform: translateY(-30%) rotate(225deg) !important;
+}
+
+body > .fd18-dropdown-menu {
+  position: fixed !important;
+  z-index: 100000 !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 2px !important;
+  box-sizing: border-box !important;
+  margin: 0 !important;
+  padding: 4px !important;
+  border: 1px solid rgba(142,203,127,.38) !important;
+  border-radius: 8px !important;
+  background: #1c1c1c !important;
+  box-shadow: 0 14px 32px rgba(0,0,0,.42), inset 0 0 0 1px rgba(255,255,255,.018) !important;
+}
+
+body > .fd18-dropdown-menu[hidden] {
+  display: none !important;
+}
+
+.fd18-dropdown-option {
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  width: 100% !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  padding: 7px 11px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 9px !important;
+  border: 0 !important;
+  border-radius: 6px !important;
+  background: transparent !important;
+  color: #d4d4d8 !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 650 !important;
+  letter-spacing: 0 !important;
+  text-align: left !important;
+  cursor: pointer !important;
+  outline: none !important;
+  transition: background 100ms ease, color 100ms ease !important;
+}
+
+.fd18-dropdown-option:hover,
+.fd18-dropdown-option:focus-visible {
+  background: #242624 !important;
+  color: #e2e2e2 !important;
+}
+
+.fd18-dropdown-option.selected {
+  background: rgba(142,203,127,.055) !important;
+  color: #8ecb7f !important;
+}
+
+.select-row.fd18-composite-row {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) 30px !important;
+  gap: 7px !important;
+  align-items: center !important;
+  width: 100% !important;
+}
+
+/* Pose remains Live Pose/RX/Render type and sits directly under - / + / Fit view. */
+#fd17-slam-statusbar {
+  justify-content: flex-start !important;
+}
+
+#fd17-slam-statusbar .pose-bar {
+  margin: 0 !important;
+  gap: 12px !important;
+  justify-content: flex-start !important;
+}
+
+#fd17-slam-statusbar .pose-bar #fd165CenterCarLayers {
+  display: none !important;
+}
+
+#fd17-slam-statusbar .pose-bar span {
+  gap: 5px !important;
+  color: #a1a1aa !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+}
+
+#fd17-slam-statusbar .pose-bar b {
+  color: #d4d4d8 !important;
+  font-family: "Space Mono", monospace !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 500 !important;
+  font-variant-numeric: tabular-nums !important;
+}
+
+/* Right rail card order and full-width actions requested by the user. */
+#fd18-car-mapping-section #car-mapping,
+#car-panel #car-localization,
+#car-panel #car-preview,
+#fd18-car-manual-section #car-align,
+#fd18-car-manual-section #car-transform {
+  width: 100% !important;
+}
+
+#car-panel #car-preview {
+  height: 30px !important;
+  min-height: 30px !important;
+  background: rgba(142,203,127,.07) !important;
+  border: 1px solid rgba(142,203,127,.46) !important;
+  color: #8fce7f !important;
+}
+
+#car-panel #car-preview:hover:not(:disabled) {
+  background: rgba(142,203,127,.11) !important;
+  border-color: rgba(142,203,127,.7) !important;
+}
+
+#fd18-car-manual-section #car-tf-flip {
+  margin: 0 !important;
+}
+
+/* The requested compact right rail fits without a scrollbar. */
+.control-panel.car-side .panel-scroll {
+  overflow: hidden !important;
+  scrollbar-width: none !important;
+}
+
+.control-panel.car-side .panel-scroll::-webkit-scrollbar {
+  display: none !important;
+}
+
+/* Car progress/status line, same presentation as the route summary. */
+#car-status {
+  white-space: pre-line !important;
+}
+
+/* Preview-car visual language for the requested utility/action buttons. */
+:is(
+  #car-center,
+  #car-localization,
+  #car-mapping,
+  #follow-robot,
+  #fit-map
+) {
+  box-sizing: border-box !important;
+  height: 30px !important;
+  min-height: 30px !important;
+  margin: 0 !important;
+  border: 1px solid rgba(142,203,127,.46) !important;
+  border-radius: 5px !important;
+  background: rgba(142,203,127,.07) !important;
+  color: #8fce7f !important;
+  box-shadow: none !important;
+  font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+  font-size: 10.5px !important;
+  line-height: 1 !important;
+  font-weight: 600 !important;
+  transition: background 140ms ease, border-color 140ms ease, color 140ms ease,
+    box-shadow 140ms ease, transform 120ms ease !important;
+}
+
+:is(#zoom-out, #zoom-in).fd18-preview-action {
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+}
+
+/* V17 identifies these with an ID+class selector, so match that specificity. */
+:is(
+  #follow-robot.fd18-preview-action,
+  #zoom-out.fd18-preview-action,
+  #zoom-in.fd18-preview-action,
+  #fit-map.fd18-preview-action
+) {
+  border: 1px solid rgba(142,203,127,.46) !important;
+  background: rgba(142,203,127,.07) !important;
+}
+
+:is(
+  #car-center,
+  #car-localization,
+  #car-mapping,
+  #follow-robot,
+  #fit-map
+):hover:not(:disabled) {
+  background: rgba(142,203,127,.11) !important;
+  border-color: rgba(142,203,127,.7) !important;
+  color: #8fce7f !important;
+}
+
+:is(
+  #car-center,
+  #car-localization,
+  #car-mapping,
+  #follow-robot,
+  #fit-map
+):active:not(:disabled) {
+  transform: translateY(1px) !important;
+}
+
+/* Confirm/Stop retain their original IDs inside Mapping's exact Start/Stop shell. */
+#fd18-car-nav-switch {
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+#fd18-car-nav-switch > #car-go,
+#fd18-car-nav-switch > #car-stop {
+  box-sizing: border-box !important;
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+  max-width: none !important;
+  height: 24px !important;
+  min-height: 24px !important;
+  margin: 0 !important;
+  padding: 0 8px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  border: 0 !important;
+  border-radius: 3px !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+  font-size: 12px !important;
+  line-height: 16px !important;
+  font-weight: 650 !important;
+}
+
+#fd18-car-nav-switch > #car-go {
+  color: #8ecb7f !important;
+}
+
+#fd18-car-nav-switch > #car-stop {
+  color: #f2aa21 !important;
+}
+
+#fd18-car-nav-switch > button:disabled {
+  opacity: .34 !important;
+}
+
+/* One Live-identical functional drag owner. */
+.app-shell > .fd18-major-surface {
+  position: relative !important;
+  box-sizing: border-box !important;
+  min-width: 0 !important;
+  min-height: 0 !important;
+  transform-origin: center !important;
+}
+
+.fd18-major-handle {
+  position: absolute !important;
+  z-index: 100 !important;
+  left: 50% !important;
+  top: 4px !important;
+  transform: translateX(-50%) !important;
+  width: 96px !important;
+  height: 22px !important;
+  min-height: 22px !important;
+  max-height: 22px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  display: grid !important;
+  place-items: center !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  cursor: grab !important;
+  touch-action: none !important;
+  user-select: none !important;
+}
+
+.fd18-major-handle:active,
+.fd18-major-handle.fd18-major-handle-active {
+  cursor: grabbing !important;
+}
+
+.app-shell > .fd18-major-surface > .fd18-major-handle:active,
+.app-shell > .fd18-major-surface > .fd18-major-handle.fd18-major-handle-active {
+  transform: translateX(-50%) !important;
+}
+
+.fd18-major-grip {
+  display: block !important;
+  width: 72px !important;
+  height: 4px !important;
+  border-radius: 999px !important;
+  background: linear-gradient(
+    90deg,
+    rgba(121,127,121,.34) 0%,
+    rgba(121,127,121,.34) 32%,
+    #8ecb7f 32%,
+    #8ecb7f 68%,
+    rgba(121,127,121,.34) 68%,
+    rgba(121,127,121,.34) 100%
+  ) !important;
+  transition:
+    box-shadow 160ms ease,
+    background 160ms ease,
+    transform 160ms ease !important;
+}
+
+.fd18-major-handle-active .fd18-major-grip {
+  box-shadow: 0 0 8px rgba(52,211,153,.24) !important;
+  transform: scaleX(1.08) !important;
+}
+
+.fd18-major-surface.fd18-major-following {
+  transform: translate3d(var(--fd18-major-drag-x,0px),0,0) !important;
+  z-index: 40000 !important;
+  box-shadow: 0 18px 44px rgba(0,0,0,.36) !important;
+  will-change: transform !important;
+  pointer-events: none !important;
+  transition: box-shadow 150ms ease !important;
+}
+
+.fd18-major-following .fd18-major-handle-active {
+  pointer-events: auto !important;
+  cursor: grabbing !important;
+}
+
+body.fd18-major-dragging .app-shell,
+body.fd18-major-dragging .fd18-major-surface {
+  overflow: visible !important;
+}
+
+body.fd18-major-dragging .fd18-major-surface:not(.fd18-major-following) {
+  will-change: transform !important;
+}
+
+/* Live V1.9.24 reorder state, using the same class mechanics and timing. */
+.app-shell > .stitch-major-v1924.stitch-major-following-v1924 {
+  transform: translate3d(var(--fd18-major-drag-x, 0px), 0, 0) !important;
+  z-index: 40000 !important;
+  box-shadow: 0 18px 44px rgba(0,0,0,.36) !important;
+  will-change: transform !important;
+  pointer-events: none !important;
+  transition: box-shadow 150ms ease !important;
+}
+
+.stitch-major-handle-v1924.stitch-major-handle-active-v1924 {
+  cursor: grabbing !important;
+}
+
+.stitch-major-handle-active-v1924 > .stitch-major-grip-v1924 {
+  box-shadow: 0 0 8px rgba(52,211,153,.24) !important;
+  transform: scaleX(1.08) !important;
+}
+
+body.stitch-major-dragging-v1924 .app-shell,
+body.stitch-major-dragging-v1924 .stitch-major-v1924 {
+  overflow: visible !important;
+}
+
+body.stitch-major-dragging-v1924 .stitch-major-v1924:not(.stitch-major-following-v1924) {
+  will-change: transform !important;
+}
+
+/* Live V1.9.31 boundary resize interaction. */
+.app-shell > .stitch-major-v1924 > .stitch-resize-edge-v1931 {
+  position: absolute !important;
+  top: 30px !important;
+  bottom: 4px !important;
+  width: 12px !important;
+  z-index: 180 !important;
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  outline: 0 !important;
+  background: transparent !important;
+  touch-action: none !important;
+  user-select: none !important;
+  cursor: col-resize !important;
+}
+
+.stitch-resize-edge-v1931[data-side="left"] { left: -6px !important; }
+.stitch-resize-edge-v1931[data-side="right"] { right: -6px !important; }
+
+.stitch-resize-edge-v1931::after {
+  content: "" !important;
+  position: absolute !important;
+  left: 5px !important;
+  top: 50% !important;
+  width: 2px !important;
+  height: 58px !important;
+  border-radius: 999px !important;
+  transform: translateY(-50%) scaleY(.76) !important;
+  background: rgba(142,203,127,0) !important;
+  box-shadow: none !important;
+  transition: background 120ms ease, box-shadow 120ms ease, transform 120ms ease !important;
+  pointer-events: none !important;
+}
+
+.stitch-resize-edge-v1931:hover::after {
+  background: rgba(142,203,127,.32) !important;
+  box-shadow: 0 0 8px rgba(52,211,153,.12) !important;
+  transform: translateY(-50%) scaleY(1) !important;
+}
+
+.stitch-resize-edge-v1931.stitch-resize-active-v1931::after {
+  background: rgba(142,203,127,.62) !important;
+  box-shadow: 0 0 10px rgba(52,211,153,.22) !important;
+  transform: translateY(-50%) scaleY(1.14) !important;
+}
+
+.app-shell > .stitch-major-v1924 >
+.stitch-resize-edge-v1931.stitch-resize-disabled-v1931 { display: none !important; }
+
+body.stitch-major-resizing-v1931,
+body.stitch-major-resizing-v1931 * {
+  cursor: col-resize !important;
+  user-select: none !important;
+}
+
+body.stitch-major-resizing-v1931 .app-shell > .stitch-major-v1924 {
+  transition: none !important;
+}
+
+/* Left rail: exact Live right-rail scroll mechanics and transient indicator. */
+.app-shell > .control-panel:not(.car-side) > .panel-scroll {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: contain !important;
+  scroll-behavior: smooth !important;
+  scrollbar-width: none !important;
+}
+
+.app-shell > .control-panel:not(.car-side) > .panel-scroll::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+}
+
+.fd18-live-scroll-indicator {
+  position: fixed !important;
+  z-index: 99999 !important;
+  width: 2px !important;
+  min-height: 20px !important;
+  border-radius: 999px !important;
+  pointer-events: none !important;
+  background: rgba(107,150,105,.42) !important;
+  box-shadow: 0 0 4px rgba(80,130,85,.10) !important;
+  opacity: 0 !important;
+  transition: opacity .16s ease !important;
+}
+
+.fd18-live-scroll-indicator.visible { opacity: .34 !important; }
+
+/* Mapping status uses the same row rhythm as controller / selector diagnostics. */
+.mapping-progress {
+  display: grid !important;
+  grid-template-columns: 1fr !important;
+  gap: 5px !important;
+  margin: 9px 0 0 !important;
+  padding: 0 !important;
+}
+
+.mapping-progress.fd-status-stack-v7 > div,
+.mapping-progress > div {
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) auto !important;
+  align-items: center !important;
+  gap: 12px !important;
+  min-height: 18px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.mapping-progress.fd-status-stack-v7 > div > span,
+.mapping-progress.fd-status-stack-v7 > div > b,
+.mapping-progress > div > span,
+.mapping-progress > div > b {
+  font-family: inherit !important;
+  font-size: 11px !important;
+  line-height: 1.3 !important;
+  font-weight: 400 !important;
+  letter-spacing: 0 !important;
+  text-transform: none !important;
+}
+
+.mapping-progress.fd-status-stack-v7 > div > span,
+.mapping-progress > div > span { color: #879099 !important; }
+.mapping-progress.fd-status-stack-v7 > div > b,
+.mapping-progress > div > b { color: #c4cbd0 !important; }
+
+/* Keep the backend-owned state nodes, but remove their requested visible lines. */
+#robot-mode-state,
+#teleop-state,
+#map-readiness { display: none !important; }
+
+#fd18-teleop-switch {
+  grid-column: 1 / -1 !important;
+  width: 100% !important;
+  min-width: 0 !important;
+}
+
+/* ============================================================
+   FD20 — SLAM feature integration corrections
+   One owner for 2D/3D presentation, YOLO checkbox and semantics readout.
+   ============================================================ */
+
+/* Center mode selector remains in the existing top-toolbar language. */
+.workspace > .topbar .fd19-view-mode-group {
+    display: inline-flex !important;
+    align-items: stretch !important;
+    gap: 0 !important;
+    flex: 0 0 auto !important;
+    overflow: hidden !important;
+    border: 1px solid rgba(157, 171, 164, .24) !important;
+    border-radius: 6px !important;
+    background: transparent !important;
+}
+
+.workspace > .topbar .fd19-view-mode-group .tool-btn {
+    min-width: 36px !important;
+    height: 30px !important;
+    padding: 0 9px !important;
+    margin: 0 !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    color: #a1a1aa !important;
+    font-size: 9px !important;
+    font-weight: 600 !important;
+    box-shadow: none !important;
+}
+
+.workspace > .topbar .fd19-view-mode-group .tool-btn + .tool-btn {
+    border-left: 1px solid rgba(157, 171, 164, .18) !important;
+}
+
+.workspace > .topbar .fd19-view-mode-group .tool-btn:hover {
+    background: rgba(152, 217, 130, .06) !important;
+    color: #d4d4d8 !important;
+}
+
+.workspace > .topbar .fd19-view-mode-group .tool-btn.active {
+    background: rgba(152, 217, 130, .10) !important;
+    color: #98d982 !important;
+}
+
+/* 2D/3D panes must own real vertical space from the very first frame. */
+.fd19-viewer-wrap {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: stretch !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    width: 100% !important;
+}
+
+.fd19-viewer-wrap .viewer-pane {
+    position: relative !important;
+    flex: 1 1 50% !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    min-height: 0 !important;
+    overflow: hidden !important;
+    background: #171817 !important;
+}
+
+.fd19-viewer-wrap .viewer-pane-2d {
+    border-top: 1px solid rgba(157, 171, 164, .16) !important;
+}
+
+.fd19-viewer-wrap .viewer-pane.pane-hidden {
+    display: none !important;
+}
+
+.fd19-viewer-wrap .viewer-pane-2d.pane-hidden {
+    border-top: 0 !important;
+}
+
+.fd19-viewer-wrap #map,
+.fd19-viewer-wrap #map3d {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+}
+
+.fd19-viewer-wrap #map3d {
+    position: absolute !important;
+    inset: 0 !important;
+    background: #171817 !important;
+    touch-action: none !important;
+}
+
+/* Exact Live-like YOLO checkbox presentation, not a button. */
+.control-panel:not(.car-side) .perception-actions {
+    display: grid !important;
+    grid-template-columns: auto minmax(0, 1fr) !important;
+    gap: 8px !important;
+    align-items: center !important;
+}
+
+.control-panel:not(.car-side) .fd20-yolo-toggle {
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    color: #a1a1aa !important;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+    font-size: 9px !important;
+    line-height: 13px !important;
+    font-weight: 500 !important;
+    letter-spacing: 0 !important;
+    cursor: pointer !important;
+}
+
+.control-panel:not(.car-side) .fd20-yolo-toggle input {
+    appearance: auto !important;
+    flex: 0 0 13px !important;
+    width: 13px !important;
+    min-width: 13px !important;
+    height: 13px !important;
+    min-height: 13px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    accent-color: #98d982 !important;
+}
+
+.control-panel:not(.car-side) .fd20-yolo-toggle.is-disabled {
+    opacity: .45 !important;
+    cursor: default !important;
+}
+
+.control-panel:not(.car-side) #semantic-clear {
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.control-panel:not(.car-side) .fd19-camera-grid {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    gap: 6px !important;
+}
+
+.control-panel:not(.car-side) .fd19-camera-grid img {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    aspect-ratio: 4 / 3 !important;
+    object-fit: contain !important;
+    border: 1px solid rgba(157, 171, 164, .16) !important;
+    border-radius: 6px !important;
+    background: #070a0b !important;
+}
+
+/* Semantics counter: left edge of the second top row, exact X/Y/Yaw type. */
+#fd17-slam-statusbar .fd20-semantic-readout {
+    position: absolute !important;
+    left: 12px !important;
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    white-space: nowrap !important;
+}
+
+#fd17-slam-statusbar .fd20-semantic-readout span {
+    color: #a1a1aa !important;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 400 !important;
+    letter-spacing: 0 !important;
+}
+
+#fd17-slam-statusbar .fd20-semantic-readout b {
+    color: #d4d4d8 !important;
+    font-family: "Space Mono", monospace !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 500 !important;
+    font-variant-numeric: tabular-nums !important;
+}
+
+/* ============================================================
+   FD21 — offline viewer + Camera Multiview
+   ============================================================ */
+
+:root {
+    --fd21-offline-surface: #0e0f0f;
+    --fd21-live-camera-card-bg: #121413;
+    --fd21-live-camera-card-border: rgba(157, 171, 164, .20);
+    --fd21-live-camera-card-radius: 7px;
+    --fd21-live-camera-header-bg: #171918;
+    --fd21-live-camera-header-color: #d4d4d8;
+    --fd21-live-camera-header-font: "Plus Jakarta Sans", system-ui, sans-serif;
+    --fd21-live-camera-header-size: 9px;
+    --fd21-live-camera-header-weight: 700;
+    --fd21-live-camera-header-spacing: .05em;
+    --fd21-live-camera-body-bg: #0e0f0f;
+}
+
+/* One uninterrupted Live-camera-dark surface while disconnected. */
+html.fd21-backend-offline .fd19-viewer-wrap {
+    display: block !important;
+    position: relative !important;
+    background: var(--fd21-offline-surface) !important;
+}
+
+html.fd21-backend-offline .fd19-viewer-wrap .viewer-pane-3d {
+    display: none !important;
+}
+
+html.fd21-backend-offline .fd19-viewer-wrap .viewer-pane-2d {
+    display: block !important;
+    position: relative !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 100% !important;
+    border: 0 !important;
+    background: var(--fd21-offline-surface) !important;
+}
+
+html.fd21-backend-offline .fd19-viewer-wrap #map,
+html.fd21-backend-offline .fd19-viewer-wrap #map3d,
+html.fd21-backend-offline .fd19-viewer-wrap .empty-state,
+html.fd21-backend-offline .fd19-viewer-wrap .viewer-hint {
+    visibility: hidden !important;
+}
+
+html.fd21-backend-offline .fd19-viewer-wrap::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    background: var(--fd21-offline-surface);
+    pointer-events: none;
+}
+
+/* Preserve the old useful lower-corner aids above the flat disconnected surface. */
+html.fd21-backend-offline .fd19-viewer-wrap .axis,
+html.fd21-backend-offline .fd19-viewer-wrap .legend,
+html.fd21-backend-offline .fd19-viewer-wrap .render-count {
+    visibility: visible !important;
+    z-index: 4 !important;
+}
+
+/* Camera Multiview — RGB and depth vertically stacked, Live-card styling. */
+.control-panel:not(.car-side) .fd21-camera-multiview .card-body {
+    gap: 8px !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-stack {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 8px !important;
+    width: 100% !important;
+    min-width: 0 !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-card {
+    display: block !important;
+    width: 100% !important;
+    min-width: 0 !important;
+    overflow: hidden !important;
+    border: 1px solid var(--fd21-live-camera-card-border) !important;
+    border-radius: var(--fd21-live-camera-card-radius) !important;
+    background: var(--fd21-live-camera-card-bg) !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-card-header {
+    display: flex !important;
+    align-items: center !important;
+    gap: 6px !important;
+    min-height: 25px !important;
+    padding: 0 8px !important;
+    border-bottom: 1px solid var(--fd21-live-camera-card-border) !important;
+    background: var(--fd21-live-camera-header-bg) !important;
+    color: var(--fd21-live-camera-header-color) !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-card-header strong {
+    margin: 0 !important;
+    color: inherit !important;
+    font-family: var(--fd21-live-camera-header-font) !important;
+    font-size: var(--fd21-live-camera-header-size) !important;
+    font-weight: var(--fd21-live-camera-header-weight) !important;
+    letter-spacing: var(--fd21-live-camera-header-spacing) !important;
+    line-height: 1 !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-dot {
+    width: 6px !important;
+    height: 6px !important;
+    flex: 0 0 6px !important;
+    border-radius: 50% !important;
+    background: #4b5250 !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-card-body {
+    position: relative !important;
+    width: 100% !important;
+    aspect-ratio: 16 / 9 !important;
+    overflow: hidden !important;
+    background: var(--fd21-live-camera-body-bg) !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-card-body video {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    object-fit: contain !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+}
+
+/* Explicitly retire the old FD19 side-by-side camera owner. */
+.control-panel:not(.car-side) .fd19-camera-grid {
+    display: none !important;
+}
+
+/* ============================================================
+   FD23 — exact ownership corrections
+   ============================================================ */
+
+/* Requested gray actions intentionally fall back to .btn.btn-muted, the same
+   presentation owner used by Download latest. */
+#teleop-capture.btn.btn-muted {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    min-height: 30px !important;
+    padding: 0 10px !important;
+    border-style: solid !important;
+    cursor: pointer !important;
+}
+#teleop-capture.btn.btn-muted strong {
+    color: inherit !important;
+    font: inherit !important;
+}
+
+/* Exact Live idle animation ancestry. */
+.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body {
+    position: relative !important;
+    overflow: hidden !important;
+}
+.fd21-camera-stack.stitch-live-v12#view-live .fd23-live-idle {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 1 !important;
+    display: grid !important;
+    place-items: center !important;
+}
+.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body > video {
+    position: absolute !important;
+    inset: 0 !important;
+    z-index: 2 !important;
+}
+/* The idle reticle stays visible until slam_camera.js receives a stream. */
+.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body > video:not(.is-live) {
+    opacity: 0 !important;
+}
+.fd21-camera-card-header:has(.fd23-live-title-icon) .fd21-camera-dot {
+    display: none !important;
+}
+
+/* ============================================================
+   FD25 — exact Download-PCD parity + horizontal-only camera resize
+   ============================================================ */
+
+/*
+ * Base visual values for the requested buttons are mirrored at runtime from
+ * #download-map after every older CSS owner has finished.
+ * Keep the same generic hover/disabled mechanics as .btn.
+ */
+#view-map:not(:disabled):hover,
+#clear-view:not(:disabled):hover,
+#localize:not(:disabled):hover,
+#preview-route:not(:disabled):hover,
+#car-align:not(:disabled):hover,
+#car-initial-pose:not(:disabled):hover,
+#car-preview:not(:disabled):hover,
+#car-tf-flip:not(:disabled):hover,
+#car-standalone:not(:disabled):hover,
+#car-transform:not(:disabled):hover,
+[data-robot-mode="damp"]:not(:disabled):hover,
+[data-robot-mode="ready"]:not(:disabled):hover,
+[data-robot-mode="run"]:not(:disabled):hover,
+#teleop-capture:hover {
+    filter: brightness(1.14) !important;
+    transform: translateY(-1px) !important;
+}
+
+#view-map:disabled,
+#clear-view:disabled,
+#localize:disabled,
+#preview-route:disabled,
+#car-align:disabled,
+#car-initial-pose:disabled,
+#car-preview:disabled,
+#car-tf-flip:disabled,
+#car-standalone:disabled,
+#car-transform:disabled,
+[data-robot-mode="damp"]:disabled,
+[data-robot-mode="ready"]:disabled,
+[data-robot-mode="run"]:disabled {
+    opacity: .45 !important;
+    cursor: not-allowed !important;
+    transform: none !important;
+}
+
+/* Keyboard capture stays functional, but keeps the Download-PCD presentation. */
+#teleop-capture {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    cursor: pointer !important;
+}
+#teleop-capture strong {
+    color: inherit !important;
+    font: inherit !important;
+}
+
+/*
+ * Camera Multiview: widening the left rail changes ONLY X.
+ * Y is fixed at the current normal-size camera body height.
+ */
+.control-panel:not(.car-side) .fd21-camera-card-body {
+    width: 100% !important;
+    height: 160px !important;
+    min-height: 160px !important;
+    max-height: 160px !important;
+    aspect-ratio: auto !important;
+}
+
+.control-panel:not(.car-side) .fd21-camera-card-body > video {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: contain !important;
+}
+
+/* ============================================================
+   FD26 — single final presentation owner
+   ============================================================ */
+
+/* Match the Live tab's 8px outer rhythm and exact surface palette. */
+html,
+body,
+.app-shell {
+    background: #0b0c0c !important;
+}
+
+.app-shell {
+    grid-template-columns: 320px minmax(0, 1fr) clamp(330px, 18.7vw, 480px) !important;
+}
+
+.app-shell > .control-panel,
+.app-shell > .workspace {
+    background: #161616 !important;
+    border-color: #333333 !important;
+}
+
+.workspace > .topbar,
+#fd17-slam-statusbar,
+.workspace > .viewer-wrap,
+.workspace > .fd19-viewer-wrap,
+.workspace .viewer-pane {
+    background-color: #161616 !important;
+}
+
+/* Exact Live middle-panel surface stack: panel, primary row, secondary row, stage. */
+.app-shell > .workspace::before {
+    display: none !important;
+    content: none !important;
+}
+
+.workspace > .topbar {
+    background: rgb(21, 22, 22) !important;
+}
+
+#fd17-slam-statusbar {
+    background: rgb(18, 19, 19) !important;
+}
+
+.workspace > .viewer-wrap,
+.workspace > .fd19-viewer-wrap,
+.workspace .viewer-pane {
+    background: rgb(14, 15, 15) !important;
+}
+
+.control-card,
+.event-card,
+#fd18-car-mapping-section,
+#car-panel,
+#fd18-car-manual-section {
+    background: #161616 !important;
+    border-color: #2e2e2e !important;
+}
+
+/* Direct mode | Flip orientation share one compact row. */
+#fd18-manual-pair {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 7px !important;
+    width: 100% !important;
+}
+
+#fd18-manual-pair > #car-standalone,
+#fd18-manual-pair > #car-tf-flip {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+}
+
+/* Download-PCD is the one gray-button visual owner from first paint. */
+:is(
+    #view-map,
+    #clear-view,
+    #localize,
+    #preview-route,
+    #teleop-capture,
+    #semantic-clear,
+    .yaw-presets > button,
+    [data-robot-mode="damp"],
+    [data-robot-mode="ready"],
+    [data-robot-mode="run"],
+    #car-align,
+    #car-initial-pose,
+    #car-preview,
+    #car-tf-flip,
+    #car-standalone,
+    #car-transform
+) {
+    box-sizing: border-box !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 8px !important;
+    border: 1px solid rgba(255,255,255,.06) !important;
+    border-radius: 5px !important;
+    background: rgba(255,255,255,.02) !important;
+    color: #8c96a7 !important;
+    box-shadow: none !important;
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system,
+        BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 400 !important;
+    font-style: normal !important;
+    line-height: normal !important;
+    letter-spacing: normal !important;
+    text-transform: none !important;
+    transition: background 120ms ease, border-color 120ms ease,
+        color 120ms ease, transform 120ms ease, box-shadow 120ms ease !important;
+}
+
+:is(
+    #view-map,
+    #clear-view,
+    #localize,
+    #preview-route,
+    #teleop-capture,
+    #semantic-clear,
+    .yaw-presets > button,
+    [data-robot-mode="damp"],
+    [data-robot-mode="ready"],
+    [data-robot-mode="run"],
+    #car-align,
+    #car-initial-pose,
+    #car-preview,
+    #car-tf-flip,
+    #car-standalone,
+    #car-transform
+):hover:not(:disabled) {
+    background: rgba(255,255,255,.045) !important;
+    border-color: rgba(255,255,255,.11) !important;
+    color: #aab2bb !important;
+    box-shadow: none !important;
+    transform: translateY(-1px) !important;
+}
+
+:is(.yaw-presets > button.selected):not(:disabled) {
+    background: rgba(255,255,255,.06) !important;
+    border-color: rgba(255,255,255,.14) !important;
+    color: #c4cbd0 !important;
+}
+
+#car-panel #car-preview,
+#car-panel #car-preview:hover:not(:disabled) {
+    background: rgba(255,255,255,.02) !important;
+    border-color: rgba(255,255,255,.06) !important;
+    color: #8c96a7 !important;
+}
+
+#car-panel #car-preview:hover:not(:disabled) {
+    background: rgba(255,255,255,.045) !important;
+    border-color: rgba(255,255,255,.11) !important;
+    color: #aab2bb !important;
+}
+
+/* Clear objects on the left; compact YOLO checkbox on the right. */
+.control-panel:not(.car-side) .perception-actions {
+    grid-template-columns: minmax(0, 1fr) auto !important;
+}
+
+.control-panel:not(.car-side) #semantic-clear {
+    justify-self: stretch !important;
+}
+
+.control-panel:not(.car-side) .fd20-yolo-toggle {
+    justify-self: end !important;
+}
+
+/* Mapping status is pixel-equivalent to Controller / Selector diagnostics. */
+.control-panel:not(.car-side)
+.mapping-progress.fd-status-stack-v7 {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 5px !important;
+    width: 100% !important;
+    margin: 9px 0 0 !important;
+    padding: 0 !important;
+}
+
+.control-panel:not(.car-side)
+.mapping-progress.fd-status-stack-v7 > div {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    justify-content: stretch !important;
+    align-items: center !important;
+    gap: 12px !important;
+    width: 100% !important;
+    min-height: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.control-panel:not(.car-side)
+.mapping-progress.fd-status-stack-v7 > div > span,
+.control-panel:not(.car-side)
+.mapping-progress.fd-status-stack-v7 > div > b {
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 1.3 !important;
+    letter-spacing: 0 !important;
+}
+
+.control-panel:not(.car-side)
+.mapping-progress.fd-status-stack-v7 > div > span {
+    color: #879099 !important;
+}
+
+.control-panel:not(.car-side)
+.mapping-progress.fd-status-stack-v7 > div > b {
+    justify-self: end !important;
+    color: #c4cbd0 !important;
+    text-align: right !important;
+}
+
+/* Held grip glows; the panel no longer draws a green rectangular outline. */
+.fd18-major-surface.fd18-major-following,
+.app-shell > .stitch-major-v1924.stitch-major-following-v1924 {
+    box-shadow: 0 18px 44px rgba(0,0,0,.36) !important;
+}
+
+/* Pointer feedback is only the Live grip glow; never paint a button rectangle. */
+html body .app-shell > .fd18-major-surface > .fd18-major-handle,
+html body .app-shell > .fd18-major-surface > .fd18-major-handle:hover,
+html body .app-shell > .fd18-major-surface > .fd18-major-handle:focus,
+html body .app-shell > .fd18-major-surface > .fd18-major-handle:focus-visible,
+html body .app-shell > .fd18-major-surface > .fd18-major-handle:active,
+html body .app-shell > .fd18-major-surface > .fd18-major-handle.fd18-major-handle-active,
+html body .app-shell > .fd18-major-surface > .stitch-major-handle-v1924.stitch-major-handle-active-v1924 {
+    border: 0 !important;
+    outline: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    filter: none !important;
+}
+
+html body .fd18-major-handle-active > .fd18-major-grip,
+html body .stitch-major-handle-active-v1924 > .stitch-major-grip-v1924,
+html body .fd18-major-following > .fd18-major-handle > .fd18-major-grip,
+html body .stitch-major-following-v1924 > .stitch-major-handle-v1924 > .stitch-major-grip-v1924 {
+    box-shadow: 0 0 8px rgba(52,211,153,.24) !important;
+    transform: scaleX(1.08) !important;
+}
+
+/* Map HUD: retire the XY gizmo, put the legend left and the point count right. */
+.fd19-viewer-wrap .axis {
+    display: none !important;
+}
+
+.fd19-viewer-wrap .legend {
+    left: 14px !important;
+    right: auto !important;
+}
+
+.fd19-viewer-wrap .render-count {
+    left: auto !important;
+    right: 14px !important;
+}
+
+/* Keep the HUD readable while the local backend is offline, as in the supplied view. */
+html.fd21-backend-offline .fd19-viewer-wrap .legend {
+    display: flex !important;
+}
+
+html.fd21-backend-offline .fd19-viewer-wrap .render-count {
+    display: block !important;
+}
+
+
+/* ============================================================
+   Sidebar titles and the car connection chip (same look as the
+   Live tab's CTRL ONLINE / CTRL OFFLINE chip).
+   ============================================================ */
+.app-shell > .control-panel:not(.car-side)::before {
+    content: "ROBOT CONTROL" !important;
+}
+
+.app-shell > .control-panel.car-side::before {
+    content: "CAR CONTROL" !important;
+}
+
+/* Same rules as the Live CTRL chip (stitch_live_v12.css); slam JS copies the
+   rendered geometry and the --full-status-* palette from the parent page. */
+#fd18-car-online-chip {
+    position: absolute !important;
+    z-index: 50 !important;
+    top: 23px !important;
+    right: 17px !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    height: 30px !important;
+    padding: 0 12px !important;
+    box-sizing: border-box !important;
+    border: 1px solid transparent !important;
+    border-radius: 6px !important;
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 12px !important;
+    line-height: 16px !important;
+    font-weight: 650 !important;
+    letter-spacing: 0 !important;
+    white-space: nowrap !important;
+    pointer-events: none !important;
+}
+
+#fd18-car-online-chip.warn {
+    color: var(--full-status-warn-fg, #d9a62a) !important;
+    background-color: var(--full-status-warn-bg, rgba(110,78,20,.16)) !important;
+    background-image: var(--full-status-warn-bg-image, none) !important;
+    border-color: var(--full-status-warn-border, #76551a) !important;
+    box-shadow: var(--full-status-warn-shadow, none) !important;
+}
+
+#fd18-car-online-chip.good {
+    color: var(--full-status-good-fg, #9bd982) !important;
+    background-color: var(--full-status-good-bg, rgba(70,110,55,.16)) !important;
+    background-image: var(--full-status-good-bg-image, none) !important;
+    border-color: var(--full-status-good-border, #4d7544) !important;
+    box-shadow: var(--full-status-good-shadow, none) !important;
+}
+
+#fd18-car-online-chip::before {
+    content: "" !important;
+    width: var(--fd18-chip-dot-width, 6px) !important;
+    height: var(--fd18-chip-dot-height, 6px) !important;
+    flex: 0 0 auto !important;
+    border-radius: var(--fd18-chip-dot-border-radius, 50%) !important;
+    background: currentColor !important;
+}
+
+/* Title-to-first-section gap equals the card heading-to-first-control gap. */
+.app-shell > .control-panel {
+    padding-top: 58px !important;
+}

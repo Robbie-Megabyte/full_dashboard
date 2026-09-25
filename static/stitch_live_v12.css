@@ -28631,3 +28631,6729 @@ select {
 
 
 /* FULL_DASH_CONTROLLER_UI_V16_END */
+
+
+/* ============================================================
+   FULL_DASH_LIVE_POLISH_V4
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   RIGHT RAIL
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.combined-rail {
+    min-height: 0 !important;
+
+    height: 100% !important;
+    max-height: 100% !important;
+
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+
+    overscroll-behavior-y: contain;
+
+    scrollbar-width: thin;
+    scrollbar-color:
+        transparent
+        transparent;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail.full-dash-rail-scrolling-v4 {
+    scrollbar-color:
+        rgba(114, 154, 112, .42)
+        transparent;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar {
+    width: 5px;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+
+    background:
+        transparent;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail.full-dash-rail-scrolling-v4::-webkit-scrollbar-thumb {
+    background:
+        rgba(114, 154, 112, .42);
+}
+
+
+/* ------------------------------------------------------------
+   ROBOT MODES
+   Same panel language as Hands / Controller Process.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card {
+    flex:
+        0 0 auto;
+
+    min-height:
+        auto !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card
+.panel-head {
+    margin-bottom:
+        8px;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card
+.panel-head
+strong {
+    font: inherit;
+
+    font-weight:
+        600;
+
+    letter-spacing:
+        .055em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-current {
+    display:
+        flex;
+
+    align-items:
+        center;
+
+    justify-content:
+        space-between;
+
+    gap:
+        8px;
+
+    margin-bottom:
+        7px;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-current
+span {
+    color:
+        var(--muted);
+
+    font-size:
+        8px;
+
+    letter-spacing:
+        .04em;
+
+    text-transform:
+        uppercase;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-current
+strong {
+    color:
+        var(--good);
+
+    font-size:
+        9px;
+
+    font-weight:
+        500;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-actions {
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    gap:
+        5px;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-row {
+    width:
+        100%;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-row
+.live-robot-mode-button {
+    flex:
+        1 1 50%;
+
+    min-width:
+        0;
+}
+
+
+/* ------------------------------------------------------------
+   COMPANION CAMERA RETICLES
+   Use SAME shared reticle container + label style as existing
+   RGB / Depth / Disparity / Point Cloud / External Cam.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.camera-tile[data-camera-view-tile="raw"]
+.camera-overlay-icon,
+
+.stitch-live-v12
+#view-live
+.camera-tile[data-camera-view-tile="simulation"]
+.camera-overlay-icon,
+
+.stitch-live-v12
+#view-live
+.camera-tile[data-camera-view-tile="keypoints"]
+.camera-overlay-icon {
+    display:
+        none !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-companion-svg-v4 * {
+    vector-effect:
+        non-scaling-stroke;
+}
+
+
+/* RAW CAMERA */
+
+.stitch-live-v12
+#view-live
+.stitch-raw-idle-v4 {
+    color:
+        var(--good);
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-camera-body-v4
+rect,
+
+.stitch-live-v12
+#view-live
+.stitch-raw-camera-body-v4
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-raw-camera-body-v4
+circle {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.25;
+
+    opacity:
+        .72;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-lens-outer-v4 {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        stitchRawLensV4
+        2.8s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-lens-inner-v4 {
+    opacity:
+        .92 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-scan-v4 {
+    stroke-width:
+        1.4 !important;
+
+    opacity:
+        .25 !important;
+
+    animation:
+        stitchRawScanV4
+        2.1s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes stitchRawLensV4 {
+
+    0%,
+    100% {
+        transform:
+            scale(.94);
+
+        opacity:
+            .55;
+    }
+
+    50% {
+        transform:
+            scale(1.05);
+
+        opacity:
+            1;
+    }
+}
+
+
+@keyframes stitchRawScanV4 {
+
+    0%,
+    100% {
+        transform:
+            translateY(-9px);
+
+        opacity:
+            .10;
+    }
+
+    50% {
+        transform:
+            translateY(9px);
+
+        opacity:
+            .80;
+    }
+}
+
+
+/* SIMULATION */
+
+.stitch-live-v12
+#view-live
+.stitch-sim-idle-v4 {
+    color:
+        var(--warn);
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-ground-v4
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-sim-cube-v4
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-sim-node-v4 {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.15;
+
+    opacity:
+        .68;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-ground-v4 {
+    opacity:
+        .36;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-cube-v4 {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        stitchSimFloatV4
+        3.4s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-node-v4 {
+    fill:
+        currentColor;
+
+    animation:
+        stitchSimNodeV4
+        1.7s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes stitchSimFloatV4 {
+
+    0%,
+    100% {
+        transform:
+            translateY(1px)
+            scale(.97);
+
+        opacity:
+            .68;
+    }
+
+    50% {
+        transform:
+            translateY(-3px)
+            scale(1.02);
+
+        opacity:
+            1;
+    }
+}
+
+
+@keyframes stitchSimNodeV4 {
+
+    0%,
+    100% {
+        opacity:
+            .30;
+    }
+
+    50% {
+        opacity:
+            1;
+    }
+}
+
+
+/* KEYPOINTS */
+
+.stitch-live-v12
+#view-live
+.stitch-keypoints-idle-v4 {
+    color:
+        var(--good);
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-keypoint-links-v4
+path {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.15;
+
+    opacity:
+        .48;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-keypoint-nodes-v4
+circle {
+    fill:
+        currentColor;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1;
+
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        stitchKeypointPulseV4
+        1.8s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-keypoint-nodes-v4
+circle:nth-child(2n) {
+    animation-delay:
+        -.55s;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-keypoint-nodes-v4
+circle:nth-child(3n) {
+    animation-delay:
+        -1.05s;
+}
+
+
+@keyframes stitchKeypointPulseV4 {
+
+    0%,
+    100% {
+        transform:
+            scale(.78);
+
+        opacity:
+            .48;
+    }
+
+    50% {
+        transform:
+            scale(1.28);
+
+        opacity:
+            1;
+    }
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_NATIVE_POLISH_V5
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   ROBOT MODES
+   Let Hands styling be the visual source of truth.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card {
+    /*
+     * No custom futuristic/card treatment.
+     * Behave like the surrounding native rail panels.
+     */
+    padding:
+        inherit;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card
+.hand-panel-head {
+    margin:
+        0 0 8px 0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card
+.hand-panel-head
+strong {
+    /*
+     * Match HANDS exactly by not imposing our own V3/V4
+     * title sizing/color/letter spacing.
+     */
+    font-family:
+        inherit !important;
+
+    font-size:
+        inherit !important;
+
+    font-weight:
+        inherit !important;
+
+    line-height:
+        inherit !important;
+
+    letter-spacing:
+        inherit !important;
+
+    color:
+        inherit !important;
+
+    text-transform:
+        inherit !important;
+}
+
+
+/*
+ * Current mode row: quiet, like other metadata in the rail.
+ */
+.stitch-live-v12
+#view-live
+.live-robot-mode-current {
+    min-height:
+        20px !important;
+
+    margin:
+        0 0 7px 0 !important;
+
+    padding:
+        0 !important;
+
+    border:
+        0 !important;
+
+    background:
+        transparent !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-actions {
+    gap:
+        5px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-row {
+    width:
+        100% !important;
+
+    margin:
+        0 !important;
+}
+
+
+/* ------------------------------------------------------------
+   CONTROLLER + MODES
+   Radius itself is synchronized from Hands by JS.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.controller-process-panel,
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card {
+    overflow:
+        hidden;
+}
+
+
+/* ------------------------------------------------------------
+   COMPANION IDLE RETICLES
+   EXACT compact visual footprint.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-native-companion-v5 {
+    /*
+     * Same centered compact presentation as existing camera
+     * idle drawings. Do not allow our SVG to inflate the
+     * reticle container.
+     */
+    display:
+        flex;
+
+    flex-direction:
+        column;
+
+    align-items:
+        center;
+
+    justify-content:
+        center;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-companion-svg-v5 {
+    width:
+        64px !important;
+
+    height:
+        48px !important;
+
+    max-width:
+        64px !important;
+
+    max-height:
+        48px !important;
+
+    flex:
+        0 0 48px !important;
+
+    overflow:
+        visible;
+
+    filter:
+        drop-shadow(
+            0 0 3px
+            rgba(73, 154, 102, .12)
+        );
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-companion-svg-v5 * {
+    vector-effect:
+        non-scaling-stroke;
+}
+
+
+/*
+ * Same label layout as the existing reticles.
+ */
+.stitch-live-v12
+#view-live
+.stitch-native-companion-v5
+.stitch-idle-label {
+    margin-top:
+        5px !important;
+}
+
+
+/* RAW ------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-native-raw-v5 {
+    color:
+        #3f8f69;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-raw-body-v5
+* {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        .85;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .78;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-raw-ring-v5 {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        nativeRawPulseV5
+        2.8s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-raw-scan-v5 {
+    opacity:
+        .18;
+
+    animation:
+        nativeRawScanV5
+        2.2s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes nativeRawPulseV5 {
+
+    0%,
+    100% {
+        transform:
+            scale(.94);
+
+        opacity:
+            .50;
+    }
+
+    50% {
+        transform:
+            scale(1.04);
+
+        opacity:
+            .92;
+    }
+}
+
+
+@keyframes nativeRawScanV5 {
+
+    0%,
+    100% {
+        transform:
+            translateY(-5px);
+
+        opacity:
+            .10;
+    }
+
+    50% {
+        transform:
+            translateY(5px);
+
+        opacity:
+            .62;
+    }
+}
+
+
+/* SIM ------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-native-sim-v5 {
+    color:
+        #9d7e17;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-sim-grid-v5
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-native-sim-cube-v5
+path {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        .85;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-sim-grid-v5 {
+    opacity:
+        .28;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-sim-cube-v5 {
+    opacity:
+        .76;
+
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        nativeSimFloatV5
+        3.2s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-sim-node-v5 {
+    fill:
+        currentColor;
+
+    opacity:
+        .72;
+
+    animation:
+        nativeSimNodeV5
+        1.7s
+        ease-in-out
+        infinite;
+}
+
+
+@keyframes nativeSimFloatV5 {
+
+    0%,
+    100% {
+        transform:
+            translateY(1px);
+
+        opacity:
+            .62;
+    }
+
+    50% {
+        transform:
+            translateY(-2px);
+
+        opacity:
+            .95;
+    }
+}
+
+
+@keyframes nativeSimNodeV5 {
+
+    0%,
+    100% {
+        opacity:
+            .25;
+    }
+
+    50% {
+        opacity:
+            .9;
+    }
+}
+
+
+/* KEYPOINTS ------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-native-keypoints-v5 {
+    color:
+        #4b966d;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-key-links-v5
+path {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        .8;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .42;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-key-nodes-v5
+circle {
+    fill:
+        currentColor;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        .45;
+
+    opacity:
+        .70;
+
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        nativeKeyPulseV5
+        1.9s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-key-nodes-v5
+circle:nth-child(2n) {
+    animation-delay:
+        -.45s;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-native-key-nodes-v5
+circle:nth-child(3n) {
+    animation-delay:
+        -.9s;
+}
+
+
+@keyframes nativeKeyPulseV5 {
+
+    0%,
+    100% {
+        transform:
+            scale(.84);
+
+        opacity:
+            .46;
+    }
+
+    50% {
+        transform:
+            scale(1.16);
+
+        opacity:
+            .92;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   RIGHT-RAIL NATIVE SCROLLBAR
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.combined-rail {
+    overflow-y:
+        scroll !important;
+
+    scrollbar-width:
+        thin !important;
+
+    scrollbar-color:
+        rgba(91, 126, 91, .30)
+        transparent !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar {
+    width:
+        6px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar-track {
+    background:
+        transparent !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar-thumb {
+    min-height:
+        28px;
+
+    border:
+        2px solid transparent;
+
+    border-radius:
+        999px;
+
+    background:
+        rgba(91, 126, 91, .30);
+
+    background-clip:
+        padding-box;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail.full-dash-rail-scrolling-v4::-webkit-scrollbar-thumb,
+
+.stitch-live-v12
+#view-live
+.combined-rail:hover::-webkit-scrollbar-thumb {
+    background:
+        rgba(111, 157, 105, .62);
+
+    background-clip:
+        padding-box;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_VISUAL_PARITY_CSS_V6
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   COMPANION RETICLES — SAME PAGE / SAME SCALE
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-companion-reticle-v6 {
+    width:
+        118px !important;
+
+    min-width:
+        118px !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    margin:
+        0 auto !important;
+
+    position:
+        relative !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-companion-svg-v6 {
+    position:
+        static !important;
+
+    inset:
+        auto !important;
+
+    display:
+        block !important;
+
+    width:
+        94px !important;
+
+    height:
+        73px !important;
+
+    max-width:
+        94px !important;
+
+    max-height:
+        73px !important;
+
+    margin:
+        0 auto !important;
+
+    transform:
+        none !important;
+
+    overflow:
+        visible !important;
+
+    flex:
+        0 0 73px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-companion-svg-v6 * {
+    vector-effect:
+        non-scaling-stroke;
+}
+
+
+/*
+ * Move all three labels DOWN so their baseline visually matches
+ * Depth stream idle / RGB stream idle.
+ */
+.stitch-live-v12
+#view-live
+.stitch-companion-reticle-v6
+.stitch-idle-label {
+    margin-top:
+        15px !important;
+
+    transform:
+        translateY(6px) !important;
+}
+
+
+/* ------------------------------------------------------------
+   RAW CAMERA
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-raw-reticle-v6 {
+    color:
+        #3f8f69;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-orbit-v6
+circle,
+
+.stitch-live-v12
+#view-live
+.stitch-raw-orbit-v6
+path {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .8;
+
+    opacity:
+        .34;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-orbit-v6
+circle:first-child {
+    stroke-dasharray:
+        3 5;
+
+    transform-origin:
+        50px 37px;
+
+    animation:
+        rawOrbitV6
+        12s
+        linear
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-orbit-v6
+circle:nth-child(2) {
+    stroke:
+        #a1831c;
+
+    stroke-dasharray:
+        1 6;
+
+    opacity:
+        .38;
+
+    transform-origin:
+        50px 37px;
+
+    animation:
+        rawOrbitV6
+        8s
+        linear
+        reverse
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-camera-v6
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-raw-camera-v6
+circle {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .95;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .82;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-lens-a-v6 {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        rawLensV6
+        2.8s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-lens-b-v6 {
+    stroke:
+        #a1831c !important;
+
+    opacity:
+        .66 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-status-v6 {
+    fill:
+        #a1831c !important;
+
+    stroke:
+        none !important;
+
+    animation:
+        rawStatusV6
+        1.7s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-scan-v6 {
+    stroke:
+        #72b084 !important;
+
+    opacity:
+        .20 !important;
+
+    animation:
+        rawScanV6
+        2.2s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-sensor-dots-v6
+circle {
+    fill:
+        #3f8f69;
+
+    opacity:
+        .52;
+
+    animation:
+        rawDotsV6
+        2.4s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-sensor-dots-v6
+circle:nth-child(2n) {
+    fill:
+        #a1831c;
+
+    animation-delay:
+        -.8s;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-raw-brackets-v6
+path {
+    fill:
+        none;
+
+    stroke:
+        #56765f;
+
+    stroke-width:
+        .8;
+
+    opacity:
+        .40;
+}
+
+
+@keyframes rawOrbitV6 {
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+@keyframes rawLensV6 {
+
+    0%,
+    100% {
+        transform:
+            scale(.94);
+
+        opacity:
+            .55;
+    }
+
+    50% {
+        transform:
+            scale(1.05);
+
+        opacity:
+            1;
+    }
+}
+
+
+@keyframes rawStatusV6 {
+
+    0%,
+    100% {
+        opacity:
+            .25;
+    }
+
+    50% {
+        opacity:
+            .92;
+    }
+}
+
+
+@keyframes rawScanV6 {
+
+    0%,
+    100% {
+        transform:
+            translateY(-7px);
+
+        opacity:
+            .08;
+    }
+
+    50% {
+        transform:
+            translateY(7px);
+
+        opacity:
+            .62;
+    }
+}
+
+
+@keyframes rawDotsV6 {
+
+    0%,
+    100% {
+        opacity:
+            .24;
+    }
+
+    50% {
+        opacity:
+            .75;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   SIMULATION
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-simulation-reticle-v6 {
+    color:
+        #9a7b18;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-orbits-v6
+ellipse {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .75;
+
+    opacity:
+        .27;
+
+    stroke-dasharray:
+        3 5;
+
+    transform-origin:
+        50px 35px;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-orbits-v6
+ellipse:first-child {
+    animation:
+        simOrbitV6
+        11s
+        linear
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-orbits-v6
+ellipse:nth-child(2) {
+    stroke:
+        #9a7b18;
+
+    animation:
+        simOrbitV6
+        7s
+        linear
+        reverse
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-grid-v6
+path {
+    fill:
+        none;
+
+    stroke:
+        #806d2a;
+
+    stroke-width:
+        .7;
+
+    opacity:
+        .28;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-cube-v6
+path {
+    fill:
+        none;
+
+    stroke:
+        #a1831c;
+
+    stroke-width:
+        .95;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .78;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-cube-v6 {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        simFloatV6
+        3.2s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-inner-v6 {
+    stroke:
+        #3f8f69 !important;
+
+    opacity:
+        .52 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-nodes-v6
+circle {
+    fill:
+        #a1831c;
+
+    opacity:
+        .58;
+
+    animation:
+        simNodesV6
+        2.2s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-nodes-v6
+circle:nth-child(2n) {
+    fill:
+        #3f8f69;
+
+    animation-delay:
+        -.65s;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-sim-orbit-node-v6 {
+    fill:
+        #77b77d;
+
+    transform-origin:
+        50px 35px;
+
+    animation:
+        simOrbitNodeV6
+        5.5s
+        linear
+        infinite;
+}
+
+
+@keyframes simOrbitV6 {
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+@keyframes simFloatV6 {
+
+    0%,
+    100% {
+        transform:
+            translateY(1px);
+
+        opacity:
+            .66;
+    }
+
+    50% {
+        transform:
+            translateY(-3px);
+
+        opacity:
+            1;
+    }
+}
+
+
+@keyframes simNodesV6 {
+
+    0%,
+    100% {
+        opacity:
+            .25;
+    }
+
+    50% {
+        opacity:
+            .82;
+    }
+}
+
+
+@keyframes simOrbitNodeV6 {
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+/* ------------------------------------------------------------
+   KEYPOINTS
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-keypoints-reticle-v6 {
+    color:
+        #4d966c;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-orbit-v6 {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .75;
+
+    stroke-dasharray:
+        2 6;
+
+    opacity:
+        .30;
+
+    transform-origin:
+        50px 37px;
+
+    animation:
+        keyOrbitV6
+        9s
+        linear
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-detection-frame-v6
+path {
+    fill:
+        none;
+
+    stroke:
+        #657a5d;
+
+    stroke-width:
+        .8;
+
+    opacity:
+        .38;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-links-v6
+path {
+    fill:
+        none;
+
+    stroke:
+        #4d966c;
+
+    stroke-width:
+        .9;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .55;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-nodes-v6
+circle {
+    fill:
+        #65aa74;
+
+    stroke:
+        #65aa74;
+
+    stroke-width:
+        .4;
+
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        keyNodePulseV6
+        1.8s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-nodes-v6
+circle:nth-child(2n) {
+    fill:
+        #a1831c;
+
+    stroke:
+        #a1831c;
+
+    animation-delay:
+        -.55s;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-nodes-v6
+circle:nth-child(3n) {
+    animation-delay:
+        -1s;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-track-dots-v6
+circle {
+    fill:
+        #3f8f69;
+
+    opacity:
+        .42;
+
+    animation:
+        keyTrackV6
+        2.3s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.stitch-key-track-dots-v6
+circle:nth-child(2n) {
+    fill:
+        #a1831c;
+
+    animation-delay:
+        -.8s;
+}
+
+
+@keyframes keyOrbitV6 {
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+@keyframes keyNodePulseV6 {
+
+    0%,
+    100% {
+        transform:
+            scale(.78);
+
+        opacity:
+            .42;
+    }
+
+    50% {
+        transform:
+            scale(1.24);
+
+        opacity:
+            .96;
+    }
+}
+
+
+@keyframes keyTrackV6 {
+
+    0%,
+    100% {
+        opacity:
+            .18;
+    }
+
+    50% {
+        opacity:
+            .72;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   ROBOT MODES
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card {
+    /*
+     * Runtime JS copies the exact outer Hands visual surface.
+     * This section only handles internal layout.
+     */
+    overflow:
+        hidden !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-head-v6 {
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        space-between !important;
+
+    gap:
+        8px !important;
+
+    margin:
+        0 0 8px 0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-refresh-v6 {
+    height:
+        19px;
+
+    min-width:
+        44px;
+
+    padding:
+        0 7px;
+
+    border:
+        1px solid rgba(110, 124, 113, .22);
+
+    border-radius:
+        4px;
+
+    background:
+        rgba(255,255,255,.018);
+
+    color:
+        #626b65;
+
+    font:
+        inherit;
+
+    font-size:
+        7px;
+
+    opacity:
+        .58;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-current {
+    min-height:
+        28px !important;
+
+    margin:
+        0 0 8px 0 !important;
+
+    padding:
+        0 9px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        space-between !important;
+
+    border:
+        1px solid rgba(95, 110, 98, .22) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(255,255,255,.018) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-current
+span {
+    font-size:
+        8px !important;
+
+    color:
+        #7a837d !important;
+
+    letter-spacing:
+        .02em !important;
+
+    text-transform:
+        none !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-current
+strong {
+    font-size:
+        8px !important;
+
+    color:
+        #739f6f !important;
+
+    font-weight:
+        600 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-actions {
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    gap:
+        5px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-row {
+    width:
+        100% !important;
+
+    min-height:
+        29px !important;
+
+    margin:
+        0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-button {
+    font-size:
+        8px !important;
+}
+
+
+/* ------------------------------------------------------------
+   CONTROLLER PROCESS
+   Exact outer border / radius copied from Hands by JS.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.controller-process-panel {
+    overflow:
+        hidden !important;
+}
+
+
+/* ------------------------------------------------------------
+   HIDE NATIVE SCROLLBAR COMPLETELY
+   Custom transient V6 indicator is the only scrollbar.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.combined-rail {
+    scrollbar-width:
+        none !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar {
+    width:
+        0 !important;
+
+    height:
+        0 !important;
+}
+
+
+/* ------------------------------------------------------------
+   TRANSIENT SCROLL INDICATOR
+   ------------------------------------------------------------ */
+
+.full-dash-rail-indicator-v6 {
+    position:
+        fixed;
+
+    z-index:
+        99999;
+
+    width:
+        2px;
+
+    min-height:
+        20px;
+
+    border-radius:
+        999px;
+
+    pointer-events:
+        none;
+
+    background:
+        rgba(107, 150, 105, .42);
+
+    box-shadow:
+        0 0 4px rgba(80, 130, 85, .10);
+
+    opacity:
+        0;
+
+    transition:
+        opacity .16s ease;
+}
+
+
+.full-dash-rail-indicator-v6.visible {
+    opacity:
+        .34;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_VISUAL_FINISH_CSS_V7
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   1) Companion reticles: slightly bigger + brighter
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-companion-svg-v6 {
+    width:
+        100px !important;
+
+    height:
+        78px !important;
+
+    max-width:
+        100px !important;
+
+    max-height:
+        78px !important;
+
+    flex:
+        0 0 78px !important;
+
+    filter:
+        brightness(1.12)
+        saturate(1.08)
+        drop-shadow(0 0 5px rgba(98, 180, 118, .10)) !important;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-companion-reticle-v6
+.stitch-idle-label {
+    transform:
+        translateY(7px) !important;
+}
+
+
+/* ------------------------------------------------------------
+   2) New distinct Robot RGB icon styling
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-svg-v7 {
+    width:
+        98px !important;
+
+    height:
+        76px !important;
+
+    max-width:
+        98px !important;
+
+    max-height:
+        76px !important;
+
+    filter:
+        brightness(1.04)
+        saturate(1.04)
+        drop-shadow(0 0 4px rgba(88, 160, 108, .08));
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-orbit-v7
+circle,
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-orbit-v7
+path {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .8;
+
+    opacity:
+        .34;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-orbit-v7
+circle:first-child {
+    stroke-dasharray:
+        3 5;
+
+    animation:
+        g1RgbOrbitA_v7
+        11s
+        linear
+        infinite;
+    transform-origin:
+        50px 38px;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-orbit-v7
+circle:nth-child(2) {
+    stroke:
+        #a1831c;
+
+    stroke-dasharray:
+        2 6;
+
+    animation:
+        g1RgbOrbitB_v7
+        7s
+        linear
+        reverse
+        infinite;
+    transform-origin:
+        50px 38px;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-frame-v7
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-sensor-v7
+path,
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-sensor-v7
+circle {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .95;
+
+    stroke-linejoin:
+        round;
+
+    stroke-linecap:
+        round;
+
+    opacity:
+        .84;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-sensor-v7
+circle:nth-child(1),
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-sensor-v7
+circle:nth-child(2) {
+    animation:
+        g1RgbLensPulse_v7
+        2.5s
+        ease-in-out
+        infinite;
+    transform-box:
+        fill-box;
+    transform-origin:
+        center;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-sensor-v7
+circle:nth-child(2) {
+    animation-delay:
+        -.6s;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-sensor-v7
+circle:nth-child(4) {
+    stroke:
+        #a1831c;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-track-v7
+path {
+    fill:
+        none;
+    stroke:
+        #6aa97a;
+    stroke-width:
+        .75;
+    opacity:
+        .46;
+}
+
+.stitch-live-v12
+#view-live
+.stitch-g1-rgb-track-v7
+circle {
+    fill:
+        #a1831c;
+    opacity:
+        .62;
+    animation:
+        g1RgbDots_v7
+        2.3s
+        ease-in-out
+        infinite;
+}
+
+.stitch-live-v12
+#view-live
+[data-full-dash-rgb-icon-v7="1"] {
+    width:
+        100%;
+
+    height:
+        100%;
+}
+
+.stitch-live-v12
+#view-live
+[data-full-dash-rgb-icon-v7="1"] * {
+    fill:
+        none;
+    stroke:
+        currentColor;
+    stroke-width:
+        1.35;
+    stroke-linecap:
+        round;
+    stroke-linejoin:
+        round;
+}
+
+@keyframes g1RgbOrbitA_v7 {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes g1RgbOrbitB_v7 {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes g1RgbLensPulse_v7 {
+    0%,100% { transform: scale(.92); opacity: .56; }
+    50% { transform: scale(1.06); opacity: 1; }
+}
+
+@keyframes g1RgbDots_v7 {
+    0%,100% { opacity: .28; }
+    50% { opacity: .9; }
+}
+
+
+/* ------------------------------------------------------------
+   3) Scroll indicator: greener tint
+   ------------------------------------------------------------ */
+
+.full-dash-rail-indicator-v6 {
+    background:
+        rgba(118, 199, 128, .58) !important;
+
+    box-shadow:
+        0 0 6px rgba(91, 170, 104, .22) !important;
+}
+
+.full-dash-rail-indicator-v6.visible {
+    opacity:
+        .42 !important;
+}
+
+
+/* ------------------------------------------------------------
+   4) Controller Process:
+      - no fake extra shell
+      - actual panel only
+      - Configure lit/clickable
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.controller-process-panel {
+    box-shadow:
+        none;
+}
+
+.stitch-live-v12
+#view-live
+.controller-process-panel::before,
+
+.stitch-live-v12
+#view-live
+.controller-process-panel::after {
+    display:
+        none !important;
+    content:
+        none !important;
+}
+
+.stitch-live-v12
+#view-live
+.controller-process-panel button {
+    pointer-events:
+        auto !important;
+}
+
+.stitch-live-v12
+#view-live
+.controller-process-panel button:disabled {
+    opacity:
+        .42;
+}
+
+.stitch-live-v12
+#view-live
+.controller-process-panel button[id*="Configure"],
+
+.stitch-live-v12
+#view-live
+.controller-process-panel button[id*="configure"] {
+    opacity:
+        1 !important;
+    filter:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   5) Robot Modes:
+      only keep layout here; visual look comes from copied
+      Camera Teleop styles.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-card {
+    overflow:
+        hidden !important;
+}
+
+.stitch-live-v12
+#view-live
+.live-robot-modes-head-v6 {
+    display:
+        flex !important;
+    align-items:
+        center !important;
+    justify-content:
+        space-between !important;
+    gap:
+        8px !important;
+}
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-actions {
+    display:
+        flex !important;
+    flex-direction:
+        column !important;
+    gap:
+        5px !important;
+}
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-row {
+    width:
+        100% !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_LIVE_PARITY_CSS_V8
+   ============================================================ */
+
+
+/*
+ * Slightly greener transient scroll marker.
+ */
+.full-dash-rail-indicator-v6 {
+    background:
+        rgba(103, 194, 116, .72) !important;
+
+    box-shadow:
+        0 0 5px
+        rgba(76, 161, 92, .24) !important;
+}
+
+
+.full-dash-rail-indicator-v6.visible {
+    opacity:
+        .46 !important;
+}
+
+
+/*
+ * Robot RGB dual-sensor small icon.
+ */
+.full-dash-robot-rgb-icon-v8 {
+    display:
+        block;
+
+    width:
+        18px;
+
+    height:
+        18px;
+}
+
+
+.full-dash-robot-rgb-icon-v8
+* {
+    fill:
+        none;
+
+    stroke:
+        currentColor;
+
+    stroke-width:
+        1.25;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+}
+
+
+/*
+ * The V8 Y alignment is measured dynamically from RGB + Depth,
+ * so remove our older hard-coded label shift.
+ */
+.stitch-live-v12
+#view-live
+.stitch-companion-reticle-v6
+.stitch-idle-label {
+    transform:
+        none !important;
+}
+
+
+/*
+ * Keep Robot Modes rows sized for this rail after copying the
+ * source Camera Teleop shell.
+ */
+.stitch-live-v12
+#view-live
+.live-robot-mode-row {
+    gap:
+        5px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.live-robot-mode-button {
+    min-width:
+        0 !important;
+
+    flex:
+        1 1 0 !important;
+}
+
+
+/*
+ * Refresh receives actual Reset view computed styles at runtime.
+ * Remove the older custom visual definition.
+ */
+.stitch-live-v12
+#view-live
+.live-robot-mode-refresh-v6 {
+    opacity:
+        inherit;
+}
+
+
+/* ============================================================
+   FULL_DASH_VISUAL_CLEANUP_V10_FIXED
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   ROBOT MODES CARD
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.robot-modes-v10 {
+    overflow:
+        hidden !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-modes-head-v10 {
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        space-between !important;
+
+    gap:
+        10px !important;
+
+    margin:
+        0 0 8px 0 !important;
+}
+
+
+/* Refresh */
+
+.stitch-live-v12
+#view-live
+.robot-mode-refresh-v10 {
+    appearance:
+        none !important;
+
+    height:
+        28px !important;
+
+    min-width:
+        74px !important;
+
+    padding:
+        0 13px !important;
+
+    border:
+        1px solid
+        rgba(82,146,89,.42) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(48,88,53,.07) !important;
+
+    color:
+        #79b978 !important;
+
+    font-family:
+        inherit !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        600 !important;
+
+    letter-spacing:
+        .01em !important;
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(255,255,255,.018) !important;
+}
+
+
+/* Current mode */
+
+.stitch-live-v12
+#view-live
+.robot-mode-current-v10 {
+    height:
+        30px !important;
+
+    min-height:
+        30px !important;
+
+    margin:
+        0 0 7px 0 !important;
+
+    padding:
+        0 10px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        space-between !important;
+
+    box-sizing:
+        border-box !important;
+
+    border:
+        1px solid
+        rgba(101,115,105,.22) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(255,255,255,.013) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-current-v10
+span {
+    color:
+        #828b85 !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        500 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-current-v10
+strong {
+    margin-left:
+        auto !important;
+
+    color:
+        #75ad72 !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        600 !important;
+}
+
+
+/* Grid */
+
+.stitch-live-v12
+#view-live
+.robot-mode-grid-v10 {
+    display:
+        grid !important;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        ) !important;
+
+    grid-auto-rows:
+        30px !important;
+
+    gap:
+        6px !important;
+
+    width:
+        100% !important;
+}
+
+
+/* Entirely new buttons */
+
+.stitch-live-v12
+#view-live
+.robot-mode-button-v10 {
+    appearance:
+        none !important;
+
+    box-sizing:
+        border-box !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    height:
+        30px !important;
+
+    min-height:
+        30px !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 9px !important;
+
+    border-radius:
+        5px !important;
+
+    font-family:
+        inherit !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        600 !important;
+
+    letter-spacing:
+        .008em !important;
+
+    box-shadow:
+        inset 0 1px 0
+        rgba(255,255,255,.012) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.mode-green-v10 {
+    border:
+        1px solid
+        rgba(79,135,84,.31) !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(57,94,59,.065),
+            rgba(31,52,33,.035)
+        ) !important;
+
+    color:
+        #719e70 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.mode-neutral-v10 {
+    border:
+        1px solid
+        rgba(109,119,112,.23) !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.018),
+            rgba(255,255,255,.008)
+        ) !important;
+
+    color:
+        #7b837e !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-button-v10:disabled,
+
+.stitch-live-v12
+#view-live
+.robot-mode-refresh-v10:disabled {
+    opacity:
+        .68 !important;
+
+    filter:
+        none !important;
+
+    cursor:
+        default !important;
+}
+
+
+/* ------------------------------------------------------------
+   ORIGINAL RESIZER ONLY
+   ------------------------------------------------------------ */
+
+#fullDashRightResizeMarkerV9 {
+    display:
+        none !important;
+}
+
+
+/*
+ * Only Y compensation.
+ * No color / width / height / radius / hover change.
+ */
+.full-dash-original-resizer-before-v10::before {
+    translate:
+        0
+        var(
+            --full-dash-resizer-scroll-v10,
+            0px
+        ) !important;
+}
+
+
+.full-dash-original-resizer-after-v10::after {
+    translate:
+        0
+        var(
+            --full-dash-resizer-scroll-v10,
+            0px
+        ) !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_UI_V11_FIXED
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   Companion idle host
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.fd11-host {
+    position:
+        absolute !important;
+
+    left:
+        50% !important;
+
+    width:
+        126px !important;
+
+    height:
+        114px !important;
+
+    transform:
+        translate(-50%, -50%) !important;
+
+    display:
+        flex !important;
+
+    flex-direction:
+        column !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    z-index:
+        4 !important;
+
+    pointer-events:
+        none !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-art {
+    width:
+        100px !important;
+
+    height:
+        78px !important;
+
+    flex:
+        0 0 78px !important;
+
+    filter:
+        brightness(1.10)
+        saturate(1.06)
+        drop-shadow(
+            0 0 4px
+            rgba(79,165,104,.09)
+        );
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-art
+svg {
+    display:
+        block !important;
+
+    width:
+        100% !important;
+
+    height:
+        100% !important;
+
+    overflow:
+        visible !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-art
+svg * {
+    vector-effect:
+        non-scaling-stroke;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-label {
+    margin-top:
+        9px !important;
+
+    white-space:
+        nowrap !important;
+
+    color:
+        rgba(163,174,167,.56) !important;
+
+    font-family:
+        inherit !important;
+
+    font-size:
+        8px !important;
+
+    font-weight:
+        400 !important;
+
+    line-height:
+        1 !important;
+
+    letter-spacing:
+        .055em !important;
+}
+
+
+/* Common */
+
+.stitch-live-v12
+#view-live
+.fd11-orbit-green
+circle,
+
+.stitch-live-v12
+#view-live
+.fd11-orbit-green
+path {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .8;
+
+    opacity:
+        .31;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-orbit-green
+circle:first-child {
+    stroke-dasharray:
+        3 5;
+
+    transform-origin:
+        60px 43px;
+
+    animation:
+        fd11Orbit
+        11s
+        linear
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-orbit-green
+circle:nth-child(2) {
+    stroke:
+        #9a7b18;
+
+    stroke-dasharray:
+        2 6;
+
+    transform-origin:
+        60px 43px;
+
+    animation:
+        fd11Orbit
+        7s
+        linear
+        reverse
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-corners
+path {
+    fill:
+        none;
+
+    stroke:
+        #52745c;
+
+    stroke-width:
+        .8;
+
+    opacity:
+        .38;
+}
+
+
+/* Raw */
+
+.stitch-live-v12
+#view-live
+.fd11-raw-camera
+rect,
+
+.stitch-live-v12
+#view-live
+.fd11-raw-camera
+path,
+
+.stitch-live-v12
+#view-live
+.fd11-raw-camera
+circle {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .95;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .82;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-raw-ring-a {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        fd11RawPulse
+        2.7s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-raw-ring-b {
+    stroke:
+        #a1831c !important;
+
+    opacity:
+        .68 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-raw-core {
+    fill:
+        #54a36d !important;
+
+    stroke:
+        none !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-amber-dot {
+    fill:
+        #a1831c !important;
+
+    stroke:
+        none !important;
+
+    animation:
+        fd11Blink
+        1.7s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-raw-scan {
+    stroke:
+        #6bad7b !important;
+
+    opacity:
+        .17 !important;
+
+    animation:
+        fd11RawScan
+        2.2s
+        ease-in-out
+        infinite;
+}
+
+
+/* Simulation */
+
+.stitch-live-v12
+#view-live
+.fd11-sim-orbits
+ellipse {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .75;
+
+    stroke-dasharray:
+        3 5;
+
+    opacity:
+        .27;
+
+    transform-origin:
+        60px 42px;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-orbits
+ellipse:first-child {
+    animation:
+        fd11Orbit
+        10s
+        linear
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-orbits
+ellipse:nth-child(2) {
+    stroke:
+        #9a7b18;
+
+    animation:
+        fd11Orbit
+        7s
+        linear
+        reverse
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-grid
+path {
+    fill:
+        none;
+
+    stroke:
+        #806d2a;
+
+    stroke-width:
+        .7;
+
+    opacity:
+        .27;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-cube {
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        fd11SimFloat
+        3.1s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-cube
+path {
+    fill:
+        none;
+
+    stroke:
+        #a1831c;
+
+    stroke-width:
+        .95;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .78;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-inner {
+    stroke:
+        #3f8f69 !important;
+
+    opacity:
+        .48 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-sim-node {
+    fill:
+        #6db67a;
+
+    transform-origin:
+        60px 42px;
+
+    animation:
+        fd11Orbit
+        5.2s
+        linear
+        infinite;
+}
+
+
+/* Keypoints */
+
+.stitch-live-v12
+#view-live
+.fd11-key-orbit {
+    fill:
+        none;
+
+    stroke:
+        #3f8f69;
+
+    stroke-width:
+        .75;
+
+    stroke-dasharray:
+        2 6;
+
+    opacity:
+        .28;
+
+    transform-origin:
+        60px 45px;
+
+    animation:
+        fd11Orbit
+        9s
+        linear
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-key-links
+path {
+    fill:
+        none;
+
+    stroke:
+        #4d966c;
+
+    stroke-width:
+        .9;
+
+    stroke-linecap:
+        round;
+
+    stroke-linejoin:
+        round;
+
+    opacity:
+        .53;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-key-dots
+circle {
+    fill:
+        #68aa73;
+
+    stroke:
+        #68aa73;
+
+    stroke-width:
+        .35;
+
+    transform-box:
+        fill-box;
+
+    transform-origin:
+        center;
+
+    animation:
+        fd11KeyPulse
+        1.8s
+        ease-in-out
+        infinite;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-key-dots
+circle:nth-child(2n) {
+    fill:
+        #a1831c;
+
+    stroke:
+        #a1831c;
+
+    animation-delay:
+        -.5s;
+}
+
+
+.stitch-live-v12
+#view-live
+.fd11-key-dots
+circle:nth-child(3n) {
+    animation-delay:
+        -.9s;
+}
+
+
+/* Animations */
+
+@keyframes fd11Orbit {
+    to {
+        transform:
+            rotate(360deg);
+    }
+}
+
+
+@keyframes fd11RawPulse {
+
+    0%,
+    100% {
+        transform:
+            scale(.94);
+
+        opacity:
+            .55;
+    }
+
+    50% {
+        transform:
+            scale(1.05);
+
+        opacity:
+            1;
+    }
+}
+
+
+@keyframes fd11Blink {
+
+    0%,
+    100% {
+        opacity:
+            .25;
+    }
+
+    50% {
+        opacity:
+            .9;
+    }
+}
+
+
+@keyframes fd11RawScan {
+
+    0%,
+    100% {
+        transform:
+            translateY(-6px);
+
+        opacity:
+            .06;
+    }
+
+    50% {
+        transform:
+            translateY(6px);
+
+        opacity:
+            .54;
+    }
+}
+
+
+@keyframes fd11SimFloat {
+
+    0%,
+    100% {
+        transform:
+            translateY(1px);
+
+        opacity:
+            .65;
+    }
+
+    50% {
+        transform:
+            translateY(-3px);
+
+        opacity:
+            1;
+    }
+}
+
+
+@keyframes fd11KeyPulse {
+
+    0%,
+    100% {
+        transform:
+            scale(.82);
+
+        opacity:
+            .45;
+    }
+
+    50% {
+        transform:
+            scale(1.22);
+
+        opacity:
+            .95;
+    }
+}
+
+
+/* ------------------------------------------------------------
+   Robot Modes V11
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.robot-modes-v11 {
+    overflow:
+        hidden !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-modes-head-v11 {
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        space-between !important;
+
+    gap:
+        10px !important;
+
+    margin:
+        0 0 8px 0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-refresh-v11 {
+    appearance:
+        none !important;
+
+    height:
+        28px !important;
+
+    min-width:
+        74px !important;
+
+    padding:
+        0 13px !important;
+
+    border:
+        1px solid
+        rgba(82,146,89,.40) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(46,84,50,.055) !important;
+
+    color:
+        #7ab679 !important;
+
+    font-family:
+        inherit !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        600 !important;
+
+    letter-spacing:
+        .01em !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-current-v11 {
+    box-sizing:
+        border-box !important;
+
+    height:
+        30px !important;
+
+    min-height:
+        30px !important;
+
+    margin:
+        0 0 7px 0 !important;
+
+    padding:
+        0 10px !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        space-between !important;
+
+    border:
+        1px solid
+        rgba(101,115,105,.21) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(255,255,255,.012) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-current-v11
+span {
+    color:
+        #858d88 !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        500 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-current-v11
+strong {
+    color:
+        #72a970 !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        600 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-grid-v11 {
+    display:
+        grid !important;
+
+    grid-template-columns:
+        repeat(2, minmax(0,1fr)) !important;
+
+    grid-auto-rows:
+        30px !important;
+
+    gap:
+        6px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11 {
+    appearance:
+        none !important;
+
+    box-sizing:
+        border-box !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    height:
+        30px !important;
+
+    padding:
+        0 8px !important;
+
+    border-radius:
+        5px !important;
+
+    font-family:
+        inherit !important;
+
+    font-size:
+        9px !important;
+
+    font-weight:
+        600 !important;
+
+    letter-spacing:
+        .008em !important;
+
+    opacity:
+        .78 !important;
+
+    filter:
+        none !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11-green {
+    border:
+        1px solid
+        rgba(80,137,85,.30) !important;
+
+    background:
+        rgba(45,80,48,.045) !important;
+
+    color:
+        #739d72 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11-neutral {
+    border:
+        1px solid
+        rgba(108,118,111,.22) !important;
+
+    background:
+        rgba(255,255,255,.010) !important;
+
+    color:
+        #7c847f !important;
+}
+
+
+/*
+ * They are intentionally disabled until robot-side mode backend
+ * exists. Keep them readable rather than browser-default disabled.
+ */
+.stitch-live-v12
+#view-live
+.robot-mode-v11:disabled,
+
+.stitch-live-v12
+#view-live
+.robot-mode-refresh-v11:disabled {
+    opacity:
+        .72 !important;
+
+    filter:
+        none !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_TYPOGRAPHY_MINWIDTH_CSS_V12
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   Camera Multiview new minimum
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.camera-panel {
+    min-width:
+        480px !important;
+}
+
+
+/* ------------------------------------------------------------
+   Companion labels
+   Typography itself is copied from RGB + Depth at runtime.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.fd11-label {
+    white-space:
+        nowrap !important;
+}
+
+
+/* ------------------------------------------------------------
+   Robot Modes — ALL buttons neutral gray
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11,
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11-green,
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11-neutral {
+    border:
+        1px solid
+        rgba(108,118,111,.25) !important;
+
+    background:
+        linear-gradient(
+            180deg,
+            rgba(255,255,255,.020),
+            rgba(255,255,255,.009)
+        ) !important;
+
+    color:
+        #818985 !important;
+}
+
+
+/*
+ * Keep disabled backend-pending controls readable.
+ */
+.stitch-live-v12
+#view-live
+.robot-mode-v11:disabled {
+    opacity:
+        .76 !important;
+
+    filter:
+        none !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_LAYOUT_MODES_CSS_V13
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   CAMERA COLUMN
+
+   V12 incorrectly forced .camera-panel itself to 480px.
+   The grid/resizer now owns the 440px minimum instead.
+
+   Keep the panel a normal grid child filling its allocated track.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.camera-panel {
+    min-width:
+        0 !important;
+
+    width:
+        100% !important;
+
+    max-width:
+        none !important;
+}
+
+
+/* Keep the expanded source tray on a single row. */
+.stitch-live-v12
+#view-live
+.camera-mode-buttons {
+    flex-wrap:
+        nowrap !important;
+}
+
+
+/* ------------------------------------------------------------
+   ROBOT MODES
+
+   Border/background language copied from the real Camera
+   Teleop .robot-mode-button styling.
+
+   ALL six buttons use the same neutral treatment.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11,
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11-green,
+
+.stitch-live-v12
+#view-live
+.robot-mode-v11-neutral {
+    appearance:
+        none !important;
+
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        ) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .018
+        ) !important;
+
+    color:
+        #75877d !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+/*
+ * Same Camera Teleop hover language.
+ *
+ * It will become relevant after the robot-mode backend is wired.
+ */
+.stitch-live-v12
+#view-live
+.robot-mode-v11:hover:not(:disabled) {
+    border-color:
+        rgba(
+            165,
+            228,
+            157,
+            .20
+        ) !important;
+
+    background:
+        rgba(
+            165,
+            228,
+            157,
+            .055
+        ) !important;
+
+    color:
+        #a5e49d !important;
+}
+
+
+/*
+ * Current Mode should visually belong to the same little control
+ * family rather than looking like a separate green box.
+ */
+.stitch-live-v12
+#view-live
+.robot-mode-current-v11 {
+    border:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        ) !important;
+
+    border-radius:
+        5px !important;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .018
+        ) !important;
+}
+
+
+/*
+ * All six are neutral. Remove every residual green distinction.
+ */
+.stitch-live-v12
+#view-live
+.robot-mode-v11-green {
+    border-color:
+        rgba(
+            255,
+            255,
+            255,
+            .06
+        ) !important;
+
+    background:
+        rgba(
+            255,
+            255,
+            255,
+            .018
+        ) !important;
+
+    color:
+        #75877d !important;
+}
+
+
+/*
+ * Backend is not wired yet. Keep disabled controls readable while
+ * preserving the neutral Camera Teleop visual language.
+ */
+.stitch-live-v12
+#view-live
+.robot-mode-v11:disabled {
+    opacity:
+        .62 !important;
+
+    filter:
+        none !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_UI_FINISH_CSS_V14
+   ============================================================ */
+
+
+/* Selected Joint: health status is now the only header chip. */
+.stitch-live-v12
+#view-live
+#selectedHealthChip {
+    min-height:
+        21px !important;
+
+    padding:
+        0 8px !important;
+
+    display:
+        inline-flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    font-size:
+        8.5px !important;
+
+    line-height:
+        1 !important;
+}
+
+
+/*
+ * Give the nine-source camera tray enough guaranteed width to
+ * remain clear of YOLO at the true 500px resize floor.
+ */
+.stitch-live-v12
+#view-live
+.camera-mode-buttons {
+    flex-wrap:
+        nowrap !important;
+
+    min-width:
+        0 !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_POLISH_CSS_V15
+   ============================================================ */
+
+
+/*
+ * The real resizer owns the 540px Camera Multiview minimum.
+ * Keep this panel filling that track rather than setting a
+ * second independent width.
+ */
+.stitch-live-v12
+#view-live
+.camera-panel {
+    min-width:
+        0 !important;
+
+    width:
+        100% !important;
+}
+
+
+/*
+ * NORMAL alignment is calculated from the actual header text
+ * at runtime.
+ */
+.stitch-live-v12
+#view-live
+#selectedHealthChip {
+    margin-top:
+        0 !important;
+
+    margin-bottom:
+        0 !important;
+}
+
+
+/*
+ * Do not introduce pseudo/inner borders on Controller Process.
+ */
+.stitch-live-v12
+#view-live
+.controller-process-panel::before,
+
+.stitch-live-v12
+#view-live
+.controller-process-panel::after {
+    content:
+        none !important;
+
+    display:
+        none !important;
+}
+
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   FULL_DASH_TELEOPERATION_CSS_V21
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   Old VR status UI = DATA SOURCE ONLY
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.combined-rail
+.hero-state,
+
+.stitch-live-v12
+#view-live
+.combined-rail
+.health-panel,
+
+.stitch-live-v12
+#view-live
+.combined-rail
+.quick-panel {
+    display:
+        none !important;
+}
+
+
+/*
+ * Some older stitch logic wraps the three source panels.
+ * Hide that old shell as well.
+ */
+.stitch-live-v12
+#view-live
+.combined-rail
+.stitch-mode-section:has(
+    .hero-state
+) {
+    display:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   TELEOPERATION
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleoperationPanelV16 {
+    box-sizing:
+        border-box !important;
+
+    width:
+        100% !important;
+}
+
+
+.stitch-live-v12
+#view-live
+#teleoperationSelectV16 {
+    box-sizing:
+        border-box !important;
+
+    display:
+        block !important;
+
+    visibility:
+        visible !important;
+
+    opacity:
+        1 !important;
+
+    pointer-events:
+        auto !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    max-width:
+        none !important;
+
+    cursor:
+        pointer !important;
+}
+
+
+/* ------------------------------------------------------------
+   NEW UNIFIED STATUS
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleopStatusPanelV21 {
+    box-sizing:
+        border-box !important;
+
+    width:
+        100% !important;
+
+    padding:
+        10px !important;
+
+    overflow:
+        hidden !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-head-v21 {
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    min-height:
+        20px !important;
+
+    margin:
+        0 0 7px 0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-grid-v21 {
+    display:
+        grid !important;
+
+    grid-template-columns:
+        repeat(
+            2,
+            minmax(0,1fr)
+        ) !important;
+
+    column-gap:
+        20px !important;
+
+    row-gap:
+        0 !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-item-v21 {
+    display:
+        grid !important;
+
+    grid-template-columns:
+        minmax(0,1fr)
+        auto !important;
+
+    align-items:
+        center !important;
+
+    gap:
+        8px !important;
+
+    min-width:
+        0 !important;
+
+    min-height:
+        23px !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-item-v21
+span {
+    min-width:
+        0 !important;
+
+    overflow:
+        hidden !important;
+
+    text-overflow:
+        ellipsis !important;
+
+    white-space:
+        nowrap !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-item-v21
+strong {
+    justify-self:
+        end !important;
+
+    white-space:
+        nowrap !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-item-v21
+strong[data-tone="good"] {
+    color:
+        #83c47c !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-item-v21
+strong[data-tone="warn"] {
+    color:
+        #d6a82d !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.teleop-status-item-v21
+strong[data-tone="bad"] {
+    color:
+        #d45e67 !important;
+}
+
+
+/* ------------------------------------------------------------
+   VR / CAMERA CONTROLLER ISOLATION
+
+   Parent-level switching means legacy controller pollers cannot
+   make their children reappear.
+   ------------------------------------------------------------ */
+
+body[
+    data-teleoperation-mode-v21="vr"
+]
+#view-live
+#vrControllerControlsV21 {
+    display:
+        block !important;
+}
+
+
+body[
+    data-teleoperation-mode-v21="vr"
+]
+#view-live
+#cameraControllerControlsV21 {
+    display:
+        none !important;
+}
+
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#vrControllerControlsV21 {
+    display:
+        none !important;
+}
+
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#cameraControllerControlsV21 {
+    display:
+        block !important;
+}
+
+
+/* Camera Controller should contain ONLY amber status + V21 switch. */
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+.controller-process-meta,
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+.controller-process-detail {
+    display:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   HANDS
+   ------------------------------------------------------------ */
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+section:has(
+    #handMatrixBody
+) {
+    display:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   BRAND-NEW CAMERA THREE-PART CONTROL
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21 {
+    width:
+        100% !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-teleop-switch-v21 {
+    position:
+        relative !important;
+
+    display:
+        grid !important;
+
+    grid-template-columns:
+        repeat(
+            3,
+            minmax(0,1fr)
+        ) !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    overflow:
+        hidden !important;
+
+    isolation:
+        isolate !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-teleop-indicator-v21 {
+    position:
+        absolute !important;
+
+    z-index:
+        1 !important;
+
+    top:
+        2px !important;
+
+    bottom:
+        2px !important;
+
+    left:
+        2px !important;
+
+    width:
+        calc(
+            (100% - 4px)
+            /
+            3
+        ) !important;
+
+    pointer-events:
+        none !important;
+
+    transform:
+        translateX(0);
+
+    transition:
+        transform
+        250ms
+        cubic-bezier(
+            .22,
+            .72,
+            .22,
+            1
+        ) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-segment-v21 {
+    position:
+        relative !important;
+
+    z-index:
+        2 !important;
+
+    box-sizing:
+        border-box !important;
+
+    display:
+        flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    gap:
+        4px !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    background:
+        transparent !important;
+
+    border:
+        0 !important;
+
+    opacity:
+        .36 !important;
+
+    filter:
+        none !important;
+
+    cursor:
+        default !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-segment-v21
++
+.camera-segment-v21 {
+    border-left:
+        1px solid
+        rgba(
+            255,
+            255,
+            255,
+            .045
+        ) !important;
+}
+
+
+/* Initial */
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="idle"
+]
+#cameraConfigureV21 {
+    color:
+        var(
+            --camera-active-color-v21,
+            #8fc987
+        ) !important;
+
+    opacity:
+        1 !important;
+
+    cursor:
+        pointer !important;
+}
+
+
+/* Configure -> Enter */
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+.camera-teleop-indicator-v21 {
+    transform:
+        translateX(
+            100%
+        ) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+#cameraEnterV21 {
+    color:
+        var(
+            --camera-active-color-v21,
+            #8fc987
+        ) !important;
+
+    opacity:
+        1 !important;
+
+    cursor:
+        pointer !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+#cameraStopV21 {
+    color:
+        var(
+            --camera-active-color-v21,
+            #8fc987
+        ) !important;
+
+    opacity:
+        .88 !important;
+
+    cursor:
+        pointer !important;
+}
+
+
+/* Enter -> Stop */
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="teleop"
+]
+.camera-teleop-indicator-v21 {
+    transform:
+        translateX(
+            200%
+        ) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="teleop"
+]
+#cameraStopV21 {
+    color:
+        var(
+            --camera-active-color-v21,
+            #8fc987
+        ) !important;
+
+    opacity:
+        1 !important;
+
+    cursor:
+        pointer !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-segment-v21:disabled {
+    filter:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   SCROLL STABILITY
+
+   No V21 code changes scrollTop or rail geometry repeatedly.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.combined-rail {
+    overscroll-behavior-y:
+        contain !important;
+
+    scroll-behavior:
+        auto !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_TELEOPERATION_POLISH_CSS_V22
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   TELEOPERATION SELECT — NEVER COLLAPSE AGAIN
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleoperationSelectV16 {
+    box-sizing:
+        border-box !important;
+
+    display:
+        block !important;
+
+    visibility:
+        visible !important;
+
+    opacity:
+        1 !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    max-width:
+        none !important;
+
+    height:
+        31px !important;
+
+    min-height:
+        31px !important;
+
+    max-height:
+        31px !important;
+
+    line-height:
+        29px !important;
+
+    padding:
+        0 32px 0 11px !important;
+
+    margin:
+        0 !important;
+
+    cursor:
+        pointer !important;
+}
+
+
+/* ------------------------------------------------------------
+   ABSOLUTE VR / CAMERA EXCLUSIVITY
+
+   Also targets the later V20 controller host.
+   ------------------------------------------------------------ */
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#vrControllerControlsV21,
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#bacaControllerV20,
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+.controller-process-actions,
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#controllerProcessSwitchV16,
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#controllerXrSwitchV16,
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#controllerSettingsBtn {
+    display:
+        none !important;
+
+    visibility:
+        hidden !important;
+}
+
+
+body[
+    data-teleoperation-mode-v21="vr"
+]
+#view-live
+#cameraControllerControlsV21 {
+    display:
+        none !important;
+}
+
+
+body[
+    data-teleoperation-mode-v21="camera"
+]
+#view-live
+#cameraControllerControlsV21 {
+    display:
+        block !important;
+
+    visibility:
+        visible !important;
+}
+
+
+/* ------------------------------------------------------------
+   CAMERA THREE-STAGE TYPOGRAPHY
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#cameraTeleopSwitchV21
+.camera-segment-v21 {
+    text-align:
+        center !important;
+
+    white-space:
+        nowrap !important;
+
+    text-overflow:
+        clip !important;
+}
+
+
+.stitch-live-v12
+#view-live
+#cameraTeleopSwitchV21
+.camera-segment-v21
+>
+span:not(
+    .camera-segment-icon-v21
+) {
+    display:
+        inline-flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    font:
+        inherit !important;
+
+    line-height:
+        inherit !important;
+
+    letter-spacing:
+        inherit !important;
+
+    text-transform:
+        inherit !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-segment-icon-v21 {
+    display:
+        inline-flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    width:
+        10px !important;
+
+    flex:
+        0 0 10px !important;
+
+    line-height:
+        1 !important;
+}
+
+
+/* ------------------------------------------------------------
+   BATTERY THRESHOLDS
+
+   51–100 green
+   11–50 amber
+   0–10 red
+   ------------------------------------------------------------ */
+
+.full-dash-battery-v22[
+    data-battery-tone-v22="green"
+],
+.full-dash-battery-percent-v22[
+    data-battery-tone-v22="green"
+] {
+    color:
+        #8fd47f !important;
+}
+
+
+.full-dash-battery-v22[
+    data-battery-tone-v22="amber"
+],
+.full-dash-battery-percent-v22[
+    data-battery-tone-v22="amber"
+] {
+    color:
+        #d7a51d !important;
+}
+
+
+.full-dash-battery-v22[
+    data-battery-tone-v22="red"
+],
+.full-dash-battery-percent-v22[
+    data-battery-tone-v22="red"
+] {
+    color:
+        #dc5964 !important;
+}
+
+
+.full-dash-battery-v22[
+    data-battery-tone-v22="green"
+]
+svg,
+.full-dash-battery-v22[
+    data-battery-tone-v22="green"
+]
+svg * {
+    stroke:
+        #8fd47f !important;
+}
+
+
+.full-dash-battery-v22[
+    data-battery-tone-v22="amber"
+]
+svg,
+.full-dash-battery-v22[
+    data-battery-tone-v22="amber"
+]
+svg * {
+    stroke:
+        #d7a51d !important;
+}
+
+
+.full-dash-battery-v22[
+    data-battery-tone-v22="red"
+]
+svg,
+.full-dash-battery-v22[
+    data-battery-tone-v22="red"
+]
+svg * {
+    stroke:
+        #dc5964 !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_VISUAL_PARITY_CSS_V23
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   Native state owner is invisible.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleoperationSelectV16 {
+    display:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   CAMERA CONTROLLER — REAL CONFIGURE SATURATION
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.camera-segment-v21 {
+    color:
+        rgba(
+            125,
+            137,
+            130,
+            .40
+        ) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-segment-v21
+.camera-segment-icon-v21 {
+    color:
+        inherit !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="idle"
+]
+#cameraConfigureV21,
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+#cameraEnterV21,
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+#cameraStopV21,
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="teleop"
+]
+#cameraStopV21 {
+    color:
+        var(
+            --camera-selected-text-v23,
+            #8fd486
+        ) !important;
+}
+
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="idle"
+]
+#cameraConfigureV21
+span,
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+#cameraEnterV21
+span,
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="configured"
+]
+#cameraStopV21
+span,
+
+.stitch-live-v12
+#view-live
+.camera-controller-controls-v21[
+    data-camera-state="teleop"
+]
+#cameraStopV21
+span {
+    color:
+        inherit !important;
+
+    opacity:
+        1 !important;
+}
+
+
+/*
+ * Indicator receives exact Configure background/border/shadow
+ * from JavaScript.
+ */
+.stitch-live-v12
+#view-live
+.camera-teleop-indicator-v21 {
+    opacity:
+        1 !important;
+}
+
+
+/* ------------------------------------------------------------
+   OFFLINE chip
+
+   Runtime copies geometry/font/radius from NORMAL.
+   Existing amber color/background/border remain untouched.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#controllerProcessState {
+    box-sizing:
+        border-box !important;
+
+    display:
+        inline-flex !important;
+
+    align-items:
+        center !important;
+
+    justify-content:
+        center !important;
+
+    white-space:
+        nowrap !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_DROPDOWN_STABILITY_CSS_V24
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   TELEOPERATION PANEL MUST OWN THE TOP STACKING LAYER
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleoperationPanelV16 {
+    position:
+        relative !important;
+
+    z-index:
+        5000 !important;
+
+    overflow:
+        visible !important;
+
+    isolation:
+        auto !important;
+}
+
+
+/* Custom dropdown itself. */
+.stitch-live-v12
+#view-live
+#teleoperationDropdownV23 {
+    position:
+        relative !important;
+
+    z-index:
+        5001 !important;
+
+    overflow:
+        visible !important;
+}
+
+
+/* Open menu must sit ABOVE Controller Process. */
+.stitch-live-v12
+#view-live
+#teleoperationDropdownMenuV23 {
+    z-index:
+        5002 !important;
+}
+
+
+/*
+ * Following cards must not establish a higher stacking layer.
+ */
+.stitch-live-v12
+#view-live
+.controller-process-panel,
+
+.stitch-live-v12
+#view-live
+#teleopStatusPanelV21,
+
+.stitch-live-v12
+#view-live
+#liveRobotModesCard,
+
+.stitch-live-v12
+#view-live
+.rail-joint-inspector {
+    position:
+        relative !important;
+
+    z-index:
+        1 !important;
+}
+
+
+/*
+ * Absolutely no native browser selector is permitted to
+ * participate in layout anymore.
+ */
+.stitch-live-v12
+#view-live
+#teleoperationSelectV16 {
+    display:
+        none !important;
+
+    position:
+        absolute !important;
+
+    width:
+        0 !important;
+
+    height:
+        0 !important;
+
+    min-width:
+        0 !important;
+
+    min-height:
+        0 !important;
+
+    margin:
+        0 !important;
+
+    padding:
+        0 !important;
+
+    border:
+        0 !important;
+
+    opacity:
+        0 !important;
+
+    pointer-events:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   BATTERY GRAPHIC = PERCENTAGE COLOR
+   ------------------------------------------------------------ */
+
+.full-dash-battery-match-v24 {
+    color:
+        var(
+            --full-dash-battery-color-v24
+        ) !important;
+}
+
+
+.full-dash-battery-match-v24
+svg {
+    color:
+        var(
+            --full-dash-battery-color-v24
+        ) !important;
+}
+
+
+/*
+ * Covers common CSS-drawn battery outline/fill implementations.
+ */
+.full-dash-battery-match-v24
+[class*="battery"]::before,
+
+.full-dash-battery-match-v24
+[class*="battery"]::after,
+
+.full-dash-battery-match-v24
+[class*="charge"]::before,
+
+.full-dash-battery-match-v24
+[class*="charge"]::after,
+
+.full-dash-battery-match-v24
+[class*="level"]::before,
+
+.full-dash-battery-match-v24
+[class*="level"]::after {
+    color:
+        var(
+            --full-dash-battery-color-v24
+        ) !important;
+
+    border-color:
+        var(
+            --full-dash-battery-color-v24
+        ) !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_EXACT_COMPOSITE_DROPDOWN_CSS_V25
+   ------------------------------------------------------------
+   Same Composite component.
+   Only contextual width differs.
+   ============================================================ */
+
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownV23.teleoperation-health-clone-v25 {
+    display:
+        flex !important;
+
+    flex:
+        1 1 auto !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    max-width:
+        none !important;
+
+    height:
+        32px !important;
+
+    margin:
+        0 !important;
+}
+
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownV23
+>
+.stitch-health-trigger-v174 {
+    flex:
+        1 1 auto !important;
+
+    width:
+        100% !important;
+
+    min-width:
+        0 !important;
+
+    max-width:
+        none !important;
+}
+
+
+/*
+ * Same BODY popup as Composite.
+ *
+ * V24 previously gave this ID z-index 5002.
+ * Composite's REAL popup layer is 100000.
+ */
+body
+>
+#teleoperationDropdownMenuV23.stitch-health-menu-v174 {
+    z-index:
+        100000 !important;
+}
+
+
+/*
+ * Explicitly respect hidden exactly as the real control expects.
+ */
+body
+>
+#teleoperationDropdownMenuV23.stitch-health-menu-v174[hidden] {
+    display:
+        none !important;
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_MICRO_POLISH_CSS_V26
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   1. TELEOPERATION SELECTED TEXT = COMPOSITE GREEN
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownLabelV23 {
+    color:
+        var(
+            --full-dash-teleop-selected-v26,
+            #8ecb7f
+        ) !important;
+}
+
+
+body
+>
+#teleoperationDropdownMenuV23
+.stitch-health-option-v174.selected {
+    color:
+        var(
+            --full-dash-teleop-selected-v26,
+            #8ecb7f
+        ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   2. REMOVE THE LITTLE GRAY CLICK / FOCUS BOX
+
+   Keep the REAL Composite open-state green treatment.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownTriggerV23:focus,
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownTriggerV23:focus-visible,
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownTriggerV23:active {
+    outline:
+        none !important;
+
+    -webkit-tap-highlight-color:
+        transparent !important;
+}
+
+
+.stitch-live-v12
+#view-live
+#teleoperationDropdownTriggerV23::-moz-focus-inner {
+    border:
+        0 !important;
+
+    padding:
+        0;
+}
+
+
+/*
+ * When open, use the exact green open shadow already used by
+ * the Composite dropdown rather than any browser focus box.
+ */
+.stitch-live-v12
+#view-live
+#teleoperationDropdownV23.open
+#teleoperationDropdownTriggerV23 {
+    outline:
+        none !important;
+
+    box-shadow:
+        0 0 0 2px
+        rgba(
+            142,
+            203,
+            127,
+            .08
+        ) !important;
+}
+
+
+/* ------------------------------------------------------------
+   3. CONTROLLER PROCESS SETTINGS ICON
+
+   Remove browser focus/click rectangle only.
+   Normal icon border/hover styling stays untouched.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+#controllerSettingsBtn:focus,
+
+.stitch-live-v12
+#view-live
+#controllerSettingsBtn:focus-visible,
+
+.stitch-live-v12
+#view-live
+#controllerSettingsBtn:active {
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    -webkit-tap-highlight-color:
+        transparent !important;
+}
+
+
+.stitch-live-v12
+#view-live
+#controllerSettingsBtn::-moz-focus-inner {
+    border:
+        0 !important;
+
+    padding:
+        0;
+}
+
+
+/* ------------------------------------------------------------
+   4. RIGHT SIDEBAR SCROLL THUMB
+
+   Preserve existing:
+   - width
+   - green tint
+   - opacity
+   - border radius
+   - appear-on-scroll mechanic
+
+   Only make the thumb a little longer.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12
+#view-live
+.combined-rail::-webkit-scrollbar-thumb {
+    min-height:
+        64px !important;
+}
+
+
+
+/* ============================================================
+   FULL_DASH_INTERACTION_PARITY_V27
+
+   One interaction language across Live:
+
+   GREEN:
+   - Teleoperation dropdown
+   - Composite dropdown
+   - Reset view
+   - Refresh
+   - Configure
+   - Enter Teleop
+   - Connect
+   - Settings
+
+   AMBER:
+   - Stop
+   - Exit Teleop
+   - Disconnect
+
+   Hover / mouse-down / keyboard focus use the SAME intensity.
+   Mouse click must not leave a gray browser focus outline.
+
+   Presentation only.
+   ============================================================ */
+
+.stitch-live-v12 {
+    --fd-hover-green:
+        0 0 0 2px rgba(142,203,127,.08);
+
+    --fd-hover-amber:
+        0 0 0 2px rgba(214,168,45,.10);
+}
+
+
+/* ============================================================
+   REMOVE BROWSER CLICK / FOCUS BOXES
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174,
+
+.stitch-live-v12 #view-live
+.twin-reset-btn,
+
+.stitch-live-v12 #view-live
+#liveRobotModeRefresh,
+
+.stitch-live-v12 #view-live
+#controllerConfigureBtn,
+
+.stitch-live-v12 #view-live
+#controllerStopBtn,
+
+.stitch-live-v12 #view-live
+#bacaEnterTeleopBtn,
+
+.stitch-live-v12 #view-live
+#bacaExitTeleopBtn,
+
+.stitch-live-v12 #view-live
+#cameraConfigureV21,
+
+.stitch-live-v12 #view-live
+#cameraEnterV21,
+
+.stitch-live-v12 #view-live
+#cameraStopV21,
+
+.stitch-live-v12 #view-live
+#cameraConnectBtn,
+
+.stitch-live-v12 #view-live
+#cameraStopBtn,
+
+.stitch-live-v12 #view-live
+#controllerSettingsBtn {
+    outline:
+        none !important;
+
+    -webkit-tap-highlight-color:
+        transparent !important;
+}
+
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+.twin-reset-btn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#liveRobotModeRefresh:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#controllerConfigureBtn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#controllerStopBtn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#bacaEnterTeleopBtn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#bacaExitTeleopBtn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#cameraConfigureV21:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#cameraEnterV21:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#cameraStopV21:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#cameraConnectBtn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#cameraStopBtn:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+#controllerSettingsBtn:focus:not(:focus-visible):not(:hover) {
+    box-shadow:
+        none !important;
+}
+
+
+/* ============================================================
+   DROPDOWNS
+
+   Hover and OPEN are intentionally the SAME intensity.
+   No click flash / no stronger open glow.
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:hover,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:active,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:focus-visible,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownV23.open
+#teleoperationDropdownTriggerV23,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:hover,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:active,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:focus-visible,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174.open
+.stitch-health-trigger-v174 {
+    background:
+        #1e211e !important;
+
+    border-color:
+        #4c7448 !important;
+
+    box-shadow:
+        var(--fd-hover-green) !important;
+
+    filter:
+        none !important;
+}
+
+
+/* ============================================================
+   GREEN CONTROLS
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+:is(
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #bacaEnterTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraConnectBtn,
+    #controllerSettingsBtn
+):hover:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #bacaEnterTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraConnectBtn,
+    #controllerSettingsBtn
+):active:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #bacaEnterTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraConnectBtn,
+    #controllerSettingsBtn
+):focus-visible:not(:disabled) {
+    box-shadow:
+        var(--fd-hover-green) !important;
+
+    filter:
+        none !important;
+}
+
+
+/* ============================================================
+   AMBER CONTROLS
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+:is(
+    #controllerStopBtn,
+    #bacaExitTeleopBtn,
+    #cameraStopV21,
+    #cameraStopBtn
+):hover:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    #controllerStopBtn,
+    #bacaExitTeleopBtn,
+    #cameraStopV21,
+    #cameraStopBtn
+):active:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    #controllerStopBtn,
+    #bacaExitTeleopBtn,
+    #cameraStopV21,
+    #cameraStopBtn
+):focus-visible:not(:disabled) {
+    box-shadow:
+        var(--fd-hover-amber) !important;
+
+    filter:
+        none !important;
+}
+
+
+/* ============================================================
+   CAMERA CONNECT / DISCONNECT
+
+   Retire any stronger per-button hover/filter effect so these
+   use the exact same glow strength as everything else.
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+#cameraConnectBtn:hover:not(:disabled),
+
+.stitch-live-v12 #view-live
+#cameraConnectBtn:active:not(:disabled),
+
+.stitch-live-v12 #view-live
+#cameraStopBtn:hover:not(:disabled),
+
+.stitch-live-v12 #view-live
+#cameraStopBtn:active:not(:disabled) {
+    transform:
+        none !important;
+
+    filter:
+        none !important;
+}
+
+
+/*
+ * Settings icon: same rule — no gray click rectangle.
+ */
+.stitch-live-v12 #view-live
+#controllerSettingsBtn:active:not(:disabled) {
+    outline:
+        none !important;
+}
+
+
+
+/* ============================================================
+   FULL_DASH_INTERACTION_PARITY_V28
+
+   V27 used an OUTER 2 px halo.
+   V28 keeps the highlight entirely INSIDE the existing control
+   border, so the apparent size never grows beyond the button.
+
+   Same interaction language for all requested controls.
+   ============================================================ */
+
+.stitch-live-v12 {
+    --fd-soft-green:
+        inset 0 0 0 1px rgba(142, 203, 127, .16),
+        inset 0 0 7px rgba(142, 203, 127, .035);
+
+    --fd-soft-amber:
+        inset 0 0 0 1px rgba(214, 168, 45, .17),
+        inset 0 0 7px rgba(214, 168, 45, .04);
+}
+
+
+/* ------------------------------------------------------------
+   TELEOPERATION DROPDOWN
+   Hover / active / keyboard focus / open = EXACT SAME intensity.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:hover,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:active,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:focus-visible,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownV23.open
+#teleoperationDropdownTriggerV23 {
+    box-shadow:
+        var(--fd-soft-green) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   COMPOSITE / HEALTH DROPDOWN
+   Override its older OUTER open-state ring too.
+   ------------------------------------------------------------ */
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:hover,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:active,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:focus-visible,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174.open
+.stitch-health-trigger-v174 {
+    box-shadow:
+        var(--fd-soft-green) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   GREEN CONTROLS
+
+   Reset view
+   Refresh
+   Configure
+   Enter Teleop
+   Connect
+   Settings
+   ------------------------------------------------------------ */
+
+.stitch-live-v12 #view-live
+:is(
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #bacaEnterTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraConnectBtn,
+    #controllerSettingsBtn
+):hover:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #bacaEnterTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraConnectBtn,
+    #controllerSettingsBtn
+):active:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #bacaEnterTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraConnectBtn,
+    #controllerSettingsBtn
+):focus-visible:not(:disabled) {
+    box-shadow:
+        var(--fd-soft-green) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+/* ------------------------------------------------------------
+   AMBER CONTROLS
+
+   Stop
+   Exit Teleop
+   Disconnect
+   ------------------------------------------------------------ */
+
+.stitch-live-v12 #view-live
+:is(
+    #controllerStopBtn,
+    #bacaExitTeleopBtn,
+    #cameraStopV21,
+    #cameraStopBtn
+):hover:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    #controllerStopBtn,
+    #bacaExitTeleopBtn,
+    #cameraStopV21,
+    #cameraStopBtn
+):active:not(:disabled),
+
+.stitch-live-v12 #view-live
+:is(
+    #controllerStopBtn,
+    #bacaExitTeleopBtn,
+    #cameraStopV21,
+    #cameraStopBtn
+):focus-visible:not(:disabled) {
+    box-shadow:
+        var(--fd-soft-amber) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+/* Mouse-click focus must never leave a second gray rectangle. */
+
+.stitch-live-v12 #view-live
+:is(
+    #teleoperationDropdownTriggerV23,
+    #controllerSettingsBtn,
+    .twin-reset-btn,
+    #liveRobotModeRefresh,
+    #controllerConfigureBtn,
+    #controllerStopBtn,
+    #bacaEnterTeleopBtn,
+    #bacaExitTeleopBtn,
+    #cameraConfigureV21,
+    #cameraEnterV21,
+    #cameraStopV21,
+    #cameraConnectBtn,
+    #cameraStopBtn
+):focus:not(:focus-visible):not(:hover) {
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+/*
+ * Same protection for Composite.
+ */
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:focus:not(:focus-visible):not(:hover) {
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+}
+
+
+
+/* ============================================================
+   FULL_DASH_EXACT_BUTTON_GLOW_CSS_V29
+
+   FINAL Live interaction language.
+
+   Green effect is exactly shared by:
+   - VR/Camera Teleoperation dropdown
+   - Composite
+   - Reset view
+   - Refresh
+   - Configure
+   - Enter Teleop
+   - Connect
+
+   Amber uses the identical geometry/intensity with amber RGB:
+   - Stop
+   - Exit Teleop
+   - Disconnect
+
+   Glow remains INSIDE the existing border.
+   ============================================================ */
+
+.stitch-live-v12 {
+
+    --fd-v29-green-text:
+        rgb(
+            142,
+            203,
+            127
+        );
+
+    --fd-v29-green-border:
+        rgba(
+            142,
+            203,
+            127,
+            .42
+        );
+
+    --fd-v29-green-bg:
+        rgba(
+            142,
+            203,
+            127,
+            .055
+        );
+
+    --fd-v29-green-glow:
+        inset 0 0 0 1px
+        rgba(
+            142,
+            203,
+            127,
+            .14
+        ),
+        inset 0 0 7px
+        rgba(
+            142,
+            203,
+            127,
+            .032
+        );
+
+
+    --fd-v29-amber-text:
+        rgb(
+            214,
+            168,
+            45
+        );
+
+    --fd-v29-amber-border:
+        rgba(
+            214,
+            168,
+            45,
+            .42
+        );
+
+    --fd-v29-amber-bg:
+        rgba(
+            214,
+            168,
+            45,
+            .055
+        );
+
+    --fd-v29-amber-glow:
+        inset 0 0 0 1px
+        rgba(
+            214,
+            168,
+            45,
+            .14
+        ),
+        inset 0 0 7px
+        rgba(
+            214,
+            168,
+            45,
+            .032
+        );
+}
+
+
+/* ============================================================
+   TELEOPERATION + COMPOSITE
+
+   Keep these as the reference implementation.
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:hover,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:active,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23:focus-visible,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownV23.open
+#teleoperationDropdownTriggerV23,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:hover,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:active,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174
+.stitch-health-trigger-v174:focus-visible,
+
+.stitch-live-v12 #view-live
+#stitchHealthDropdownV174.open
+.stitch-health-trigger-v174 {
+    color:
+        var(
+            --fd-v29-green-text
+        ) !important;
+
+    background:
+        var(
+            --fd-v29-green-bg
+        ) !important;
+
+    border-color:
+        var(
+            --fd-v29-green-border
+        ) !important;
+
+    box-shadow:
+        var(
+            --fd-v29-green-glow
+        ) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+/* ============================================================
+   GREEN ACTION BUTTONS
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29:hover:not(:disabled):not([aria-disabled="true"]),
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29:active:not(:disabled):not([aria-disabled="true"]),
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29:focus-visible:not(:disabled):not([aria-disabled="true"]) {
+    color:
+        var(
+            --fd-v29-green-text
+        ) !important;
+
+    background:
+        var(
+            --fd-v29-green-bg
+        ) !important;
+
+    border-color:
+        var(
+            --fd-v29-green-border
+        ) !important;
+
+    box-shadow:
+        var(
+            --fd-v29-green-glow
+        ) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+/* ============================================================
+   AMBER ACTION BUTTONS
+
+   Exact same effect.
+   Every green visual component has been replaced with amber.
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29:hover:not(:disabled):not([aria-disabled="true"]),
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29:active:not(:disabled):not([aria-disabled="true"]),
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29:focus-visible:not(:disabled):not([aria-disabled="true"]) {
+    color:
+        var(
+            --fd-v29-amber-text
+        ) !important;
+
+    background:
+        var(
+            --fd-v29-amber-bg
+        ) !important;
+
+    border-color:
+        var(
+            --fd-v29-amber-border
+        ) !important;
+
+    box-shadow:
+        var(
+            --fd-v29-amber-glow
+        ) !important;
+
+    outline:
+        none !important;
+
+    filter:
+        none !important;
+
+    transform:
+        none !important;
+}
+
+
+/* ============================================================
+   MOUSE CLICK MUST NOT LEAVE A GRAY FOCUS BOX
+   ============================================================ */
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29:focus:not(:focus-visible):not(:hover),
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29:focus:not(:focus-visible):not(:hover) {
+    outline:
+        none !important;
+
+    box-shadow:
+        none !important;
+
+    filter:
+        none !important;
+}
+
+
+/*
+ * If the mouse is still over the control after the click,
+ * keep EXACTLY the same hover effect instead of flashing to a
+ * different active/focus intensity.
+ */
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29:hover:focus,
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29:hover:active {
+    color:
+        var(
+            --fd-v29-green-text
+        ) !important;
+
+    background:
+        var(
+            --fd-v29-green-bg
+        ) !important;
+
+    border-color:
+        var(
+            --fd-v29-green-border
+        ) !important;
+
+    box-shadow:
+        var(
+            --fd-v29-green-glow
+        ) !important;
+}
+
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29:hover:focus,
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29:hover:active {
+    color:
+        var(
+            --fd-v29-amber-text
+        ) !important;
+
+    background:
+        var(
+            --fd-v29-amber-bg
+        ) !important;
+
+    border-color:
+        var(
+            --fd-v29-amber-border
+        ) !important;
+
+    box-shadow:
+        var(
+            --fd-v29-amber-glow
+        ) !important;
+}
+
+
+/* Browser-specific focus rectangle cleanup. */
+
+.stitch-live-v12 #view-live
+.fd-action-green-v29::-moz-focus-inner,
+
+.stitch-live-v12 #view-live
+.fd-action-amber-v29::-moz-focus-inner,
+
+.stitch-live-v12 #view-live
+#teleoperationDropdownTriggerV23::-moz-focus-inner {
+    border:
+        0 !important;
+}
+

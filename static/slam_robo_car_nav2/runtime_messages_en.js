@@ -1,0 +1,222 @@
+"use strict";
+/*
+ * English presentation of the messages returned by the unchanged SLAM runtime
+ * (bacalbasa_slam_runtime), whose backend reports errors and states in
+ * Romanian. "{}" stands for a value inserted by the runtime; unknown messages
+ * are shown unchanged.
+ */
+(() => {
+  const MESSAGES = [
+    // Mapping
+    ["Cartografiere 3D+XY pornită. Folder sesiune: {}", "3D+XY mapping started. Session folder: $1"],
+    ["Cartografiere oprită; capturile parțiale au fost păstrate", "Mapping stopped; partial captures were kept"],
+    ["Cartografiere pusă pe pauză", "Mapping paused"],
+    ["Cartografiere reluată", "Mapping resumed"],
+    ["Cartografierea a înlocuit ruta activă", "Mapping replaced the active route"],
+    ["Cartografierea cere cadre proaspete pe /utlidar/cloud_livox_mid360 și /state_estimator/odom_pelvis", "Mapping needs fresh data on /utlidar/cloud_livox_mid360 and /state_estimator/odom_pelvis"],
+    ["Cadre SLAM incompatibile: cloud={}, odom={}, body={}. Nu acumulez puncte fără un cadru fix comun.", "Incompatible SLAM frames: cloud=$1, odom=$2, body=$3. Points are not accumulated without a common fixed frame."],
+    ["Comandă de salvare inițiată pentru {}", "Save command started for $1"],
+    ["Harta {} există deja; alege un nume nou. V3 nu suprascrie hărți PCD existente.", "Map $1 already exists; choose a new name. Existing PCD maps are never overwritten."],
+    ["Harta 2D este goală; verifică Mid360 și odometria pelvisului", "The 2D map is empty; check the Mid360 and the pelvis odometry"],
+    ["Harta 2D nu conține puncte finite", "The 2D map contains no finite points"],
+    ["Norul SLAM este gol; harta nu a fost salvată", "The SLAM cloud is empty; the map was not saved"],
+    ["Nu exista o sesiune de mapping activa", "No mapping session is active"],
+    ["Nu există o sesiune de cartografiere activă", "No mapping session is active"],
+    ["Nu s-a putut crea un director unic pentru sesiunea de mapping", "Could not create a unique folder for the mapping session"],
+    ["Nume de sesiune parțială invalid", "Invalid partial session name"],
+    ["Odometria SLAM nu este proaspătă.", "SLAM odometry is not fresh."],
+    ["Captura nu există: {}", "Capture does not exist: $1"],
+    ["Sesiunea nu există: {}", "Session does not exist: $1"],
+    ["Harta nu exista: {}", "Map does not exist: $1"],
+    ["Vizualizarea a fost golită", "Visualization cleared"],
+    ["1802 nu a confirmat copia nativa", "API 1802 did not confirm the native copy"],
+    ["{}; API 1802 nu a confirmat oprirea serviciului nativ", "$1; API 1802 did not confirm that the native service stopped"],
+    ["proiecție PCD veche", "legacy PCD projection"],
+    ["proiecție XY din harta 3D stabilizată", "XY projection of the stabilized 3D map"],
+
+    // Localization
+    ["API 1804 a acceptat harta, dar pozitia de localizare nu a aparut in 10s", "API 1804 accepted the map, but no localization pose appeared within 10 s"],
+    ["Localizare confirmata prin API 1804 si pozitie ROS proaspata", "Localization confirmed by API 1804 with a fresh ROS pose"],
+    ["Localizarea SLAM nu este activă", "SLAM localization is not active"],
+    ["Harta aleasă nu este harta localizării active", "The selected map is not the active localization map"],
+    ["Harta are numai copia locala pentru vizualizare; 1802 nu a confirmat copia nativa necesara lui 1804", "The map has only a local viewing copy; API 1802 did not confirm the native copy required by API 1804"],
+    ["Cadrul localizării s-a schimbat", "The localization frame changed"],
+    ["Date de localizare invalide: {}", "Invalid localization data: $1"],
+    ["Poziția SLAM nu este proaspătă", "SLAM pose is not fresh"],
+    ["Poziție SLAM nefinita", "SLAM pose is not finite"],
+    ["Poziție inițială invalidă", "Invalid initial pose"],
+    ["Poziția trebuie să fie finită", "The pose must be finite"],
+    ["Sursa localizării s-a pierdut; oprește ruta înainte de schimbarea sursei", "The localization source was lost; stop the route before changing the source"],
+    ["Transformarea map→odom nu este încă disponibilă", "The map→odom transform is not available yet"],
+    ["O localizare nouă a înlocuit ruta activă", "A new localization replaced the active route"],
+    ["PCD-ul nu conține suficiente celule-obstacol pentru localizare", "The PCD does not contain enough obstacle cells for localization"],
+    ["Proiecția 2D a PCD-ului nu conține suficiente obstacole", "The 2D projection of the PCD does not contain enough obstacles"],
+    ["aștept poziția inițială și scanări LiDAR", "waiting for the initial pose and LiDAR scans"],
+    ["convergență LiDAR în curs", "LiDAR convergence in progress"],
+    ["corespondențe ICP instabile", "unstable ICP correspondences"],
+    ["harta locală nu este configurată", "the local map is not configured"],
+    ["nicio hartă locală încărcată", "no local map loaded"],
+    ["poziția inițială nu este setată", "the initial pose is not set"],
+    ["prea puține puncte-obstacol LiDAR", "too few LiDAR obstacle points"],
+    ["scanarea nu se suprapune suficient peste obstacolele PCD", "the scan does not overlap the PCD obstacles enough"],
+    ["ICP respins: inliers={}/{} ratio={} median={} corecție={}m/{}°", "ICP rejected: inliers=$1/$2 ratio=$3 median=$4 correction=$5 m/$6°"],
+
+    // Navigation
+    ["Acțiunea Nav2 /compute_path_to_pose nu este disponibilă", "The Nav2 /compute_path_to_pose action is not available"],
+    ["Acțiunea Nav2 /navigate_to_pose nu este disponibilă", "The Nav2 /navigate_to_pose action is not available"],
+    ["Destinația Nav2 a fost atinsă (fără pozitie/yaw pentru verificarea orientării)", "Nav2 destination reached (no pose/yaw available to verify the orientation)"],
+    ["Destinația Nav2 a fost atinsă, robotul este deja orientat spre țintă", "Nav2 destination reached; the robot already faces the target orientation"],
+    ["Destinația Nav2 a fost atinsă, robotul este orientat spre țintă", "Nav2 destination reached; the robot faces the target orientation"],
+    ["Destinația a fost atinsă, /spin a refuzat rotația finală", "Destination reached; /spin refused the final rotation"],
+    ["Destinația a fost atinsă, dar acțiunea /spin nu este disponibilă pentru orientarea finală", "Destination reached, but the /spin action is not available for the final orientation"],
+    ["Destinația a fost atinsă, rotația finală a eșuat: {}", "Destination reached; the final rotation failed: $1"],
+    ["Destinația a fost atinsă, rotația finală s-a încheiat cu status {}", "Destination reached; the final rotation ended with status $1"],
+    ["Există deja o rută Nav2 activă", "A Nav2 route is already active"],
+    ["Conflict de control; oprește ruta și previzualizează din nou", "Control conflict; stop the route and preview it again"],
+    ["Deplasarea a fost suspendată", "Motion was suspended"],
+    ["Harta Nav2 nu este publicată", "The Nav2 map is not published"],
+    ["Harta Nav2 nu poate fi rasterizată: {}", "The Nav2 map cannot be rasterized: $1"],
+    ["Harta rasterizată este prea mare: {}x{}", "The rasterized map is too large: $1x$2"],
+    ["Nav2 a abandonat ruta", "Nav2 aborted the route"],
+    ["Nav2 a refuzat destinația", "Nav2 rejected the destination"],
+    ["Nav2 acceptă destinația", "Nav2 accepted the destination"],
+    ["Nav2 este în așteptare", "Nav2 is waiting"],
+    ["Nav2 nu a găsit rută (status {})", "Nav2 found no route (status $1)"],
+    ["Nav2 nu a răspuns în timpul alocat", "Nav2 did not respond in time"],
+    ["Nav2 rotește robotul spre orientarea țintei", "Nav2 is rotating the robot to the target orientation"],
+    ["Nav2 s-a încheiat cu status {}", "Nav2 finished with status $1"],
+    ["Nav2 urmărește ruta", "Nav2 is following the route"],
+    ["Navigația nativă este dezactivată în nav2_v4", "Native navigation is disabled in nav2_v4"],
+    ["Nicio rută Nav2 activă", "No active Nav2 route"],
+    ["Nu există o destinație Nav2 în pauză", "No paused Nav2 destination"],
+    ["Nu există o rută Nav2 în pauză", "No paused Nav2 route"],
+    ["Robotul s-a deplasat în timpul pregătirii; recalculează", "The robot moved during preparation; recalculate the route"],
+    ["Ruta Nav2 a fost oprită", "Nav2 route stopped"],
+    ["Ruta Nav2 a fost reluată în RUN", "Nav2 route resumed in RUN"],
+    ["Ruta Nav2 este doar previzualizată; nu s-a trimis nicio comandă de mers", "The Nav2 route is only previewed; no motion command was sent"],
+    ["Ruta Nav2 este pregătită", "Nav2 route ready"],
+    ["Ruta Nav2 este în pauză", "Nav2 route paused"],
+    ["Ruta trebuie previzualizată din nou și confirmată fără modificarea țintei", "The route must be previewed again and confirmed without changing the target"],
+    ["Scanul LiDAR /scan nu este proaspăt", "The LiDAR /scan is not fresh"],
+    ["Schimbarea modului robotului a anulat ruta", "Changing the robot mode cancelled the route"],
+    ["Confirmă că navigația nativă și ceilalți emițători de mișcare sunt opriți", "Confirm that native navigation and all other motion sources are stopped"],
+    ["Ieșirea /nav2/cmd_vel_safe a expirat", "The /nav2/cmd_vel_safe output timed out"],
+    ["controller_server nu publică prima comandă pe /nav2/cmd_vel_nav2", "controller_server does not publish the first command on /nav2/cmd_vel_nav2"],
+    ["Țintă invalidă: {}", "Invalid target: $1"],
+    ["Țintă invalidă", "Invalid target"],
+    ["Ținta trebuie să fie finită", "The target must be finite"],
+    ["Viteză Nav2: {} m/s", "Nav2 speed: $1 m/s"],
+    ["Viteză invalidă: {}", "Invalid speed: $1"],
+    ["viteza trebuie să fie între {} și {} m/s", "speed must be between $1 and $2 m/s"],
+    ["Testează mai întâi mersul din taste: activează teleoperarea, pornește teleop_twist_keyboard și confirmă mișcarea reală", "Test walking from the keyboard first: enable teleop and confirm real motion"],
+    ["Alt emitent comandă navigația/SLAM (API {})", "Another source is commanding navigation/SLAM (API $1)"],
+    ["Alt emitent trimite comenzi de mișcare; oprește-l înainte de Nav2", "Another source is sending motion commands; stop it before Nav2"],
+    ["API 7105 acceptă viteza, dar odom_pelvis nu arată mișcare; verifică autoritatea locomotorie/FSM, nu obstacolele Nav2", "API 7105 accepts the velocity, but odom_pelvis shows no motion; check the locomotion authority/FSM, not the Nav2 obstacles"],
+
+    // Teleop and robot mode
+    ["Alt emitent locomotor a publicat recent; oprește-l și încearcă din nou", "Another locomotion source published recently; stop it and try again"],
+    ["Alt emitent locomotor este activ", "Another locomotion source is active"],
+    ["Confirmă că maneta și ceilalți emițători de mișcare sunt opriți", "Confirm that the joystick and all other motion sources are stopped"],
+    ["Există deja un publisher extern pe /cmd_vel_teleop; oprește start_teleop_keyboard.sh înainte de controlul din browser", "An external publisher already exists on /cmd_vel_teleop; stop start_teleop_keyboard.sh before controlling from the browser"],
+    ["Fluxul /cmd_vel_teleop a expirat în timpul mișcării", "The /cmd_vel_teleop stream timed out while moving"],
+    ["Nodul teleop a pornit, dar publisherul /cmd_vel_teleop nu a fost descoperit", "The teleop node started, but the /cmd_vel_teleop publisher was not discovered"],
+    ["Odometria pelvisului nu este proaspătă", "Pelvis odometry is not fresh"],
+    ["Parolă incorectă pentru schimbarea modului", "Incorrect password for changing the mode"],
+    ["Parolă incorectă pentru teleoperare", "Incorrect password for teleop"],
+    ["Pornirea teleop a eșuat: {}", "Starting teleop failed: $1"],
+    ["Procesul teleop_twist_keyboard nu mai rulează", "The teleop_twist_keyboard process is no longer running"],
+    ["Tastă teleop nepermisă", "Teleop key not allowed"],
+    ["Teleop nu a putut rearma RUN: {}", "Teleop could not re-arm RUN: $1"],
+    ["Teleoperare armată în dashboard; folosește săgețile/WASD sau tastele standard i/j/k/l/,", "Teleop armed; use the arrow keys/WASD or the standard i/j/k/l/, keys"],
+    ["Teleoperarea a fost oprită", "Teleop stopped"],
+    ["Teleoperarea a preluat controlul exclusiv", "Teleop took exclusive control"],
+    ["Teleoperarea cere serviciul {}, RUN și FSM din {}", "Teleop requires service $1, RUN and an FSM in $2"],
+    ["Teleoperarea nu este armată", "Teleop is not armed"],
+    ["Terminalul teleop nu răspunde: {}", "The teleop terminal does not respond: $1"],
+    ["Terminalul teleop nu răspunde", "The teleop terminal does not respond"],
+    ["teleop_twist_keyboard lipsește: {}", "teleop_twist_keyboard is missing: $1"],
+    ["teleop_twist_keyboard nu rulează", "teleop_twist_keyboard is not running"],
+    ["teleop_twist_keyboard s-a oprit la pornire", "teleop_twist_keyboard stopped at startup"],
+    ["viteza teleop trebuie să fie între {} și {} m/s", "teleop speed must be between $1 and $2 m/s"],
+    ["viteza unghiulară trebuie să fie între {} și {} rad/s", "angular speed must be between $1 and $2 rad/s"],
+    ["Comandă de viteză nefinita", "Velocity command is not finite"],
+    ["Sursă cmd_vel invalidă: {}", "Invalid cmd_vel source: $1"],
+    ["Transformarea Twist→7105 a eșuat: {}", "Twist→7105 conversion failed: $1"],
+    ["Mod invalid; folosește damp, ready sau run", "Invalid mode; use damp, ready or run"],
+    ["MotionSwitcher CheckMode a eșuat: {}", "MotionSwitcher CheckMode failed: $1"],
+    ["Pregătirea locomotiei a eșuat: {}", "Locomotion preparation failed: $1"],
+    ["Robotul nu a confirmat FSM-ul cerut {}; FSM actual: {}", "The robot did not confirm the requested FSM $1; current FSM: $2"],
+    ["Tranziția intermediară READY a eșuat: {}", "The intermediate READY transition failed: $1"],
+    ["FSM {} citit; cererea {} acceptată", "FSM $1 read; request $2 accepted"],
+    ["API 7001 a răspuns, dar nu conține un FSM valid", "API 7001 responded without a valid FSM"],
+    ["Controlul {} nu a fost acordat: {}", "Control $1 was not granted: $2"],
+    ["API {} nu a răspuns în {}s ({})", "API $1 did not respond within $2 s ($3)"],
+    ["Serviciul Unitree nu este descoperit pe {}", "The Unitree service is not discovered on $1"],
+    ["serviciul nu are publisher pe topicul de răspuns", "the service has no publisher on the response topic"],
+    ["publisheri răspuns vizibili: {}", "visible response publishers: $1"],
+    ["Nodul ROS nu este pornit", "The ROS node is not running"],
+    ["Dashboard închis", "Dashboard closed"],
+    ["Camera nu a livrat încă un cadru", "The camera has not delivered a frame yet"],
+    ["ultralytics nu este instalat", "ultralytics is not installed"],
+    ["Comandă trimisă: {}", "Command sent: $1"],
+    ["valorile trebuie să fie finite", "values must be finite"],
+
+    // Car
+    ["Aștept o hartă /map cu suficiente celule ocupate de la mașină.", "Waiting for a /map from the car with enough occupied cells."],
+    ["Aștept o hartă cu suficiente celule de la mașină.", "Waiting for a car map with enough cells."],
+    ["Cererea traseului a eșuat: {}", "Route request failed: $1"],
+    ["Compar geometriile celor două hărți…", "Comparing the geometry of both maps…"],
+    ["Harta G1 s-a schimbat; reconfirmă alinierea.", "The robot map changed; confirm the alignment again."],
+    ["Hărțile au fost suprapuse ({}, RMSE={} m, overlap={}%).", "Maps aligned ($1, RMSE=$2 m, overlap=$3%)."],
+    ["ICP nu a putut alinia pereții (suprapunere insuficientă)", "ICP could not align the walls (insufficient overlap)"],
+    ["Mașina nu este conectată", "The car is not connected"],
+    ["Mașina nu este conectată la dashboard", "The car is not connected to the dashboard"],
+    ["Mașina nu este conectată pentru încărcarea hărții selectate.", "The car is not connected, so the selected map cannot be loaded."],
+    ["Mașinuța nu a confirmat încărcarea hărții în 8 secunde.", "The car did not confirm loading the map within 8 seconds."],
+    ["Mod direct mașinuță activ (coordonate native car_map).", "Car direct mode active (native car_map coordinates)."],
+    ["Mod direct mașinuță activ (fără aliniere G1).", "Car direct mode active (no robot alignment)."],
+    ["Mod invalid '{}'. Folosește 'mapping', 'localization' sau 'stop'.", "Invalid mode '$1'. Use 'mapping', 'localization' or 'stop'."],
+    ["Pereți aliniați precis prin ICP (RMSE={} m, overlap={}%).", "Walls aligned precisely by ICP (RMSE=$1 m, overlap=$2%)."],
+    ["Potrivire nesigură: matches={}, overlap={}%, RMSE={} m", "Unreliable match: matches=$1, overlap=$2%, RMSE=$3 m"],
+    ["Potrivirea hărților rulează deja.", "Map matching is already running."],
+    ["Puncte insuficiente pentru alinierea ICP", "Not enough points for ICP alignment"],
+    ["Rafinarea ICP a eșuat: {}", "ICP refinement failed: $1"],
+    ["Selectează un PCD G1 sau pornește mappingul până există suficiente puncte în ambele hărți.", "Select a robot PCD map or start mapping until both maps have enough points."],
+    ["Transformare invalidă", "Invalid transform"],
+    ["Transformarea manuală este activă.", "The manual transform is active."],
+    ["Transformarea trebuie să fie finită", "The transform must be finite"],
+    ["Trimiterea comenzii de mod a eșuat: {}", "Sending the mode command failed: $1"],
+    ["Trimiterea comenzii de salvare a eșuat: {}", "Sending the save command failed: $1"],
+    ["Trimiterea poziției a eșuat: {}", "Sending the pose failed: $1"],
+    ["Trimiterea țintei a eșuat: {}", "Sending the target failed: $1"],
+    ["hartă OccupancyGrid invalidă", "invalid OccupancyGrid map"],
+    ["geometrică 2D", "2D geometric"],
+    ["trăsături vizuale", "visual features"],
+    ["neconfirmată", "not confirmed"],
+  ];
+
+  const escape = (text) => text.replace(/[.*+?^$()|[\]\\]/g, "\\$&");
+  const compiled = MESSAGES.map(([source, english]) => ({
+    pattern: new RegExp(`^${escape(source).replace(/\{\}/g, "(.+?)")}$`, "s"),
+    english,
+  }));
+
+  function translateOne(text) {
+    for (const { pattern, english } of compiled) {
+      if (pattern.test(text)) return text.replace(pattern, english);
+    }
+    return text;
+  }
+
+  // Runtime messages are sometimes joined with " · " or "; " or prefixed.
+  window.translateRuntimeMessage = (message) => {
+    const text = String(message ?? "").trim();
+    if (!text) return text;
+    const whole = translateOne(text);
+    if (whole !== text) return whole;
+    return text
+      .split(/( · |; |: )/)
+      .map((part) => (/^( · |; |: )$/.test(part) ? part : translateOne(part)))
+      .join("");
+  };
+})();

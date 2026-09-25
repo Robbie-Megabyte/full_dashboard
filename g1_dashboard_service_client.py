@@ -13,7 +13,7 @@ SCHEMA = "g1_dashboard.service_action.v1"
 
 
 class ServiceActionClient:
-    def __init__(self, *, socket_path: str | None = None, token: str | None = None, timeout_s: float = 5.0) -> None:
+    def __init__(self, *, socket_path: str | None = None, token: str | None = None, timeout_s: float = 15.0) -> None:
         self.socket_path = socket_path or os.environ.get("G1_DASHBOARD_SERVICE_SOCKET", "")
         self.token = token or os.environ.get("G1_DASHBOARD_SERVICE_TOKEN", "")
         self.timeout_s = float(timeout_s)

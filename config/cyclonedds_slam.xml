@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Full Dashboard SLAM/Nav2 ROS 2 transport.
+
+  Keep robot DDS traffic on the wired G1 network. Mid360 PointCloud2 samples
+  are large enough to be lost with CycloneDDS' default receive buffer, even
+  though discovery and small robot-state messages continue to work.
+-->
+<CycloneDDS xmlns="https://cdds.io/config">
+  <Domain Id="any">
+    <SharedMemory>
+      <Enable>false</Enable>
+    </SharedMemory>
+    <General>
+      <Interfaces>
+        <NetworkInterface name="enP8p1s0" priority="default" multicast="default" />
+      </Interfaces>
+      <AllowMulticast>spdp</AllowMulticast>
+    </General>
+    <Internal>
+      <SocketReceiveBufferSize min="10MB" />
+    </Internal>
+  </Domain>
+</CycloneDDS>

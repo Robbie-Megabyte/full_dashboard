@@ -1091,6 +1091,268 @@
     `;
 
 
+
+    /* FULL_DASH_COMPANION_RETICLES_V6 */
+
+    /*
+     * Visual rules:
+     * - same stitch-idle-reticle shell as original camera views
+     * - richer geometry
+     * - green / amber only
+     * - thin instrumentation lines
+     * - restrained motion
+     */
+
+    RETICLES.raw = `
+        <div class="stitch-idle-reticle stitch-companion-reticle-v6 stitch-raw-reticle-v6">
+
+            <svg
+                class="stitch-reticle-svg stitch-companion-svg-v6"
+                viewBox="0 0 100 78"
+                aria-hidden="true"
+            >
+
+                <g class="stitch-raw-orbit-v6">
+                    <circle cx="50" cy="37" r="30"/>
+                    <circle cx="50" cy="37" r="24"/>
+                    <path d="M50 4v7M50 63v7M17 37h7M76 37h7"/>
+                </g>
+
+                <g class="stitch-raw-sensor-dots-v6">
+                    <circle cx="29" cy="17" r="1.3"/>
+                    <circle cx="73" cy="21" r="1.2"/>
+                    <circle cx="80" cy="49" r="1.1"/>
+                    <circle cx="25" cy="55" r="1.1"/>
+                </g>
+
+                <g class="stitch-raw-camera-v6">
+
+                    <path
+                        d="
+                          M31 28
+                          L36 22
+                          H48
+                          L52 28
+                          H70
+                          Q75 28 75 33
+                          V51
+                          Q75 56 70 56
+                          H30
+                          Q25 56 25 51
+                          V33
+                          Q25 28 30 28
+                          Z
+                        "
+                    />
+
+                    <circle
+                        class="stitch-raw-lens-a-v6"
+                        cx="50"
+                        cy="42"
+                        r="12"
+                    />
+
+                    <circle
+                        class="stitch-raw-lens-b-v6"
+                        cx="50"
+                        cy="42"
+                        r="7"
+                    />
+
+                    <circle
+                        cx="50"
+                        cy="42"
+                        r="2"
+                    />
+
+                    <circle
+                        class="stitch-raw-status-v6"
+                        cx="68"
+                        cy="34"
+                        r="1.5"
+                    />
+
+                    <path
+                        class="stitch-raw-scan-v6"
+                        d="M31 42H69"
+                    />
+
+                </g>
+
+                <g class="stitch-raw-brackets-v6">
+                    <path d="M14 18v-6h6"/>
+                    <path d="M80 12h6v6"/>
+                    <path d="M14 58v6h6"/>
+                    <path d="M80 64h6v-6"/>
+                </g>
+
+            </svg>
+
+            <span class="stitch-idle-label">
+                Raw camera idle
+            </span>
+
+        </div>
+    `;
+
+
+    RETICLES.simulation = `
+        <div class="stitch-idle-reticle stitch-companion-reticle-v6 stitch-simulation-reticle-v6">
+
+            <svg
+                class="stitch-reticle-svg stitch-companion-svg-v6"
+                viewBox="0 0 100 78"
+                aria-hidden="true"
+            >
+
+                <g class="stitch-sim-orbits-v6">
+                    <ellipse cx="50" cy="35" rx="33" ry="20"/>
+                    <ellipse cx="50" cy="35" rx="26" ry="15"/>
+                </g>
+
+                <g class="stitch-sim-grid-v6">
+                    <path d="M15 64H85"/>
+                    <path d="M22 58H78"/>
+                    <path d="M29 53H71"/>
+
+                    <path d="M31 48L15 64"/>
+                    <path d="M42 48L37 64"/>
+                    <path d="M58 48L63 64"/>
+                    <path d="M69 48L85 64"/>
+                </g>
+
+                <g class="stitch-sim-cube-v6">
+
+                    <path
+                        d="
+                          M50 14
+                          L68 24
+                          V44
+                          L50 54
+                          L32 44
+                          V24
+                          Z
+                        "
+                    />
+
+                    <path d="M32 24L50 34L68 24"/>
+                    <path d="M50 34V54"/>
+
+                    <path
+                        class="stitch-sim-inner-v6"
+                        d="
+                          M50 20
+                          L61 26
+                          V39
+                          L50 45
+                          L39 39
+                          V26
+                          Z
+                        "
+                    />
+
+                </g>
+
+                <g class="stitch-sim-nodes-v6">
+                    <circle cx="50" cy="14" r="1.6"/>
+                    <circle cx="68" cy="24" r="1.4"/>
+                    <circle cx="68" cy="44" r="1.4"/>
+                    <circle cx="50" cy="54" r="1.4"/>
+                    <circle cx="32" cy="44" r="1.4"/>
+                    <circle cx="32" cy="24" r="1.4"/>
+                </g>
+
+                <circle
+                    class="stitch-sim-orbit-node-v6"
+                    cx="79"
+                    cy="35"
+                    r="2"
+                />
+
+            </svg>
+
+            <span class="stitch-idle-label">
+                Enter camera teleop
+            </span>
+
+        </div>
+    `;
+
+
+    RETICLES.keypoints = `
+        <div class="stitch-idle-reticle stitch-companion-reticle-v6 stitch-keypoints-reticle-v6">
+
+            <svg
+                class="stitch-reticle-svg stitch-companion-svg-v6"
+                viewBox="0 0 100 78"
+                aria-hidden="true"
+            >
+
+                <g class="stitch-key-detection-frame-v6">
+                    <path d="M19 20v-8h8"/>
+                    <path d="M73 12h8v8"/>
+                    <path d="M19 56v8h8"/>
+                    <path d="M73 64h8v-8"/>
+                </g>
+
+                <circle
+                    class="stitch-key-orbit-v6"
+                    cx="50"
+                    cy="37"
+                    r="31"
+                />
+
+                <g class="stitch-key-links-v6">
+
+                    <path d="M50 18V29"/>
+
+                    <path d="M37 31L50 29L63 31"/>
+
+                    <path d="M37 31L29 43"/>
+                    <path d="M63 31L71 43"/>
+
+                    <path d="M50 29V45"/>
+
+                    <path d="M50 45L40 61"/>
+                    <path d="M50 45L60 61"/>
+
+                </g>
+
+                <g class="stitch-key-nodes-v6">
+
+                    <circle cx="50" cy="14" r="3"/>
+
+                    <circle cx="37" cy="31" r="2"/>
+                    <circle cx="50" cy="29" r="2"/>
+                    <circle cx="63" cy="31" r="2"/>
+
+                    <circle cx="29" cy="43" r="2"/>
+                    <circle cx="71" cy="43" r="2"/>
+
+                    <circle cx="50" cy="45" r="2"/>
+
+                    <circle cx="40" cy="61" r="2"/>
+                    <circle cx="60" cy="61" r="2"/>
+
+                </g>
+
+                <g class="stitch-key-track-dots-v6">
+                    <circle cx="23" cy="29" r="1.2"/>
+                    <circle cx="76" cy="27" r="1.1"/>
+                    <circle cx="76" cy="52" r="1.2"/>
+                    <circle cx="25" cy="54" r="1.1"/>
+                </g>
+
+            </svg>
+
+            <span class="stitch-idle-label">
+                Enter camera teleop
+            </span>
+
+        </div>
+    `;
+
+
     function installCameraReticles() {
         document
             .querySelectorAll("[data-camera-view-tile]")
@@ -1102,6 +1364,12 @@
                     return;
                 }
 
+                
+                /* FULL_DASH_COMPANION_RETICLE_THEME_V4 */
+
+                const id =
+                    tile.dataset.cameraViewTile || "rgb";
+
                 if (
                     overlay.querySelector(
                         ".stitch-idle-reticle"
@@ -1110,13 +1378,11 @@
                     return;
                 }
 
-                const id =
-                    tile.dataset.cameraViewTile || "rgb";
-
                 overlay.insertAdjacentHTML(
                     "afterbegin",
                     RETICLES[id] || RETICLES.rgb
                 );
+
             });
     }
 
@@ -10240,6 +10506,8929 @@
     }
     else{
         installModeMachineNoWrap();
+    }
+
+})();
+
+
+/* FULL_DASH_RAIL_SCROLLBAR_V4 */
+(() => {
+
+    function installFullDashRailScrollbarV4() {
+
+        const rail =
+            document.querySelector(
+                "#view-live .combined-rail"
+            );
+
+        if (
+            !rail
+            ||
+            rail.dataset.fullDashScrollbarV4 === "true"
+        ) {
+            return;
+        }
+
+        rail.dataset.fullDashScrollbarV4 =
+            "true";
+
+
+        let timer = null;
+
+
+        rail.addEventListener(
+            "scroll",
+            () => {
+
+                rail.classList.add(
+                    "full-dash-rail-scrolling-v4"
+                );
+
+
+                if (timer) {
+                    window.clearTimeout(
+                        timer
+                    );
+                }
+
+
+                timer =
+                    window.setTimeout(
+                        () => {
+
+                            rail.classList.remove(
+                                "full-dash-rail-scrolling-v4"
+                            );
+
+                        },
+                        750
+                    );
+
+            },
+            {
+                passive: true,
+            }
+        );
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            installFullDashRailScrollbarV4,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        installFullDashRailScrollbarV4();
+    }
+
+})();
+
+
+/* FULL_DASH_PANEL_RADIUS_SYNC_V5 */
+(() => {
+
+    function fullDashSyncRailPanelRadiusV5() {
+
+        const hands =
+            document.querySelector(
+                "#view-live .rail-hand-panel"
+            );
+
+        const controller =
+            document.querySelector(
+                "#view-live .controller-process-panel"
+            );
+
+        const modes =
+            document.getElementById(
+                "liveRobotModesCard"
+            );
+
+        if (!hands) {
+            return;
+        }
+
+        const computed =
+            window.getComputedStyle(
+                hands
+            );
+
+        const radius =
+            computed.borderRadius;
+
+
+        if (controller) {
+
+            controller.style.setProperty(
+                "border-radius",
+                radius,
+                "important"
+            );
+        }
+
+
+        if (modes) {
+
+            modes.style.setProperty(
+                "border-radius",
+                radius,
+                "important"
+            );
+        }
+    }
+
+
+    function bootFullDashPanelRadiusV5() {
+
+        fullDashSyncRailPanelRadiusV5();
+
+        window.setTimeout(
+            fullDashSyncRailPanelRadiusV5,
+            120
+        );
+
+        window.setTimeout(
+            fullDashSyncRailPanelRadiusV5,
+            500
+        );
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootFullDashPanelRadiusV5,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootFullDashPanelRadiusV5();
+    }
+
+})();
+
+
+/* FULL_DASH_RAIL_VISUAL_CLONE_V6 */
+(() => {
+
+    const OUTER_VISUAL_PROPS = [
+        "background",
+        "backgroundColor",
+
+        "borderTopWidth",
+        "borderTopStyle",
+        "borderTopColor",
+
+        "borderRightWidth",
+        "borderRightStyle",
+        "borderRightColor",
+
+        "borderBottomWidth",
+        "borderBottomStyle",
+        "borderBottomColor",
+
+        "borderLeftWidth",
+        "borderLeftStyle",
+        "borderLeftColor",
+
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomRightRadius",
+        "borderBottomLeftRadius",
+
+        "boxShadow",
+    ];
+
+
+    const TITLE_PROPS = [
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "fontStyle",
+        "lineHeight",
+        "letterSpacing",
+        "textTransform",
+        "color",
+    ];
+
+
+    function copyComputedV6(
+        source,
+        target,
+        props
+    ) {
+
+        if (
+            !source
+            ||
+            !target
+        ) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                source
+            );
+
+
+        for (
+            const prop
+            of props
+        ) {
+
+            target.style.setProperty(
+                prop.replace(
+                    /[A-Z]/g,
+                    match =>
+                        "-"
+                        +
+                        match.toLowerCase()
+                ),
+                computed[prop],
+                "important"
+            );
+        }
+    }
+
+
+    function applyRailVisualParityV6() {
+
+        const hands =
+            document.querySelector(
+                "#view-live "
+                +
+                ".hand-panel.twin-hands.rail-hand-panel"
+            );
+
+        const modes =
+            document.getElementById(
+                "liveRobotModesCard"
+            );
+
+        const controller =
+            document.querySelector(
+                "#view-live .controller-process-panel"
+            );
+
+
+        if (!hands) {
+            return;
+        }
+
+
+        /*
+         * EXACT same outer visual shell.
+         */
+        copyComputedV6(
+            hands,
+            modes,
+            OUTER_VISUAL_PROPS
+        );
+
+        copyComputedV6(
+            hands,
+            controller,
+            OUTER_VISUAL_PROPS
+        );
+
+
+        /*
+         * Robot Modes title = exact Hands title typography.
+         */
+        const handsTitle =
+            hands.querySelector(
+                ".hand-panel-head strong"
+            );
+
+        const modesTitle =
+            modes?.querySelector(
+                ".hand-panel-head strong"
+            );
+
+
+        copyComputedV6(
+            handsTitle,
+            modesTitle,
+            TITLE_PROPS
+        );
+
+
+        /*
+         * Match outer padding on Robot Modes too.
+         */
+        if (modes) {
+
+            const h =
+                window.getComputedStyle(
+                    hands
+                );
+
+            for (
+                const side
+                of [
+                    "Top",
+                    "Right",
+                    "Bottom",
+                    "Left",
+                ]
+            ) {
+
+                modes.style.setProperty(
+                    `padding-${side.toLowerCase()}`,
+                    h[`padding${side}`],
+                    "important"
+                );
+            }
+        }
+    }
+
+
+    function bootRailVisualParityV6() {
+
+        applyRailVisualParityV6();
+
+        window.setTimeout(
+            applyRailVisualParityV6,
+            100
+        );
+
+        window.setTimeout(
+            applyRailVisualParityV6,
+            400
+        );
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootRailVisualParityV6,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootRailVisualParityV6();
+    }
+
+})();
+
+
+/* FULL_DASH_TRANSIENT_SCROLL_INDICATOR_V6 */
+(() => {
+
+    function installTransientRailScrollV6() {
+
+        const rail =
+            document.querySelector(
+                "#view-live .combined-rail"
+            );
+
+        if (
+            !rail
+            ||
+            document.getElementById(
+                "fullDashRailScrollIndicatorV6"
+            )
+        ) {
+            return;
+        }
+
+
+        const indicator =
+            document.createElement(
+                "div"
+            );
+
+        indicator.id =
+            "fullDashRailScrollIndicatorV6";
+
+        indicator.className =
+            "full-dash-rail-indicator-v6";
+
+        document.body.appendChild(
+            indicator
+        );
+
+
+        let hideTimer = null;
+        let raf = null;
+
+
+        function update() {
+
+            raf = null;
+
+
+            const rect =
+                rail.getBoundingClientRect();
+
+
+            const scrollable =
+                rail.scrollHeight
+                >
+                rail.clientHeight
+                + 2;
+
+
+            if (!scrollable) {
+
+                indicator.classList.remove(
+                    "visible"
+                );
+
+                return;
+            }
+
+
+            const ratio =
+                rail.clientHeight
+                /
+                rail.scrollHeight;
+
+
+            const thumbHeight =
+                Math.max(
+                    20,
+                    Math.min(
+                        46,
+                        rect.height
+                        *
+                        ratio
+                    )
+                );
+
+
+            const maxScroll =
+                rail.scrollHeight
+                -
+                rail.clientHeight;
+
+
+            const progress =
+                maxScroll > 0
+                ?
+                rail.scrollTop
+                /
+                maxScroll
+                :
+                0;
+
+
+            const usable =
+                Math.max(
+                    0,
+                    rect.height
+                    -
+                    thumbHeight
+                );
+
+
+            indicator.style.height =
+                `${thumbHeight}px`;
+
+            indicator.style.top =
+                `${
+                    rect.top
+                    +
+                    usable
+                    *
+                    progress
+                }px`;
+
+            indicator.style.left =
+                `${
+                    rect.right
+                    -
+                    3
+                }px`;
+        }
+
+
+        function scheduleUpdate() {
+
+            if (raf) {
+                return;
+            }
+
+            raf =
+                window.requestAnimationFrame(
+                    update
+                );
+        }
+
+
+        rail.addEventListener(
+            "scroll",
+            () => {
+
+                scheduleUpdate();
+
+
+                indicator.classList.add(
+                    "visible"
+                );
+
+
+                if (hideTimer) {
+
+                    window.clearTimeout(
+                        hideTimer
+                    );
+                }
+
+
+                hideTimer =
+                    window.setTimeout(
+                        () => {
+
+                            indicator.classList.remove(
+                                "visible"
+                            );
+
+                        },
+                        480
+                    );
+            },
+            {
+                passive: true,
+            }
+        );
+
+
+        window.addEventListener(
+            "resize",
+            scheduleUpdate,
+            {
+                passive: true,
+            }
+        );
+
+
+        scheduleUpdate();
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            installTransientRailScrollV6,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        installTransientRailScrollV6();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_VISUAL_FINISH_V7
+   ============================================================ */
+
+
+/* ------------------------------------------------------------
+   1) NEW DISTINCT ROBOT RGB IDLE RETICLE
+      Keep theme, but clearly not the same as Raw Camera.
+   ------------------------------------------------------------ */
+
+const FULL_DASH_RGB_IDLE_RETICLE_V7 = `
+    <div class="stitch-idle-reticle stitch-g1-rgb-reticle-v7">
+
+        <svg
+            class="stitch-reticle-svg stitch-g1-rgb-svg-v7"
+            viewBox="0 0 100 78"
+            aria-hidden="true"
+        >
+
+            <g class="stitch-g1-rgb-orbit-v7">
+                <circle cx="50" cy="38" r="29"/>
+                <circle cx="50" cy="38" r="22"/>
+                <path d="M50 7v6M50 63v6M19 38h6M75 38h6"/>
+            </g>
+
+            <g class="stitch-g1-rgb-frame-v7">
+                <path
+                    d="
+                      M26 29
+                      H74
+                      Q77 29 77 32
+                      V50
+                      Q77 53 74 53
+                      H26
+                      Q23 53 23 50
+                      V32
+                      Q23 29 26 29
+                      Z
+                    "
+                />
+                <path
+                    d="
+                      M33 29
+                      L37 24
+                      H63
+                      L67 29
+                    "
+                />
+            </g>
+
+            <g class="stitch-g1-rgb-sensor-v7">
+                <circle cx="41" cy="40" r="6.5"/>
+                <circle cx="59" cy="40" r="6.5"/>
+                <circle cx="41" cy="40" r="2"/>
+                <circle cx="59" cy="40" r="2"/>
+
+                <path d="M50 36v8"/>
+                <circle cx="50" cy="40" r="1.6"/>
+            </g>
+
+            <g class="stitch-g1-rgb-track-v7">
+                <path d="M31 20l6 4"/>
+                <path d="M69 20l-6 4"/>
+                <circle cx="31" cy="20" r="1.2"/>
+                <circle cx="69" cy="20" r="1.2"/>
+                <circle cx="21" cy="45" r="1.1"/>
+                <circle cx="79" cy="46" r="1.1"/>
+            </g>
+
+        </svg>
+
+        <span class="stitch-idle-label">
+            RGB stream idle
+        </span>
+
+    </div>
+`;
+
+
+function fullDashApplyRobotRgbReticleV7() {
+    if (typeof RETICLES !== "object" || !RETICLES) {
+        return;
+    }
+
+    RETICLES.rgb = FULL_DASH_RGB_IDLE_RETICLE_V7;
+}
+
+
+/* ------------------------------------------------------------
+   2) Replace small RGB source icons in dock / tile headers
+      where we can identify them.
+   ------------------------------------------------------------ */
+
+const FULL_DASH_RGB_ICON_SMALL_V7 = `
+<svg
+  data-full-dash-rgb-icon-v7="1"
+  viewBox="0 0 24 24"
+  aria-hidden="true"
+>
+  <rect x="3.5" y="7" width="17" height="10.5" rx="2"/>
+  <path d="M7.8 7L9.1 5.3h5.8L16.2 7"/>
+  <circle cx="9.3" cy="12.2" r="2.25"/>
+  <circle cx="14.7" cy="12.2" r="2.25"/>
+  <circle cx="12" cy="12.2" r=".85"/>
+  <path d="M12 9.4v5.6"/>
+</svg>
+`;
+
+
+function fullDashSwapRobotRgbIconsV7() {
+
+    const dockTargets = document.querySelectorAll(
+        '[data-camera-mode="rgb"] .stitch-camera-dock-svg'
+    );
+
+    dockTargets.forEach(node => {
+        node.innerHTML = FULL_DASH_RGB_ICON_SMALL_V7;
+    });
+
+
+    const tileTargets = document.querySelectorAll(
+        [
+            '[data-camera-view-tile="rgb"] .camera-tile-label-icon',
+            '[data-camera-view-tile="rgb"] .camera-tile-title-icon',
+            '[data-camera-view-tile="rgb"] .camera-tile-head-icon',
+            '[data-camera-view-tile="rgb"] .camera-tile-kicker',
+            '[data-camera-view-tile="rgb"] .camera-tile-title',
+            '[data-camera-view-tile="rgb"] .panel-kicker'
+        ].join(',')
+    );
+
+    tileTargets.forEach(node => {
+
+        /*
+         * If this target is a dedicated icon container, replace it.
+         * If it is a text/title wrapper, only replace the first small SVG.
+         */
+        if (
+            node.classList.contains('camera-tile-label-icon')
+            || node.classList.contains('camera-tile-title-icon')
+            || node.classList.contains('camera-tile-head-icon')
+            || node.classList.contains('stitch-camera-dock-svg')
+        ) {
+            node.innerHTML = FULL_DASH_RGB_ICON_SMALL_V7;
+            return;
+        }
+
+        const existing = node.querySelector('svg');
+
+        if (existing) {
+            existing.outerHTML = FULL_DASH_RGB_ICON_SMALL_V7;
+        }
+    });
+}
+
+
+/* ------------------------------------------------------------
+   3) Fix Controller Process actual border / radius.
+      Remove our V6 copied border/background/box-shadow from the
+      controller panel and apply only the HANDS corner radius to
+      the actual outer panel.
+   ------------------------------------------------------------ */
+
+function fullDashFixControllerPanelV7() {
+
+    const hands = document.querySelector(
+        '#view-live .hand-panel.twin-hands.rail-hand-panel'
+    );
+
+    const controller = document.querySelector(
+        '#view-live .controller-process-panel'
+    );
+
+    if (!hands || !controller) {
+        return;
+    }
+
+    const hc = window.getComputedStyle(hands);
+
+    /*
+     * Clear the copied V6 shell styling that made it feel like an
+     * extra frame. Keep only the actual existing controller panel.
+     */
+    [
+        'background',
+        'background-color',
+        'box-shadow',
+        'border-top-width',
+        'border-right-width',
+        'border-bottom-width',
+        'border-left-width',
+        'border-top-style',
+        'border-right-style',
+        'border-bottom-style',
+        'border-left-style',
+        'border-top-color',
+        'border-right-color',
+        'border-bottom-color',
+        'border-left-color',
+    ].forEach(prop => {
+        controller.style.removeProperty(prop);
+    });
+
+    controller.style.setProperty(
+        'border-top-left-radius',
+        hc.borderTopLeftRadius,
+        'important'
+    );
+    controller.style.setProperty(
+        'border-top-right-radius',
+        hc.borderTopRightRadius,
+        'important'
+    );
+    controller.style.setProperty(
+        'border-bottom-right-radius',
+        hc.borderBottomRightRadius,
+        'important'
+    );
+    controller.style.setProperty(
+        'border-bottom-left-radius',
+        hc.borderBottomLeftRadius,
+        'important'
+    );
+}
+
+
+/* ------------------------------------------------------------
+   4) Re-enable Configure button visually + interactively.
+      This is only for the sidebar Configure control.
+   ------------------------------------------------------------ */
+
+function fullDashEnableConfigureV7() {
+
+    /*
+     * Retired by V10.
+     * Configure state belongs to the real controller manager.
+     */
+    return;
+
+
+    const panel = document.querySelector(
+        '#view-live .controller-process-panel'
+    );
+
+    if (!panel) {
+        return;
+    }
+
+    const btn =
+        panel.querySelector('#controllerConfigureBtn')
+        || panel.querySelector('#configureControllerBtn')
+        || [...panel.querySelectorAll('button')].find(
+            button => /configure/i.test(
+                (button.textContent || '').trim()
+            )
+        );
+
+    if (!btn) {
+        return;
+    }
+
+    btn.disabled = false;
+    btn.removeAttribute('disabled');
+    btn.setAttribute('aria-disabled', 'false');
+
+    btn.style.setProperty('opacity', '1', 'important');
+    btn.style.setProperty('pointer-events', 'auto', 'important');
+    btn.style.setProperty('filter', 'none', 'important');
+}
+
+
+/* ------------------------------------------------------------
+   5) Make Live Robot Modes visually match Camera Teleop
+      Robot Modes as closely as possible by copying computed
+      styles from the original hidden Robot Modes card.
+   ------------------------------------------------------------ */
+
+function fullDashCopyPropsV7(source, target, props) {
+    if (!source || !target) return;
+
+    const cs = window.getComputedStyle(source);
+
+    props.forEach(prop => {
+        target.style.setProperty(
+            prop.replace(/[A-Z]/g, m => '-' + m.toLowerCase()),
+            cs[prop],
+            'important'
+        );
+    });
+}
+
+
+function fullDashFindSourceRobotModesCardV7() {
+
+    return (
+        document.querySelector('#robotModesCard')
+        || document.querySelector('#view-bacalbasa #robotModesCard')
+        || document.querySelector('#view-camera-teleop #robotModesCard')
+        || document.querySelector('[data-view="bacalbasa"] #robotModesCard')
+    );
+}
+
+
+function fullDashRobotModesParityV7() {
+
+    if (
+        document
+            .getElementById("liveRobotModesCard")
+            ?.dataset.robotModesV11
+        === "1"
+    ) {
+        return;
+    }
+
+
+    if (
+        document
+            .getElementById("liveRobotModesCard")
+            ?.dataset.robotModesV10
+        === "1"
+    ) {
+        return;
+    }
+
+
+    const sourceCard = fullDashFindSourceRobotModesCardV7();
+    const liveCard = document.getElementById('liveRobotModesCard');
+
+    if (!sourceCard || !liveCard) {
+        return;
+    }
+
+    const PANEL_PROPS = [
+        'background',
+        'backgroundColor',
+        'boxShadow',
+        'borderTopWidth',
+        'borderTopStyle',
+        'borderTopColor',
+        'borderRightWidth',
+        'borderRightStyle',
+        'borderRightColor',
+        'borderBottomWidth',
+        'borderBottomStyle',
+        'borderBottomColor',
+        'borderLeftWidth',
+        'borderLeftStyle',
+        'borderLeftColor',
+        'borderTopLeftRadius',
+        'borderTopRightRadius',
+        'borderBottomRightRadius',
+        'borderBottomLeftRadius',
+        'paddingTop',
+        'paddingRight',
+        'paddingBottom',
+        'paddingLeft',
+    ];
+
+    const TITLE_PROPS = [
+        'fontFamily',
+        'fontSize',
+        'fontWeight',
+        'fontStyle',
+        'lineHeight',
+        'letterSpacing',
+        'textTransform',
+        'color',
+    ];
+
+    const BUTTON_PROPS = [
+        'height',
+        'minHeight',
+        'paddingTop',
+        'paddingRight',
+        'paddingBottom',
+        'paddingLeft',
+        'background',
+        'backgroundColor',
+        'borderTopWidth',
+        'borderTopStyle',
+        'borderTopColor',
+        'borderRightWidth',
+        'borderRightStyle',
+        'borderRightColor',
+        'borderBottomWidth',
+        'borderBottomStyle',
+        'borderBottomColor',
+        'borderLeftWidth',
+        'borderLeftStyle',
+        'borderLeftColor',
+        'borderTopLeftRadius',
+        'borderTopRightRadius',
+        'borderBottomRightRadius',
+        'borderBottomLeftRadius',
+        'boxShadow',
+        'fontFamily',
+        'fontSize',
+        'fontWeight',
+        'lineHeight',
+        'letterSpacing',
+        'textTransform',
+        'color',
+        'opacity',
+    ];
+
+    fullDashCopyPropsV7(sourceCard, liveCard, PANEL_PROPS);
+
+    const sourceTitle =
+        sourceCard.querySelector('strong')
+        || sourceCard.querySelector('.panel-kicker');
+
+    const liveTitle =
+        liveCard.querySelector('.hand-panel-head strong')
+        || liveCard.querySelector('strong');
+
+    fullDashCopyPropsV7(sourceTitle, liveTitle, TITLE_PROPS);
+
+
+    const sourceRefresh = [...sourceCard.querySelectorAll('button')].find(
+        button => /refresh/i.test(button.textContent || '')
+    );
+
+    const liveRefresh =
+        document.getElementById('liveRobotModeRefresh')
+        || [...liveCard.querySelectorAll('button')].find(
+            button => /refresh/i.test(button.textContent || '')
+        );
+
+    fullDashCopyPropsV7(sourceRefresh, liveRefresh, BUTTON_PROPS);
+
+
+    /*
+     * Current mode row
+     */
+    const sourceCurrent =
+        [...sourceCard.querySelectorAll('div, span, section')].find(
+            node => /current mode/i.test(node.textContent || '')
+        );
+
+    const liveCurrent =
+        liveCard.querySelector('.live-robot-mode-current');
+
+    if (sourceCurrent && liveCurrent) {
+        fullDashCopyPropsV7(sourceCurrent, liveCurrent, PANEL_PROPS);
+
+        const sourceKids = sourceCurrent.querySelectorAll('span, strong, em, b');
+        const liveKids = liveCurrent.querySelectorAll('span, strong, em, b');
+
+        [...sourceKids].forEach((srcNode, index) => {
+            const dstNode = liveKids[index];
+            if (!dstNode) return;
+            fullDashCopyPropsV7(srcNode, dstNode, TITLE_PROPS);
+        });
+    }
+
+
+    /*
+     * Action buttons (exclude Refresh)
+     */
+    const sourceButtons = [...sourceCard.querySelectorAll('button')].filter(
+        button => !/refresh/i.test(button.textContent || '')
+    );
+
+    const liveButtons = [...liveCard.querySelectorAll('button')].filter(
+        button => button.id !== 'liveRobotModeRefresh'
+    );
+
+    sourceButtons.forEach((srcButton, index) => {
+        const dstButton = liveButtons[index];
+        if (!dstButton) return;
+        fullDashCopyPropsV7(srcButton, dstButton, BUTTON_PROPS);
+    });
+}
+
+
+/* ------------------------------------------------------------
+   6) Boot / re-apply
+   ------------------------------------------------------------ */
+
+function fullDashBootVisualFinishV7() {
+
+    fullDashApplyRobotRgbReticleV7();
+    fullDashSwapRobotRgbIconsV7();
+
+    fullDashFixControllerPanelV7();
+    fullDashEnableConfigureV7();
+    fullDashRobotModesParityV7();
+
+    window.setTimeout(() => {
+        fullDashSwapRobotRgbIconsV7();
+        fullDashFixControllerPanelV7();
+        fullDashEnableConfigureV7();
+        fullDashRobotModesParityV7();
+    }, 120);
+
+    window.setTimeout(() => {
+        fullDashSwapRobotRgbIconsV7();
+        fullDashFixControllerPanelV7();
+        fullDashEnableConfigureV7();
+        fullDashRobotModesParityV7();
+    }, 500);
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener(
+        'DOMContentLoaded',
+        fullDashBootVisualFinishV7,
+        {once: true}
+    );
+} else {
+    fullDashBootVisualFinishV7();
+}
+
+
+
+
+/* ============================================================
+   FULL_DASH_LIVE_PARITY_V8
+   ============================================================ */
+
+(() => {
+
+    /* --------------------------------------------------------
+       Helpers
+       -------------------------------------------------------- */
+
+    function copyPropsV8(
+        source,
+        target,
+        props
+    ) {
+
+        if (!source || !target) {
+            return;
+        }
+
+        const computed =
+            window.getComputedStyle(
+                source
+            );
+
+        for (const prop of props) {
+
+            const cssName =
+                prop.replace(
+                    /[A-Z]/g,
+                    char =>
+                        "-"
+                        +
+                        char.toLowerCase()
+                );
+
+            target.style.setProperty(
+                cssName,
+                computed[prop],
+                "important"
+            );
+        }
+    }
+
+
+    function cameraTeleopDocumentV8() {
+
+        /*
+         * Camera Teleop is currently embedded from the same
+         * robot origin, so its iframe document is readable.
+         */
+        const frame =
+            [...document.querySelectorAll("iframe")]
+                .find(
+                    node =>
+                        /bacalbasa/i.test(
+                            node.getAttribute("src") || ""
+                        )
+                        ||
+                        /camera.?teleop/i.test(
+                            node.title || ""
+                        )
+                );
+
+        if (!frame) {
+            return null;
+        }
+
+        try {
+            return (
+                frame.contentDocument
+                ||
+                frame.contentWindow?.document
+                ||
+                null
+            );
+        }
+
+        catch (_) {
+            return null;
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       A. Companion reticle Y parity
+       -------------------------------------------------------- */
+
+    function alignCompanionReticlesV8() {
+
+        /*
+         * RGB + Depth is the requested visual Y reference.
+         *
+         * If it happens to be temporarily unavailable in layout,
+         * fall back to Depth, then Robot RGB.
+         */
+        const referenceIds = [
+            "overlay",
+            "depth",
+            "rgb",
+        ];
+
+        let referenceTile = null;
+
+
+        for (const id of referenceIds) {
+
+            const candidate =
+                document.querySelector(
+                    `[data-camera-view-tile="${id}"]`
+                );
+
+            if (
+                candidate
+                &&
+                candidate.getBoundingClientRect().height > 0
+            ) {
+
+                referenceTile =
+                    candidate;
+
+                break;
+            }
+        }
+
+
+        if (!referenceTile) {
+            return;
+        }
+
+
+        const referenceSvg =
+            referenceTile.querySelector(
+                ".stitch-reticle-svg"
+            );
+
+        const referenceLabel =
+            referenceTile.querySelector(
+                ".stitch-idle-label"
+            );
+
+
+        if (!referenceSvg) {
+            return;
+        }
+
+
+        const refTileRect =
+            referenceTile.getBoundingClientRect();
+
+        const refSvgRect =
+            referenceSvg.getBoundingClientRect();
+
+
+        const refSvgCenter =
+            (
+                refSvgRect.top
+                +
+                refSvgRect.height / 2
+            )
+            -
+            refTileRect.top;
+
+
+        let refLabelCenter = null;
+
+
+        if (referenceLabel) {
+
+            const rect =
+                referenceLabel.getBoundingClientRect();
+
+            refLabelCenter =
+                (
+                    rect.top
+                    +
+                    rect.height / 2
+                )
+                -
+                refTileRect.top;
+        }
+
+
+        for (
+            const id
+            of [
+                "raw",
+                "simulation",
+                "keypoints",
+            ]
+        ) {
+
+            const tile =
+                document.querySelector(
+                    `[data-camera-view-tile="${id}"]`
+                );
+
+            const svg =
+                tile?.querySelector(
+                    ".stitch-reticle-svg"
+                );
+
+            const label =
+                tile?.querySelector(
+                    ".stitch-idle-label"
+                );
+
+
+            if (
+                !tile
+                ||
+                !svg
+                ||
+                tile.getBoundingClientRect().height <= 0
+            ) {
+                continue;
+            }
+
+
+            /*
+             * Reset previous V8 alignment before measuring.
+             */
+            svg.style.removeProperty(
+                "translate"
+            );
+
+            label?.style.removeProperty(
+                "translate"
+            );
+
+
+            const tileRect =
+                tile.getBoundingClientRect();
+
+            const svgRect =
+                svg.getBoundingClientRect();
+
+
+            const ownSvgCenter =
+                (
+                    svgRect.top
+                    +
+                    svgRect.height / 2
+                )
+                -
+                tileRect.top;
+
+
+            const svgDelta =
+                refSvgCenter
+                -
+                ownSvgCenter;
+
+
+            svg.style.setProperty(
+                "translate",
+                `0 ${svgDelta.toFixed(2)}px`,
+                "important"
+            );
+
+
+            if (
+                label
+                &&
+                refLabelCenter !== null
+            ) {
+
+                const labelRect =
+                    label.getBoundingClientRect();
+
+
+                const ownLabelCenter =
+                    (
+                        labelRect.top
+                        +
+                        labelRect.height / 2
+                    )
+                    -
+                    tileRect.top;
+
+
+                const labelDelta =
+                    refLabelCenter
+                    -
+                    ownLabelCenter;
+
+
+                label.style.setProperty(
+                    "translate",
+                    `0 ${labelDelta.toFixed(2)}px`,
+                    "important"
+                );
+            }
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       B. Robot RGB icon everywhere visible
+       -------------------------------------------------------- */
+
+    const RGB_ICON_V8 = `
+      <svg
+        class="full-dash-robot-rgb-icon-v8"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <rect x="3.5" y="7" width="17" height="10.5" rx="2"/>
+        <path d="M7.8 7L9.2 5.2h5.6L16.2 7"/>
+
+        <circle cx="9.2" cy="12.2" r="2.35"/>
+        <circle cx="14.8" cy="12.2" r="2.35"/>
+
+        <circle cx="9.2" cy="12.2" r=".8"/>
+        <circle cx="14.8" cy="12.2" r=".8"/>
+
+        <path d="M12 9.5v5.4"/>
+        <circle cx="12" cy="12.2" r=".65"/>
+      </svg>
+    `;
+
+
+    function applyRobotRgbIconsV8() {
+
+        /*
+         * Dock.
+         */
+        document
+            .querySelectorAll(
+                '[data-camera-mode="rgb"] .stitch-camera-dock-svg'
+            )
+            .forEach(
+                node => {
+                    node.innerHTML =
+                        RGB_ICON_V8;
+                }
+            );
+
+
+        /*
+         * Actual RGB window top bar.
+         *
+         * We deliberately replace only small SVGs inside the
+         * header, never the idle reticle itself.
+         */
+        const tile =
+            document.querySelector(
+                '[data-camera-view-tile="rgb"]'
+            );
+
+
+        if (tile) {
+
+            const head =
+                tile.querySelector(
+                    ".camera-tile-head"
+                );
+
+
+            if (head) {
+
+                const candidates =
+                    [...head.querySelectorAll("svg")];
+
+
+                for (const svg of candidates) {
+
+                    if (
+                        svg.classList.contains(
+                            "full-dash-robot-rgb-icon-v8"
+                        )
+                    ) {
+                        continue;
+                    }
+
+                    svg.outerHTML =
+                        RGB_ICON_V8;
+
+                    /*
+                     * Only the title icon should be replaced.
+                     */
+                    break;
+                }
+            }
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       C. Robot Modes visual parity
+       -------------------------------------------------------- */
+
+    const SHELL_PROPS = [
+        "height",
+        "minHeight",
+
+        "paddingTop",
+        "paddingRight",
+        "paddingBottom",
+        "paddingLeft",
+
+        "background",
+        "backgroundColor",
+
+        "borderTopWidth",
+        "borderTopStyle",
+        "borderTopColor",
+
+        "borderRightWidth",
+        "borderRightStyle",
+        "borderRightColor",
+
+        "borderBottomWidth",
+        "borderBottomStyle",
+        "borderBottomColor",
+
+        "borderLeftWidth",
+        "borderLeftStyle",
+        "borderLeftColor",
+
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomRightRadius",
+        "borderBottomLeftRadius",
+
+        "boxShadow",
+
+        "opacity",
+    ];
+
+
+    const TYPE_PROPS = [
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "fontStyle",
+        "lineHeight",
+        "letterSpacing",
+        "textTransform",
+        "color",
+    ];
+
+
+    function findResetViewButtonV8() {
+
+        return (
+            document.getElementById(
+                "twinReset"
+            )
+            ||
+            [...document.querySelectorAll(
+                "#view-live button"
+            )]
+                .find(
+                    button =>
+                        /^reset\s+view$/i.test(
+                            (
+                                button.textContent
+                                ||
+                                ""
+                            ).trim()
+                        )
+                )
+            ||
+            null
+        );
+    }
+
+
+    function applyRobotModeStyleV8() {
+
+    if (
+        document
+            .getElementById("liveRobotModesCard")
+            ?.dataset.robotModesV11
+        === "1"
+    ) {
+        return;
+    }
+
+
+        const liveCard =
+            document.getElementById(
+                "liveRobotModesCard"
+            );
+
+
+        if (!liveCard) {
+            return;
+        }
+
+
+        const teleopDoc =
+            cameraTeleopDocumentV8();
+
+
+        const sourceCard =
+            teleopDoc?.getElementById(
+                "robotModesCard"
+            );
+
+
+        /*
+         * Source mode buttons from the real existing Camera
+         * Teleop Robot Modes implementation.
+         */
+        if (sourceCard) {
+
+            const sourceButtons =
+                [...sourceCard.querySelectorAll(
+                    "button"
+                )]
+                    .filter(
+                        button =>
+                            !/refresh/i.test(
+                                button.textContent || ""
+                            )
+                    );
+
+
+            const liveButtons =
+                [...liveCard.querySelectorAll(
+                    "[data-live-robot-mode]"
+                )];
+
+
+            liveButtons.forEach(
+                (
+                    button,
+                    index
+                ) => {
+
+                    const source =
+                        sourceButtons[index];
+
+
+                    if (!source) {
+                        return;
+                    }
+
+
+                    copyPropsV8(
+                        source,
+                        button,
+                        SHELL_PROPS
+                    );
+
+
+                    /*
+                     * Slight scale increase for the Full Dash
+                     * right rail.
+                     */
+                    const sourceHeight =
+                        parseFloat(
+                            window.getComputedStyle(
+                                source
+                            ).height
+                        );
+
+
+                    if (
+                        Number.isFinite(
+                            sourceHeight
+                        )
+                    ) {
+
+                        button.style.setProperty(
+                            "height",
+                            `${
+                                Math.round(
+                                    sourceHeight
+                                    *
+                                    1.13
+                                )
+                            }px`,
+                            "important"
+                        );
+                    }
+                }
+            );
+
+
+            /*
+             * Current Mode shell from Camera Teleop too.
+             */
+            const sourceCurrent =
+                sourceCard
+                    .querySelector(
+                        ".robot-mode-current"
+                    )
+                ||
+                [...sourceCard.querySelectorAll(
+                    "div"
+                )]
+                    .find(
+                        node =>
+                            /^current\s+mode/i.test(
+                                (
+                                    node.textContent
+                                    ||
+                                    ""
+                                ).trim()
+                            )
+                    );
+
+
+            const liveCurrent =
+                liveCard.querySelector(
+                    ".live-robot-mode-current"
+                );
+
+
+            copyPropsV8(
+                sourceCurrent,
+                liveCurrent,
+                SHELL_PROPS
+            );
+        }
+
+
+        /*
+         * All requested text should use the same visual type
+         * language as Composite.
+         */
+        const composite =
+            document.getElementById(
+                "healthModeSelect"
+            )
+            ||
+            [...document.querySelectorAll(
+                "#view-live select"
+            )]
+                .find(
+                    select =>
+                        /composite/i.test(
+                            select.value
+                            ||
+                            select.textContent
+                            ||
+                            ""
+                        )
+                );
+
+
+        if (composite) {
+
+            liveCard
+                .querySelectorAll(
+                    [
+                        "[data-live-robot-mode]",
+                        ".live-robot-mode-current span",
+                        ".live-robot-mode-current strong"
+                    ].join(",")
+                )
+                .forEach(
+                    node =>
+                        copyPropsV8(
+                            composite,
+                            node,
+                            TYPE_PROPS
+                        )
+                );
+        }
+
+
+        /*
+         * Refresh = exact Reset view button treatment.
+         */
+        const refresh =
+            document.getElementById(
+                "liveRobotModeRefresh"
+            );
+
+        const resetView =
+            findResetViewButtonV8();
+
+
+        if (
+            refresh
+            &&
+            resetView
+        ) {
+
+            copyPropsV8(
+                resetView,
+                refresh,
+                [
+                    ...SHELL_PROPS,
+                    ...TYPE_PROPS,
+                    "width",
+                    "minWidth",
+                    "maxWidth",
+                ]
+            );
+
+
+            /*
+             * It is still nonfunctional until robot-side mode
+             * backend exists. Keep disabled state but not an
+             * unrelated custom visual style.
+             */
+            refresh.style.removeProperty(
+                "filter"
+            );
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       D. Reapply / resize observation
+       -------------------------------------------------------- */
+
+    function applyAllV8() {
+
+        applyRobotRgbIconsV8();
+
+        applyRobotModeStyleV8();
+
+        window.requestAnimationFrame(
+            alignCompanionReticlesV8
+        );
+    }
+
+
+    let resizeTimer = null;
+
+
+    function scheduleV8() {
+
+        if (resizeTimer) {
+            window.clearTimeout(
+                resizeTimer
+            );
+        }
+
+
+        resizeTimer =
+            window.setTimeout(
+                applyAllV8,
+                40
+            );
+    }
+
+
+    function bootV8() {
+
+        applyAllV8();
+
+
+        window.setTimeout(
+            applyAllV8,
+            150
+        );
+
+        window.setTimeout(
+            applyAllV8,
+            600
+        );
+
+        window.setTimeout(
+            applyAllV8,
+            1400
+        );
+
+
+        window.addEventListener(
+            "resize",
+            scheduleV8,
+            {
+                passive: true,
+            }
+        );
+
+
+        const cameraStage =
+            document.getElementById(
+                "cameraStage"
+            );
+
+
+        if (
+            cameraStage
+            &&
+            "ResizeObserver" in window
+        ) {
+
+            const observer =
+                new ResizeObserver(
+                    scheduleV8
+                );
+
+
+            observer.observe(
+                cameraStage
+            );
+        }
+
+
+        const frame =
+            [...document.querySelectorAll(
+                "iframe"
+            )]
+                .find(
+                    node =>
+                        /bacalbasa/i.test(
+                            node.getAttribute(
+                                "src"
+                            )
+                            ||
+                            ""
+                        )
+                );
+
+
+        frame?.addEventListener(
+            "load",
+            () => {
+
+                window.setTimeout(
+                    applyAllV8,
+                    100
+                );
+            }
+        );
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV8,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV8();
+    }
+
+})();
+
+
+
+
+
+
+
+/* ============================================================
+   FULL_DASH_ORIGINAL_RESIZER_FIX_V10_FIXED
+   ============================================================ */
+
+(() => {
+
+    /* --------------------------------------------------------
+       RETICLES
+       -------------------------------------------------------- */
+
+    function alignCompanionReticlesV10() {
+
+        const referenceTile =
+            document.querySelector(
+                '[data-camera-view-tile="overlay"]'
+            );
+
+        const referenceReticle =
+            referenceTile?.querySelector(
+                ".stitch-idle-reticle"
+            );
+
+        if (
+            !referenceTile
+            ||
+            !referenceReticle
+        ) {
+            return;
+        }
+
+
+        const refTileRect =
+            referenceTile.getBoundingClientRect();
+
+        const refRect =
+            referenceReticle.getBoundingClientRect();
+
+
+        const refCenter =
+            (
+                refRect.top
+                +
+                refRect.height / 2
+            )
+            -
+            refTileRect.top;
+
+
+        for (
+            const id
+            of [
+                "raw",
+                "simulation",
+                "keypoints",
+            ]
+        ) {
+
+            const tile =
+                document.querySelector(
+                    `[data-camera-view-tile="${id}"]`
+                );
+
+            const reticle =
+                tile?.querySelector(
+                    ".stitch-idle-reticle"
+                );
+
+            if (
+                !tile
+                ||
+                !reticle
+            ) {
+                continue;
+            }
+
+
+            /*
+             * Destroy old child-level positioning traces.
+             */
+            reticle.style.removeProperty(
+                "translate"
+            );
+
+            reticle.style.removeProperty(
+                "transform"
+            );
+
+            reticle
+                .querySelector(".stitch-reticle-svg")
+                ?.style
+                .removeProperty("translate");
+
+            reticle
+                .querySelector(".stitch-idle-label")
+                ?.style
+                .removeProperty("translate");
+
+
+            const tileRect =
+                tile.getBoundingClientRect();
+
+            const ownRect =
+                reticle.getBoundingClientRect();
+
+
+            const ownCenter =
+                (
+                    ownRect.top
+                    +
+                    ownRect.height / 2
+                )
+                -
+                tileRect.top;
+
+
+            /*
+             * Exact geometric alignment to RGB + Depth,
+             * then 9 px lower for the requested optical match.
+             */
+            const delta =
+                refCenter
+                -
+                ownCenter
+                +
+                9;
+
+
+            reticle.style.setProperty(
+                "translate",
+                `0 ${delta.toFixed(2)}px`,
+                "important"
+            );
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       RESET VIEW
+       -------------------------------------------------------- */
+
+    function restoreResetViewV10() {
+
+        const reset =
+            [...document.querySelectorAll(
+                "#view-live button"
+            )]
+                .find(
+                    button =>
+                        /^reset\s+view$/i.test(
+                            (
+                                button.textContent
+                                ||
+                                ""
+                            ).trim()
+                        )
+                );
+
+
+        if (!reset) {
+            return;
+        }
+
+
+        reset.disabled =
+            false;
+
+        reset.removeAttribute(
+            "disabled"
+        );
+
+        reset.style.setProperty(
+            "pointer-events",
+            "auto",
+            "important"
+        );
+
+        reset.style.setProperty(
+            "position",
+            "relative",
+            "important"
+        );
+
+        reset.style.setProperty(
+            "z-index",
+            "20",
+            "important"
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       ORIGINAL RIGHT-RAIL RESIZER
+       -------------------------------------------------------- */
+
+    function railV10() {
+
+        return document.querySelector(
+            "#view-live .combined-rail"
+        );
+    }
+
+
+    function findOriginalResizerV10() {
+
+        const rail =
+            railV10();
+
+
+        if (!rail) {
+            return null;
+        }
+
+
+        const railRect =
+            rail.getBoundingClientRect();
+
+
+        let best =
+            null;
+
+        let bestDistance =
+            Infinity;
+
+
+        for (
+            const node
+            of document.querySelectorAll(
+                "#view-live *"
+            )
+        ) {
+
+            const style =
+                window.getComputedStyle(
+                    node
+                );
+
+
+            const cursor =
+                (
+                    style.cursor
+                    ||
+                    ""
+                ).toLowerCase();
+
+
+            if (
+                !cursor.includes("ew-resize")
+                &&
+                !cursor.includes("col-resize")
+            ) {
+                continue;
+            }
+
+
+            const rect =
+                node.getBoundingClientRect();
+
+
+            if (
+                rect.width > 40
+                ||
+                rect.height < 40
+            ) {
+                continue;
+            }
+
+
+            const distance =
+                Math.abs(
+                    (
+                        rect.left
+                        +
+                        rect.width / 2
+                    )
+                    -
+                    railRect.left
+                );
+
+
+            if (
+                distance < 30
+                &&
+                distance < bestDistance
+            ) {
+
+                best =
+                    node;
+
+                bestDistance =
+                    distance;
+            }
+        }
+
+
+        return best;
+    }
+
+
+    function pseudoScoreV10(
+        style
+    ) {
+
+        if (!style) {
+            return -1;
+        }
+
+
+        let score =
+            0;
+
+
+        const width =
+            parseFloat(
+                style.width
+            );
+
+        const height =
+            parseFloat(
+                style.height
+            );
+
+
+        if (
+            Number.isFinite(width)
+            &&
+            width > 0
+            &&
+            width <= 14
+        ) {
+            score += 2;
+        }
+
+
+        if (
+            Number.isFinite(height)
+            &&
+            height >= 5
+            &&
+            height <= 100
+        ) {
+            score += 2;
+        }
+
+
+        if (
+            style.content
+            &&
+            style.content !== "none"
+            &&
+            style.content !== "normal"
+        ) {
+            score += 1;
+        }
+
+
+        if (
+            style.backgroundColor
+            &&
+            style.backgroundColor
+                !== "rgba(0, 0, 0, 0)"
+        ) {
+            score += 1;
+        }
+
+
+        return score;
+    }
+
+
+    let resizerV10 =
+        null;
+
+
+    function prepareOriginalResizerV10() {
+
+        /*
+         * Old custom marker must never survive.
+         */
+        document
+            .getElementById(
+                "fullDashRightResizeMarkerV9"
+            )
+            ?.remove();
+
+
+        document
+            .querySelectorAll(
+                ".full-dash-rail-resizer-owner-v9"
+            )
+            .forEach(
+                node =>
+                    node.classList.remove(
+                        "full-dash-rail-resizer-owner-v9"
+                    )
+            );
+
+
+        const handle =
+            findOriginalResizerV10();
+
+
+        if (!handle) {
+            return;
+        }
+
+
+        resizerV10 =
+            handle;
+
+
+        handle.classList.add(
+            "full-dash-original-resizer-v10"
+        );
+
+
+        const before =
+            window.getComputedStyle(
+                handle,
+                "::before"
+            );
+
+        const after =
+            window.getComputedStyle(
+                handle,
+                "::after"
+            );
+
+
+        const beforeScore =
+            pseudoScoreV10(
+                before
+            );
+
+        const afterScore =
+            pseudoScoreV10(
+                after
+            );
+
+
+        handle.classList.remove(
+            "full-dash-original-resizer-before-v10",
+            "full-dash-original-resizer-after-v10"
+        );
+
+
+        if (
+            beforeScore >= afterScore
+            &&
+            beforeScore > 0
+        ) {
+
+            handle.classList.add(
+                "full-dash-original-resizer-before-v10"
+            );
+        }
+
+        else if (
+            afterScore > 0
+        ) {
+
+            handle.classList.add(
+                "full-dash-original-resizer-after-v10"
+            );
+        }
+
+
+        syncOriginalResizerV10();
+    }
+
+
+    function syncOriginalResizerV10() {
+
+        const rail =
+            railV10();
+
+
+        if (
+            !rail
+            ||
+            !resizerV10
+        ) {
+            return;
+        }
+
+
+        /*
+         * Preserve original mechanics and appearance.
+         *
+         * The rail scroll moves the pseudo-marker upward.
+         * Add exactly scrollTop back on Y.
+         */
+        resizerV10.style.setProperty(
+            "--full-dash-resizer-scroll-v10",
+            `${rail.scrollTop}px`
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       BOOT
+       -------------------------------------------------------- */
+
+    function applyV10() {
+
+        restoreResetViewV10();
+
+        alignCompanionReticlesV10();
+
+        prepareOriginalResizerV10();
+
+        syncOriginalResizerV10();
+    }
+
+
+    function bootV10() {
+
+        applyV10();
+
+
+        window.setTimeout(
+            applyV10,
+            120
+        );
+
+        window.setTimeout(
+            applyV10,
+            500
+        );
+
+        window.setTimeout(
+            applyV10,
+            1200
+        );
+
+
+        railV10()?.addEventListener(
+            "scroll",
+            syncOriginalResizerV10,
+            {
+                passive: true,
+            }
+        );
+
+
+        window.addEventListener(
+            "resize",
+            () => {
+
+                window.requestAnimationFrame(
+                    applyV10
+                );
+            },
+            {
+                passive: true,
+            }
+        );
+
+
+        const stage =
+            document.getElementById(
+                "cameraStage"
+            );
+
+
+        if (
+            stage
+            &&
+            "ResizeObserver" in window
+        ) {
+
+            new ResizeObserver(
+                () =>
+                    window.requestAnimationFrame(
+                        alignCompanionReticlesV10
+                    )
+            ).observe(
+                stage
+            );
+        }
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV10,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV10();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_COMPANION_IDLE_V11_FIXED
+   ============================================================ */
+
+(() => {
+
+    const DEFINITIONS = {
+
+        raw: {
+            label: "Raw camera idle",
+
+            art: `
+              <svg viewBox="0 0 120 92" aria-hidden="true">
+
+                <g class="fd11-orbit-green">
+                  <circle cx="60" cy="43" r="34"/>
+                  <circle cx="60" cy="43" r="27"/>
+                  <path d="M60 6v7M60 73v7M22 43h7M91 43h7"/>
+                </g>
+
+                <g class="fd11-corners">
+                  <path d="M16 24v-8h8"/>
+                  <path d="M96 16h8v8"/>
+                  <path d="M16 63v8h8"/>
+                  <path d="M96 71h8v-8"/>
+                </g>
+
+                <g class="fd11-raw-camera">
+                  <rect x="33" y="31" width="54" height="34" rx="6"/>
+                  <path d="M42 31l6-7h24l6 7"/>
+
+                  <circle
+                    class="fd11-raw-ring-a"
+                    cx="60"
+                    cy="48"
+                    r="12"
+                  />
+
+                  <circle
+                    class="fd11-raw-ring-b"
+                    cx="60"
+                    cy="48"
+                    r="6"
+                  />
+
+                  <circle
+                    class="fd11-raw-core"
+                    cx="60"
+                    cy="48"
+                    r="2"
+                  />
+
+                  <circle
+                    class="fd11-amber-dot"
+                    cx="79"
+                    cy="38"
+                    r="1.6"
+                  />
+
+                  <path
+                    class="fd11-raw-scan"
+                    d="M40 48h40"
+                  />
+                </g>
+
+              </svg>
+            `,
+        },
+
+
+        simulation: {
+            label: "Enter camera teleop",
+
+            art: `
+              <svg viewBox="0 0 120 92" aria-hidden="true">
+
+                <g class="fd11-sim-orbits">
+                  <ellipse cx="60" cy="42" rx="38" ry="23"/>
+                  <ellipse cx="60" cy="42" rx="30" ry="17"/>
+                </g>
+
+                <g class="fd11-sim-grid">
+                  <path d="M19 73h82"/>
+                  <path d="M29 65h62"/>
+                  <path d="M39 58h42"/>
+
+                  <path d="M37 53L19 73"/>
+                  <path d="M49 53L44 73"/>
+                  <path d="M71 53L76 73"/>
+                  <path d="M83 53L101 73"/>
+                </g>
+
+                <g class="fd11-sim-cube">
+                  <path
+                    d="
+                      M60 18
+                      L79 29
+                      V50
+                      L60 61
+                      L41 50
+                      V29
+                      Z
+                    "
+                  />
+
+                  <path d="M41 29L60 40L79 29"/>
+                  <path d="M60 40V61"/>
+
+                  <path
+                    class="fd11-sim-inner"
+                    d="
+                      M60 25
+                      L72 32
+                      V45
+                      L60 52
+                      L48 45
+                      V32
+                      Z
+                    "
+                  />
+                </g>
+
+                <circle
+                  class="fd11-sim-node"
+                  cx="94"
+                  cy="42"
+                  r="2.2"
+                />
+
+              </svg>
+            `,
+        },
+
+
+        keypoints: {
+            label: "Enter camera teleop",
+
+            art: `
+              <svg viewBox="0 0 120 92" aria-hidden="true">
+
+                <g class="fd11-corners">
+                  <path d="M23 25v-8h8"/>
+                  <path d="M89 17h8v8"/>
+                  <path d="M23 65v8h8"/>
+                  <path d="M89 73h8v-8"/>
+                </g>
+
+                <circle
+                  class="fd11-key-orbit"
+                  cx="60"
+                  cy="45"
+                  r="35"
+                />
+
+                <g class="fd11-key-links">
+                  <path d="M60 25v15"/>
+                  <path d="M43 42l17-2 17 2"/>
+                  <path d="M43 42L34 55"/>
+                  <path d="M77 42L86 55"/>
+                  <path d="M60 40v20"/>
+                  <path d="M60 60L48 77"/>
+                  <path d="M60 60L72 77"/>
+                </g>
+
+                <g class="fd11-key-dots">
+                  <circle cx="60" cy="20" r="3.4"/>
+                  <circle cx="43" cy="42" r="2.3"/>
+                  <circle cx="60" cy="40" r="2.3"/>
+                  <circle cx="77" cy="42" r="2.3"/>
+                  <circle cx="34" cy="55" r="2.3"/>
+                  <circle cx="86" cy="55" r="2.3"/>
+                  <circle cx="60" cy="60" r="2.5"/>
+                  <circle cx="48" cy="77" r="2.3"/>
+                  <circle cx="72" cy="77" r="2.3"/>
+                </g>
+
+              </svg>
+            `,
+        },
+    };
+
+
+    function tile(id) {
+
+        return document.querySelector(
+            `[data-camera-view-tile="${id}"]`
+        );
+    }
+
+
+    function ensureHost(id) {
+
+        const node =
+            tile(id);
+
+
+        if (!node) {
+            return null;
+        }
+
+
+        node.style.position =
+            "relative";
+
+
+        /*
+         * Hide all historical idle-reticle owners for companion
+         * tiles. V11 is the sole visual owner.
+         */
+        node
+            .querySelectorAll(
+                ".stitch-idle-reticle"
+            )
+            .forEach(
+                old =>
+                    old.style.setProperty(
+                        "display",
+                        "none",
+                        "important"
+                    )
+            );
+
+
+        let host =
+            node.querySelector(
+                `.fd11-host[data-fd11="${id}"]`
+            );
+
+
+        if (!host) {
+
+            host =
+                document.createElement(
+                    "div"
+                );
+
+
+            host.className =
+                "fd11-host";
+
+            host.dataset.fd11 =
+                id;
+
+
+            const definition =
+                DEFINITIONS[id];
+
+
+            host.innerHTML =
+                `
+                  <div class="fd11-art">
+                    ${definition.art}
+                  </div>
+
+                  <div class="fd11-label">
+                    ${definition.label}
+                  </div>
+                `;
+
+
+            node.appendChild(
+                host
+            );
+        }
+
+
+        return host;
+    }
+
+
+    /*
+     * RGB+Depth is the requested Y reference.
+     *
+     * Position the WHOLE companion unit using the reference
+     * reticle center, never the child SVG independently.
+     */
+    function alignHosts() {
+
+        const reference =
+            tile("overlay");
+
+
+        const referenceReticle =
+            reference?.querySelector(
+                ".stitch-idle-reticle"
+            );
+
+
+        if (
+            !reference
+            ||
+            !referenceReticle
+        ) {
+            return;
+        }
+
+
+        const referenceTileRect =
+            reference.getBoundingClientRect();
+
+        const referenceRect =
+            referenceReticle.getBoundingClientRect();
+
+
+        const referenceCenter =
+            (
+                referenceRect.top
+                +
+                referenceRect.height / 2
+            )
+            -
+            referenceTileRect.top;
+
+
+        for (
+            const id
+            of Object.keys(
+                DEFINITIONS
+            )
+        ) {
+
+            const host =
+                ensureHost(
+                    id
+                );
+
+
+            if (!host) {
+                continue;
+            }
+
+
+            /*
+             * User requested a little lower than previous passes.
+             */
+            host.style.setProperty(
+                "top",
+                `${
+                    (
+                        referenceCenter
+                        +
+                        10
+                    ).toFixed(2)
+                }px`,
+                "important"
+            );
+        }
+    }
+
+
+    function apply() {
+
+        for (
+            const id
+            of Object.keys(
+                DEFINITIONS
+            )
+        ) {
+
+            ensureHost(id);
+        }
+
+
+        alignHosts();
+    }
+
+
+    let timer =
+        null;
+
+
+    function schedule() {
+
+        if (timer) {
+
+            window.clearTimeout(
+                timer
+            );
+        }
+
+
+        timer =
+            window.setTimeout(
+                apply,
+                30
+            );
+    }
+
+
+    function boot() {
+
+        apply();
+
+
+        window.setTimeout(
+            apply,
+            120
+        );
+
+        window.setTimeout(
+            apply,
+            500
+        );
+
+        window.setTimeout(
+            apply,
+            1200
+        );
+
+
+        window.addEventListener(
+            "resize",
+            schedule,
+            {
+                passive: true,
+            }
+        );
+
+
+        const stage =
+            document.getElementById(
+                "cameraStage"
+            );
+
+
+        if (
+            stage
+            &&
+            "ResizeObserver" in window
+        ) {
+
+            new ResizeObserver(
+                schedule
+            ).observe(
+                stage
+            );
+        }
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            boot,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        boot();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_TYPOGRAPHY_MINWIDTH_V12
+   ============================================================ */
+
+(() => {
+
+    const CAMERA_MIN_WIDTH_V12 =
+        480;
+
+
+    /* --------------------------------------------------------
+       Generic computed-style copier
+       -------------------------------------------------------- */
+
+    function copyComputedV12(
+        source,
+        target,
+        properties
+    ) {
+
+        if (!source || !target) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                source
+            );
+
+
+        for (
+            const property
+            of properties
+        ) {
+
+            const cssName =
+                property.replace(
+                    /[A-Z]/g,
+                    char =>
+                        "-"
+                        +
+                        char.toLowerCase()
+                );
+
+
+            target.style.setProperty(
+                cssName,
+                computed[property],
+                "important"
+            );
+        }
+    }
+
+
+    const TEXT_PROPS_V12 = [
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "fontStyle",
+        "lineHeight",
+        "letterSpacing",
+        "textTransform",
+        "color",
+        "opacity",
+    ];
+
+
+    /* --------------------------------------------------------
+       1. Companion idle labels = RGB + Depth idle EXACT type
+       -------------------------------------------------------- */
+
+    function syncCompanionIdleLabelsV12() {
+
+        const reference =
+            document.querySelector(
+                '[data-camera-view-tile="overlay"] '
+                +
+                '.stitch-idle-label'
+            )
+            ||
+            document.querySelector(
+                '[data-camera-view-tile="depth"] '
+                +
+                '.stitch-idle-label'
+            );
+
+
+        if (!reference) {
+            return;
+        }
+
+
+        document
+            .querySelectorAll(
+                "#view-live .fd11-label"
+            )
+            .forEach(
+                label => {
+
+                    copyComputedV12(
+                        reference,
+                        label,
+                        TEXT_PROPS_V12
+                    );
+
+
+                    /*
+                     * Preserve V11's intended text.
+                     */
+                    label.style.setProperty(
+                        "white-space",
+                        "nowrap",
+                        "important"
+                    );
+                }
+            );
+    }
+
+
+    /* --------------------------------------------------------
+       2. Find the actual XR text in the MODE panel
+       -------------------------------------------------------- */
+
+    function exactTextElementV12(
+        root,
+        wanted
+    ) {
+
+        if (!root) {
+            return null;
+        }
+
+
+        const walker =
+            document.createTreeWalker(
+                root,
+                NodeFilter.SHOW_ELEMENT
+            );
+
+
+        while (
+            walker.nextNode()
+        ) {
+
+            const node =
+                walker.currentNode;
+
+
+            if (
+                (
+                    node.textContent
+                    ||
+                    ""
+                ).trim()
+                === wanted
+            ) {
+
+                return node;
+            }
+        }
+
+
+        return null;
+    }
+
+
+    function xrTypographyReferenceV12() {
+
+        const rail =
+            document.querySelector(
+                "#view-live .combined-rail"
+            );
+
+
+        return (
+            exactTextElementV12(
+                rail,
+                "Xr"
+            )
+            ||
+            exactTextElementV12(
+                rail,
+                "XR"
+            )
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       3. Robot Modes text = XR typography
+          All six buttons = neutral gray
+       -------------------------------------------------------- */
+
+    function syncRobotModeTypographyV12() {
+
+        const reference =
+            xrTypographyReferenceV12();
+
+
+        const card =
+            document.getElementById(
+                "liveRobotModesCard"
+            );
+
+
+        if (
+            !reference
+            ||
+            !card
+        ) {
+            return;
+        }
+
+
+        card
+            .querySelectorAll(
+                [
+                    ".robot-mode-current-v11 span",
+                    ".robot-mode-current-v11 strong",
+                    ".robot-mode-v11",
+                ].join(",")
+            )
+            .forEach(
+                node =>
+                    copyComputedV12(
+                        reference,
+                        node,
+                        TEXT_PROPS_V12
+                    )
+            );
+
+
+        /*
+         * Remove the mixed green/gray state completely.
+         */
+        card
+            .querySelectorAll(
+                ".robot-mode-v11"
+            )
+            .forEach(
+                button => {
+
+                    button.classList.remove(
+                        "robot-mode-v11-green"
+                    );
+
+                    button.classList.add(
+                        "robot-mode-v11-neutral"
+                    );
+                }
+            );
+    }
+
+
+    /* --------------------------------------------------------
+       4. New Camera Multiview minimum width
+       -------------------------------------------------------- */
+
+    function enforceCameraMinimumV12() {
+
+        /*
+         * FULL_DASH_LAYOUT_MODES_V13
+         *
+         * Retired.
+         *
+         * Camera width belongs exclusively to
+         * stitch_resize_v1931.js.
+         */
+        return;
+
+
+        const camera =
+            document.querySelector(
+                "#view-live .camera-panel"
+            );
+
+
+        const grid =
+            document.querySelector(
+                "#view-live .combined-live-grid"
+            );
+
+
+        if (
+            !camera
+            ||
+            !grid
+        ) {
+            return;
+        }
+
+
+        const cameraColumn =
+            [
+                ...grid.children
+            ]
+                .find(
+                    child =>
+                        child === camera
+                        ||
+                        child.contains(
+                            camera
+                        )
+                )
+            ||
+            camera;
+
+
+        const minimum =
+            `${CAMERA_MIN_WIDTH_V12}px`;
+
+
+        camera.style.setProperty(
+            "min-width",
+            minimum,
+            "important"
+        );
+
+
+        cameraColumn.style.setProperty(
+            "min-width",
+            minimum,
+            "important"
+        );
+
+
+        /*
+         * If an older resize state already stored a narrower
+         * explicit width, immediately clamp the rendered width.
+         */
+        const width =
+            cameraColumn
+                .getBoundingClientRect()
+                .width;
+
+
+        if (
+            width
+            <
+            CAMERA_MIN_WIDTH_V12
+        ) {
+
+            cameraColumn.style.setProperty(
+                "width",
+                minimum,
+                "important"
+            );
+        }
+
+
+        /*
+         * Nine icons should remain one row at the new minimum.
+         */
+        const dock =
+            camera.querySelector(
+                ".camera-mode-buttons"
+            );
+
+
+        if (dock) {
+
+            dock.style.setProperty(
+                "flex-wrap",
+                "nowrap",
+                "important"
+            );
+
+            dock.style.setProperty(
+                "min-width",
+                "0",
+                "important"
+            );
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       Apply / observe
+       -------------------------------------------------------- */
+
+    function applyV12() {
+
+        syncCompanionIdleLabelsV12();
+
+        syncRobotModeTypographyV12();
+
+        enforceCameraMinimumV12();
+    }
+
+
+    let timer =
+        null;
+
+
+    function scheduleV12() {
+
+        if (timer) {
+
+            window.clearTimeout(
+                timer
+            );
+        }
+
+
+        timer =
+            window.setTimeout(
+                applyV12,
+                30
+            );
+    }
+
+
+    function bootV12() {
+
+        applyV12();
+
+
+        window.setTimeout(
+            applyV12,
+            120
+        );
+
+        window.setTimeout(
+            applyV12,
+            500
+        );
+
+        window.setTimeout(
+            applyV12,
+            1200
+        );
+
+
+        window.addEventListener(
+            "resize",
+            scheduleV12,
+            {
+                passive: true,
+            }
+        );
+
+
+        const camera =
+            document.querySelector(
+                "#view-live .camera-panel"
+            );
+
+
+        if (
+            camera
+            &&
+            "ResizeObserver" in window
+        ) {
+
+            new ResizeObserver(
+                scheduleV12
+            ).observe(
+                camera
+            );
+        }
+
+
+        const rail =
+            document.querySelector(
+                "#view-live .combined-rail"
+            );
+
+
+        if (
+            rail
+            &&
+            "MutationObserver" in window
+        ) {
+
+            new MutationObserver(
+                scheduleV12
+            ).observe(
+                rail,
+                {
+                    subtree: true,
+                    childList: true,
+                }
+            );
+        }
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV12,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV12();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_UI_FINISH_V14
+   ============================================================ */
+
+(() => {
+
+    const STYLE_PROPS = [
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "fontStyle",
+        "lineHeight",
+        "letterSpacing",
+        "textTransform",
+        "color",
+
+        "background",
+        "backgroundColor",
+
+        "borderTopWidth",
+        "borderTopStyle",
+        "borderTopColor",
+
+        "borderRightWidth",
+        "borderRightStyle",
+        "borderRightColor",
+
+        "borderBottomWidth",
+        "borderBottomStyle",
+        "borderBottomColor",
+
+        "borderLeftWidth",
+        "borderLeftStyle",
+        "borderLeftColor",
+
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomRightRadius",
+        "borderBottomLeftRadius",
+
+        "paddingTop",
+        "paddingRight",
+        "paddingBottom",
+        "paddingLeft",
+
+        "boxShadow",
+    ];
+
+
+    function cssNameV14(name) {
+
+        return name.replace(
+            /[A-Z]/g,
+            char =>
+                "-"
+                +
+                char.toLowerCase()
+        );
+    }
+
+
+    function copyStyleV14(
+        source,
+        target,
+        props
+    ) {
+
+        if (!source || !target) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                source
+            );
+
+
+        for (const prop of props) {
+
+            target.style.setProperty(
+                cssNameV14(prop),
+                computed[prop],
+                "important"
+            );
+        }
+    }
+
+
+    function resetViewButtonV14() {
+
+        return [
+            ...document.querySelectorAll(
+                "#view-live button"
+            )
+        ].find(
+            node =>
+                /^reset\s+view$/i.test(
+                    (
+                        node.textContent
+                        ||
+                        ""
+                    ).trim()
+                )
+        );
+    }
+
+
+    function syncRefreshV14() {
+
+        const source =
+            resetViewButtonV14();
+
+
+        const refresh =
+            document.getElementById(
+                "liveRobotModeRefresh"
+            );
+
+
+        if (!source || !refresh) {
+            return;
+        }
+
+
+        copyStyleV14(
+            source,
+            refresh,
+            STYLE_PROPS
+        );
+
+
+        /*
+         * Exact rendered dimensions, not an approximation.
+         */
+        const rect =
+            source.getBoundingClientRect();
+
+
+        if (rect.width > 0) {
+
+            refresh.style.setProperty(
+                "width",
+                `${rect.width}px`,
+                "important"
+            );
+
+            refresh.style.setProperty(
+                "min-width",
+                `${rect.width}px`,
+                "important"
+            );
+
+            refresh.style.setProperty(
+                "max-width",
+                `${rect.width}px`,
+                "important"
+            );
+        }
+
+
+        if (rect.height > 0) {
+
+            refresh.style.setProperty(
+                "height",
+                `${rect.height}px`,
+                "important"
+            );
+
+            refresh.style.setProperty(
+                "min-height",
+                `${rect.height}px`,
+                "important"
+            );
+
+            refresh.style.setProperty(
+                "max-height",
+                `${rect.height}px`,
+                "important"
+            );
+        }
+
+
+        /*
+         * Robot Mode actions remain backend-pending.
+         * Only the visual appearance is matched.
+         */
+        refresh.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        refresh.style.setProperty(
+            "filter",
+            "none",
+            "important"
+        );
+    }
+
+
+    function syncControllerRadiusV14() {
+
+        /*
+         * Find the actual HANDS panel, not Robot Modes.
+         */
+        const hands =
+            [...document.querySelectorAll(
+                "#view-live .rail-hand-panel"
+            )]
+            .find(
+                node =>
+                    /^HANDS$/i.test(
+                        (
+                            node.querySelector(
+                                ".hand-panel-head strong"
+                            )
+                            ?.textContent
+                            ||
+                            ""
+                        ).trim()
+                    )
+            );
+
+
+        const controller =
+            document.querySelector(
+                "#view-live .controller-process-panel"
+            );
+
+
+        if (!hands || !controller) {
+            return;
+        }
+
+
+        const source =
+            window.getComputedStyle(
+                hands
+            );
+
+
+        /*
+         * ONLY corners.
+         *
+         * Do not copy borders/backgrounds and do not create
+         * another inner frame.
+         */
+        [
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+        ]
+        .forEach(
+            prop => {
+
+                controller.style.setProperty(
+                    cssNameV14(prop),
+                    source[prop],
+                    "important"
+                );
+            }
+        );
+    }
+
+
+    function applyV14() {
+
+        syncRefreshV14();
+
+        syncControllerRadiusV14();
+    }
+
+
+    function bootV14() {
+
+        applyV14();
+
+
+        window.setTimeout(
+            applyV14,
+            100
+        );
+
+        window.setTimeout(
+            applyV14,
+            400
+        );
+
+        window.setTimeout(
+            applyV14,
+            1000
+        );
+
+
+        window.addEventListener(
+            "resize",
+            () =>
+                window.requestAnimationFrame(
+                    applyV14
+                ),
+            {
+                passive: true,
+            }
+        );
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV14,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV14();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_POLISH_V15
+   ============================================================ */
+
+(() => {
+
+    function cssNameV15(name) {
+        return name.replace(
+            /[A-Z]/g,
+            c => "-" + c.toLowerCase()
+        );
+    }
+
+
+    function findLeafByTextV15(
+        root,
+        wanted
+    ) {
+
+        if (!root) {
+            return null;
+        }
+
+
+        return [
+            ...root.querySelectorAll("*")
+        ].find(
+            node =>
+                node.children.length === 0
+                &&
+                (
+                    node.textContent
+                    ||
+                    ""
+                ).trim()
+                === wanted
+        ) || null;
+    }
+
+
+    /* --------------------------------------------------------
+       HANDS = radius source
+       -------------------------------------------------------- */
+
+    function handsPanelV15() {
+
+        return [
+            ...document.querySelectorAll(
+                "#view-live .panel"
+            )
+        ].find(
+            panel => {
+
+                const title =
+                    panel.querySelector(
+                        ".panel-head strong, "
+                        +
+                        ".hand-panel-head strong"
+                    );
+
+
+                return (
+                    (
+                        title?.textContent
+                        ||
+                        ""
+                    ).trim()
+                    .toUpperCase()
+                    === "HANDS"
+                );
+            }
+        ) || null;
+    }
+
+
+    /* --------------------------------------------------------
+       Controller Process:
+       copy ONLY corner radii from Hands.
+       -------------------------------------------------------- */
+
+    function syncControllerCornersV15() {
+
+        const hands =
+            handsPanelV15();
+
+
+        const controller =
+            document.querySelector(
+                "#view-live "
+                +
+                ".controller-process-panel"
+            );
+
+
+        if (!hands || !controller) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                hands
+            );
+
+
+        [
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+        ]
+        .forEach(
+            prop => {
+
+                controller.style.setProperty(
+                    cssNameV15(prop),
+                    computed[prop],
+                    "important"
+                );
+            }
+        );
+
+
+        /*
+         * Ensure internal backgrounds obey those actual
+         * outer corners. No new border is created.
+         */
+        controller.style.setProperty(
+            "overflow",
+            "hidden",
+            "important"
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       Selected Joint NORMAL:
+       align its CENTER Y exactly with SELECTED JOINT.
+       -------------------------------------------------------- */
+
+    function alignSelectedHealthV15() {
+
+        const chip =
+            document.getElementById(
+                "selectedHealthChip"
+            );
+
+
+        if (!chip) {
+            return;
+        }
+
+
+        const panel =
+            chip.closest(
+                ".panel"
+            )
+            ||
+            chip.parentElement;
+
+
+        const title =
+            findLeafByTextV15(
+                panel,
+                "SELECTED JOINT"
+            );
+
+
+        if (!title) {
+            return;
+        }
+
+
+        /*
+         * Remove previous correction before measuring.
+         */
+        chip.style.removeProperty(
+            "translate"
+        );
+
+
+        const titleRect =
+            title.getBoundingClientRect();
+
+        const chipRect =
+            chip.getBoundingClientRect();
+
+
+        const titleCenter =
+            titleRect.top
+            +
+            titleRect.height / 2;
+
+
+        const chipCenter =
+            chipRect.top
+            +
+            chipRect.height / 2;
+
+
+        const delta =
+            titleCenter
+            -
+            chipCenter;
+
+
+        chip.style.setProperty(
+            "translate",
+            `0 ${delta.toFixed(2)}px`,
+            "important"
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       Controller status badge:
+       NORMAL is the style/size source.
+       KEEP original status colors.
+       -------------------------------------------------------- */
+
+    const STATUS_STYLE_PROPS_V15 = [
+        "display",
+        "alignItems",
+        "justifyContent",
+
+        "height",
+        "minHeight",
+        "maxHeight",
+
+        "paddingTop",
+        "paddingRight",
+        "paddingBottom",
+        "paddingLeft",
+
+        "fontFamily",
+        "fontSize",
+        "fontWeight",
+        "fontStyle",
+        "lineHeight",
+        "letterSpacing",
+        "textTransform",
+
+        "borderTopWidth",
+        "borderTopStyle",
+
+        "borderRightWidth",
+        "borderRightStyle",
+
+        "borderBottomWidth",
+        "borderBottomStyle",
+
+        "borderLeftWidth",
+        "borderLeftStyle",
+
+        "borderTopLeftRadius",
+        "borderTopRightRadius",
+        "borderBottomRightRadius",
+        "borderBottomLeftRadius",
+    ];
+
+
+    function controllerStatusBadgeV15() {
+
+        const controller =
+            document.querySelector(
+                "#view-live "
+                +
+                ".controller-process-panel"
+            );
+
+
+        if (!controller) {
+            return null;
+        }
+
+
+        const statuses =
+            new Set([
+                "OFFLINE",
+                "STOPPED",
+                "STARTING",
+                "RUNNING",
+                "STOPPING",
+                "ERROR",
+                "UNAVAILABLE",
+            ]);
+
+
+        return [
+            ...controller.querySelectorAll("*")
+        ].find(
+            node =>
+                node.children.length === 0
+                &&
+                statuses.has(
+                    (
+                        node.textContent
+                        ||
+                        ""
+                    ).trim()
+                    .toUpperCase()
+                )
+        ) || null;
+    }
+
+
+    function syncControllerStatusBadgeV15() {
+
+        const normal =
+            document.getElementById(
+                "selectedHealthChip"
+            );
+
+
+        const status =
+            controllerStatusBadgeV15();
+
+
+        if (!normal || !status) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                normal
+            );
+
+
+        for (
+            const prop
+            of STATUS_STYLE_PROPS_V15
+        ) {
+
+            status.style.setProperty(
+                cssNameV15(prop),
+                computed[prop],
+                "important"
+            );
+        }
+
+
+        /*
+         * Intentionally DO NOT copy:
+         *
+         * color
+         * background
+         * background-color
+         * border-color
+         * box-shadow
+         *
+         * so OFFLINE keeps its amber palette.
+         */
+    }
+
+
+    function applyV15() {
+
+        syncControllerCornersV15();
+
+        alignSelectedHealthV15();
+
+        syncControllerStatusBadgeV15();
+    }
+
+
+    function bootV15() {
+
+        applyV15();
+
+
+        window.setTimeout(
+            applyV15,
+            100
+        );
+
+        window.setTimeout(
+            applyV15,
+            400
+        );
+
+        window.setTimeout(
+            applyV15,
+            1000
+        );
+
+
+        window.addEventListener(
+            "resize",
+            () =>
+                window.requestAnimationFrame(
+                    applyV15
+                ),
+            {
+                passive: true,
+            }
+        );
+    }
+
+
+    if (
+        document.readyState
+        === "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV15,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV15();
+    }
+
+})();
+
+
+
+
+
+
+
+
+
+/* ============================================================
+   FULL_DASH_TELEOPERATION_RUNTIME_V21
+   ------------------------------------------------------------
+   STRUCTURAL OWNER.
+
+   - no MutationObserver
+   - no DOM reordering loop
+   - no scrollTop writes
+   - no layout polling
+   - hidden legacy status remains DATA ONLY
+   - VR controller controls isolated behind one parent
+   - Camera controller is entirely new DOM/IDs
+   ============================================================ */
+
+(() => {
+
+    const STORAGE_KEY_V21 =
+        "fullDash.teleoperationMode.v16";
+
+
+    let cameraStateV21 =
+        "idle";
+
+
+    /* --------------------------------------------------------
+       Helpers
+       -------------------------------------------------------- */
+
+    function byIdV21(id) {
+
+        return document.getElementById(
+            id
+        );
+    }
+
+
+    function cameraModeV21() {
+
+        return (
+            byIdV21(
+                "teleoperationSelectV16"
+            )?.value
+            ===
+            "camera"
+        );
+    }
+
+
+    function cssNameV21(name) {
+
+        return name.replace(
+            /[A-Z]/g,
+            char =>
+                "-"
+                +
+                char.toLowerCase()
+        );
+    }
+
+
+    function copyComputedV21(
+        source,
+        target,
+        props
+    ) {
+
+        if (!source || !target) {
+            return;
+        }
+
+
+        const style =
+            window.getComputedStyle(
+                source
+            );
+
+
+        for (
+            const prop
+            of props
+        ) {
+
+            target.style.setProperty(
+                cssNameV21(prop),
+                style[prop],
+                "important"
+            );
+        }
+    }
+
+
+    function textV21(node) {
+
+        return (
+            node?.textContent
+            ||
+            "—"
+        ).trim()
+        ||
+        "—";
+    }
+
+
+    /* --------------------------------------------------------
+       Title + panel style references
+       -------------------------------------------------------- */
+
+    function handsPanelV21() {
+
+        return byIdV21(
+            "handMatrixBody"
+        )
+        ?.closest(
+            "section"
+        )
+        ||
+        null;
+    }
+
+
+    function syncPanelStylesV21() {
+
+        const hands =
+            handsPanelV21();
+
+
+        const status =
+            byIdV21(
+                "teleopStatusPanelV21"
+            );
+
+
+        const teleoperation =
+            byIdV21(
+                "teleoperationPanelV16"
+            );
+
+
+        const titleSource =
+            byIdV21(
+                "controllerProcessTitle"
+            );
+
+
+        const titleProps = [
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "fontStyle",
+            "lineHeight",
+            "letterSpacing",
+            "textTransform",
+            "color",
+        ];
+
+
+        copyComputedV21(
+            titleSource,
+            byIdV21(
+                "teleopStatusTitleV21"
+            ),
+            titleProps
+        );
+
+
+        copyComputedV21(
+            titleSource,
+            document.querySelector(
+                "#teleoperationPanelV16 "
+                +
+                ".teleoperation-head-v16 strong"
+            ),
+            titleProps
+        );
+
+
+        if (hands) {
+
+            const shellProps = [
+                "borderTopWidth",
+                "borderTopStyle",
+                "borderTopColor",
+
+                "borderRightWidth",
+                "borderRightStyle",
+                "borderRightColor",
+
+                "borderBottomWidth",
+                "borderBottomStyle",
+                "borderBottomColor",
+
+                "borderLeftWidth",
+                "borderLeftStyle",
+                "borderLeftColor",
+
+                "borderTopLeftRadius",
+                "borderTopRightRadius",
+                "borderBottomRightRadius",
+                "borderBottomLeftRadius",
+
+                "background",
+                "backgroundColor",
+                "boxShadow",
+            ];
+
+
+            copyComputedV21(
+                hands,
+                status,
+                shellProps
+            );
+
+
+            copyComputedV21(
+                hands,
+                teleoperation,
+                shellProps
+            );
+        }
+
+
+        const oldLabel =
+            document.querySelector(
+                "#view-live "
+                +
+                ".health-panel "
+                +
+                ".health-item span"
+            )
+            ||
+            document.querySelector(
+                "#view-live "
+                +
+                ".quick-panel span"
+            );
+
+
+        const oldValue =
+            document.querySelector(
+                "#view-live "
+                +
+                ".health-panel "
+                +
+                ".health-item strong"
+            )
+            ||
+            document.querySelector(
+                "#view-live "
+                +
+                ".quick-panel strong"
+            );
+
+
+        const valueProps = [
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "fontStyle",
+            "lineHeight",
+            "letterSpacing",
+            "textTransform",
+            "color",
+        ];
+
+
+        document
+            .querySelectorAll(
+                "#teleopStatusGridV21 "
+                +
+                ".teleop-status-item-v21"
+            )
+            .forEach(
+                item => {
+
+                    copyComputedV21(
+                        oldLabel,
+                        item.querySelector(
+                            "span"
+                        ),
+                        valueProps
+                    );
+
+
+                    copyComputedV21(
+                        oldValue,
+                        item.querySelector(
+                            "strong"
+                        ),
+                        valueProps
+                    );
+                }
+            );
+    }
+
+
+    /* --------------------------------------------------------
+       Teleoperation dropdown = exact Composite styling
+       -------------------------------------------------------- */
+
+    function syncTeleoperationSelectV21() {
+
+        const source =
+            byIdV21(
+                "healthModeSelect"
+            );
+
+
+        const target =
+            byIdV21(
+                "teleoperationSelectV16"
+            );
+
+
+        if (!target) {
+            return;
+        }
+
+
+        const props = [
+            "appearance",
+            "WebkitAppearance",
+
+            "height",
+            "minHeight",
+
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "fontStyle",
+            "lineHeight",
+            "letterSpacing",
+            "textTransform",
+
+            "color",
+
+            "background",
+            "backgroundColor",
+            "backgroundImage",
+            "backgroundPosition",
+            "backgroundRepeat",
+            "backgroundSize",
+
+            "borderTopWidth",
+            "borderTopStyle",
+            "borderTopColor",
+
+            "borderRightWidth",
+            "borderRightStyle",
+            "borderRightColor",
+
+            "borderBottomWidth",
+            "borderBottomStyle",
+            "borderBottomColor",
+
+            "borderLeftWidth",
+            "borderLeftStyle",
+            "borderLeftColor",
+
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+
+            "paddingTop",
+            "paddingRight",
+            "paddingBottom",
+            "paddingLeft",
+
+            "boxShadow",
+        ];
+
+
+        copyComputedV21(
+            source,
+            target,
+            props
+        );
+
+
+        target.style.setProperty(
+            "display",
+            "block",
+            "important"
+        );
+
+        target.style.setProperty(
+            "visibility",
+            "visible",
+            "important"
+        );
+
+        target.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        target.style.setProperty(
+            "pointer-events",
+            "auto",
+            "important"
+        );
+
+        target.style.setProperty(
+            "width",
+            "100%",
+            "important"
+        );
+
+        target.style.setProperty(
+            "min-width",
+            "0",
+            "important"
+        );
+
+        target.style.setProperty(
+            "max-width",
+            "none",
+            "important"
+        );
+
+
+        const sourceHeight =
+            source
+                ?.getBoundingClientRect()
+                ?.height;
+
+
+        target.style.setProperty(
+            "height",
+            `${
+                sourceHeight > 0
+                    ? sourceHeight
+                    : 30
+            }px`,
+            "important"
+        );
+
+        target.style.setProperty(
+            "min-height",
+            `${
+                sourceHeight > 0
+                    ? sourceHeight
+                    : 30
+            }px`,
+            "important"
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       VR Status source
+       -------------------------------------------------------- */
+
+    function faultValueV21() {
+
+        return textV21(
+            document.querySelector(
+                "#actionCondFault "
+                +
+                ".stitch-status-value"
+            )
+        );
+    }
+
+
+    function vrStatusValuesV21() {
+
+        return [
+            [
+                "Xr",
+                textV21(
+                    byIdV21(
+                        "xrValue"
+                    )
+                ),
+            ],
+
+            [
+                "Hands",
+                textV21(
+                    byIdV21(
+                        "handsValue"
+                    )
+                ),
+            ],
+
+            [
+                "Fault",
+                faultValueV21(),
+            ],
+
+            [
+                "Fingerworker",
+                textV21(
+                    byIdV21(
+                        "fingerPhase"
+                    )
+                ),
+            ],
+
+            [
+                "Inspire",
+                textV21(
+                    byIdV21(
+                        "fingerFeedback"
+                    )
+                ),
+            ],
+
+            [
+                "Packet",
+                textV21(
+                    byIdV21(
+                        "packetAge"
+                    )
+                ),
+            ],
+        ];
+    }
+
+
+    /* --------------------------------------------------------
+       Camera Status source
+       -------------------------------------------------------- */
+
+    function cameraDocumentV21() {
+
+        const frame =
+            byIdV21(
+                "bacalbasaFrame"
+            );
+
+
+        try {
+
+            return (
+                frame?.contentDocument
+                ||
+                null
+            );
+        }
+
+        catch (_) {
+
+            return null;
+        }
+    }
+
+
+    function findLeafV21(
+        root,
+        wanted
+    ) {
+
+        if (!root) {
+            return null;
+        }
+
+
+        const target =
+            wanted
+                .trim()
+                .toUpperCase();
+
+
+        return [
+            ...root.querySelectorAll(
+                "span,div,strong"
+            )
+        ]
+        .find(
+            node =>
+                node.children.length
+                ===
+                0
+                &&
+                (
+                    node.textContent
+                    ||
+                    ""
+                )
+                .trim()
+                .toUpperCase()
+                ===
+                target
+        )
+        ||
+        null;
+    }
+
+
+    function legacyStatusV21(
+        doc,
+        label
+    ) {
+
+        const leaf =
+            findLeafV21(
+                doc?.body,
+                label
+            );
+
+
+        if (!leaf) {
+            return "OFF";
+        }
+
+
+        let row =
+            leaf.parentElement;
+
+
+        for (
+            let depth = 0;
+            depth < 5 && row;
+            depth += 1
+        ) {
+
+            const candidates =
+                row.querySelectorAll(
+                    "strong, .value, [data-state]"
+                );
+
+
+            for (
+                const candidate
+                of candidates
+            ) {
+
+                if (
+                    candidate
+                    ===
+                    leaf
+                ) {
+                    continue;
+                }
+
+
+                const value =
+                    (
+                        candidate.textContent
+                        ||
+                        ""
+                    ).trim();
+
+
+                if (value) {
+                    return value;
+                }
+            }
+
+
+            row =
+                row.parentElement;
+        }
+
+
+        return "OFF";
+    }
+
+
+    function directLegacyV21(
+        doc,
+        selectors,
+        fallbackLabel
+    ) {
+
+        for (
+            const selector
+            of selectors
+        ) {
+
+            const value =
+                (
+                    doc
+                        ?.querySelector(
+                            selector
+                        )
+                        ?.textContent
+                    ||
+                    ""
+                ).trim();
+
+
+            if (value) {
+                return value;
+            }
+        }
+
+
+        return legacyStatusV21(
+            doc,
+            fallbackLabel
+        );
+    }
+
+
+    function cameraStatusValuesV21() {
+
+        const doc =
+            cameraDocumentV21();
+
+
+        if (!doc) {
+
+            return [
+                ["System", "OFFLINE"],
+                ["Simulation", "OFF"],
+                ["SONIC", "OFF"],
+                ["Camera", "OFF"],
+                ["Alignment", "WAITING"],
+                ["Tracking", "OFF"],
+            ];
+        }
+
+
+        return [
+            [
+                "System",
+                directLegacyV21(
+                    doc,
+                    [
+                        "#systemBadge",
+                        "#dashboardStatus",
+                    ],
+                    "System"
+                ),
+            ],
+
+            [
+                "Simulation",
+                legacyStatusV21(
+                    doc,
+                    "Simulation"
+                ),
+            ],
+
+            [
+                "SONIC",
+                directLegacyV21(
+                    doc,
+                    [
+                        "#demoSonicState",
+                        "#sonicSimState",
+                    ],
+                    "SONIC"
+                ),
+            ],
+
+            [
+                "Camera",
+                directLegacyV21(
+                    doc,
+                    [
+                        "#demoCameraState",
+                        "#cameraState",
+                    ],
+                    "Camera"
+                ),
+            ],
+
+            [
+                "Alignment",
+                directLegacyV21(
+                    doc,
+                    [
+                        "#alignmentState",
+                        "#demoAlignmentState",
+                    ],
+                    "Alignment"
+                ),
+            ],
+
+            [
+                "Tracking",
+                directLegacyV21(
+                    doc,
+                    [
+                        "#demoTrackingState",
+                    ],
+                    "Tracking"
+                ),
+            ],
+        ];
+    }
+
+
+    /* --------------------------------------------------------
+       Unified Status render
+       -------------------------------------------------------- */
+
+    function statusToneV21(
+        node,
+        value
+    ) {
+
+        if (!node) {
+            return;
+        }
+
+
+        const upper =
+            (
+                value
+                ||
+                ""
+            ).toUpperCase();
+
+
+        node.dataset.tone =
+            /\b(ERROR|FAULT|FAILED|FAIL|BAD)\b/
+            .test(
+                upper
+            )
+                ? "bad"
+                :
+            /\b(WAITING|STARTING|STOPPING|HOLD|PENDING|ALIGN)\b/
+            .test(
+                upper
+            )
+                ? "warn"
+                :
+            /\b(READY|RUNNING|LIVE|OK|ON|CONNECTED|TRACKING)\b/
+            .test(
+                upper
+            )
+                ? "good"
+                :
+                "neutral";
+    }
+
+
+    function renderStatusV21() {
+
+        const rows =
+            cameraModeV21()
+                ? cameraStatusValuesV21()
+                : vrStatusValuesV21();
+
+
+        rows.forEach(
+            (
+                [
+                    label,
+                    value,
+                ],
+                index
+            ) => {
+
+                const n =
+                    index + 1;
+
+
+                const labelNode =
+                    byIdV21(
+                        `teleopStatusLabel${n}V21`
+                    );
+
+
+                const valueNode =
+                    byIdV21(
+                        `teleopStatusValue${n}V21`
+                    );
+
+
+                if (labelNode) {
+
+                    labelNode.textContent =
+                        label;
+                }
+
+
+                if (valueNode) {
+
+                    valueNode.textContent =
+                        value
+                        ||
+                        "—";
+
+
+                    statusToneV21(
+                        valueNode,
+                        value
+                    );
+                }
+            }
+        );
+    }
+
+
+    /* --------------------------------------------------------
+       New Camera controller styling
+       -------------------------------------------------------- */
+
+    function syncCameraControlStyleV21() {
+
+        const sourceSwitch =
+            byIdV21(
+                "controllerProcessSwitchV16"
+            );
+
+
+        const sourceConfigure =
+            byIdV21(
+                "controllerConfigureBtn"
+            );
+
+
+        const targetSwitch =
+            byIdV21(
+                "cameraTeleopSwitchV21"
+            );
+
+
+        if (
+            !sourceSwitch
+            ||
+            !sourceConfigure
+            ||
+            !targetSwitch
+        ) {
+            return;
+        }
+
+
+        const switchProps = [
+            "height",
+            "minHeight",
+
+            "paddingTop",
+            "paddingRight",
+            "paddingBottom",
+            "paddingLeft",
+
+            "background",
+            "backgroundColor",
+
+            "borderTopWidth",
+            "borderTopStyle",
+            "borderTopColor",
+
+            "borderRightWidth",
+            "borderRightStyle",
+            "borderRightColor",
+
+            "borderBottomWidth",
+            "borderBottomStyle",
+            "borderBottomColor",
+
+            "borderLeftWidth",
+            "borderLeftStyle",
+            "borderLeftColor",
+
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+
+            "boxShadow",
+        ];
+
+
+        copyComputedV21(
+            sourceSwitch,
+            targetSwitch,
+            switchProps
+        );
+
+
+        const buttonProps = [
+            "height",
+            "minHeight",
+
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "fontStyle",
+            "lineHeight",
+            "letterSpacing",
+            "textTransform",
+
+            "paddingTop",
+            "paddingRight",
+            "paddingBottom",
+            "paddingLeft",
+
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+        ];
+
+
+        document
+            .querySelectorAll(
+                "#cameraTeleopSwitchV21 "
+                +
+                ".camera-segment-v21"
+            )
+            .forEach(
+                button =>
+                    copyComputedV21(
+                        sourceConfigure,
+                        button,
+                        buttonProps
+                    )
+            );
+
+
+        const configureStyle =
+            window.getComputedStyle(
+                sourceConfigure
+            );
+
+
+        const host =
+            byIdV21(
+                "cameraControllerControlsV21"
+            );
+
+
+        if (host) {
+
+            host.style.setProperty(
+                "--camera-active-color-v21",
+                configureStyle.color,
+            );
+
+
+            host.style.setProperty(
+                "--camera-active-background-v21",
+                configureStyle.backgroundColor,
+            );
+
+
+            host.style.setProperty(
+                "--camera-active-border-v21",
+                configureStyle.borderTopColor,
+            );
+        }
+
+
+        const indicator =
+            byIdV21(
+                "cameraTeleopIndicatorV21"
+            );
+
+
+        if (indicator) {
+
+            copyComputedV21(
+                sourceConfigure,
+                indicator,
+                [
+                    "background",
+                    "backgroundColor",
+
+                    "borderTopWidth",
+                    "borderTopStyle",
+                    "borderTopColor",
+
+                    "borderRightWidth",
+                    "borderRightStyle",
+                    "borderRightColor",
+
+                    "borderBottomWidth",
+                    "borderBottomStyle",
+                    "borderBottomColor",
+
+                    "borderLeftWidth",
+                    "borderLeftStyle",
+                    "borderLeftColor",
+
+                    "borderTopLeftRadius",
+                    "borderTopRightRadius",
+                    "borderBottomRightRadius",
+                    "borderBottomLeftRadius",
+
+                    "boxShadow",
+                ]
+            );
+        }
+    }
+
+
+    /* --------------------------------------------------------
+       Camera controller state machine — UI ONLY
+       -------------------------------------------------------- */
+
+    function applyCameraStateV21(
+        state
+    ) {
+
+        if (
+            ![
+                "idle",
+                "configured",
+                "teleop",
+            ].includes(
+                state
+            )
+        ) {
+
+            state =
+                "idle";
+        }
+
+
+        cameraStateV21 =
+            state;
+
+
+        const host =
+            byIdV21(
+                "cameraControllerControlsV21"
+            );
+
+
+        const configure =
+            byIdV21(
+                "cameraConfigureV21"
+            );
+
+
+        const enter =
+            byIdV21(
+                "cameraEnterV21"
+            );
+
+
+        const stop =
+            byIdV21(
+                "cameraStopV21"
+            );
+
+
+        if (!host) {
+            return;
+        }
+
+
+        host.dataset.cameraState =
+            state;
+
+
+        configure.disabled =
+            state !== "idle";
+
+
+        enter.disabled =
+            state !== "configured";
+
+
+        stop.disabled =
+            state === "idle";
+    }
+
+
+    /* --------------------------------------------------------
+       Teleoperation mode
+       -------------------------------------------------------- */
+
+    function applyModeV21(
+        save = true
+    ) {
+
+        const camera =
+            cameraModeV21();
+
+
+        document.body.dataset
+            .teleoperationModeV21 =
+                camera
+                    ? "camera"
+                    : "vr";
+
+
+        if (save) {
+
+            try {
+
+                window.localStorage.setItem(
+                    STORAGE_KEY_V21,
+                    camera
+                        ? "camera"
+                        : "vr"
+                );
+            }
+
+            catch (_) {}
+        }
+
+
+        renderStatusV21();
+    }
+
+
+    /* --------------------------------------------------------
+       Boot
+       -------------------------------------------------------- */
+
+    function bootV21() {
+
+        const select =
+            byIdV21(
+                "teleoperationSelectV16"
+            );
+
+
+        let saved =
+            "vr";
+
+
+        try {
+
+            const candidate =
+                window.localStorage.getItem(
+                    STORAGE_KEY_V21
+                );
+
+
+            if (
+                candidate === "vr"
+                ||
+                candidate === "camera"
+            ) {
+
+                saved =
+                    candidate;
+            }
+        }
+
+        catch (_) {}
+
+
+        if (select) {
+
+            select.value =
+                saved;
+
+
+            select.addEventListener(
+                "change",
+                () => {
+
+                    applyModeV21(
+                        true
+                    );
+                }
+            );
+        }
+
+
+        byIdV21(
+            "cameraConfigureV21"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                /*
+                 * UI ONLY.
+                 */
+                applyCameraStateV21(
+                    "configured"
+                );
+            }
+        );
+
+
+        byIdV21(
+            "cameraEnterV21"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    cameraStateV21
+                    !==
+                    "configured"
+                ) {
+                    return;
+                }
+
+
+                /*
+                 * UI ONLY.
+                 */
+                applyCameraStateV21(
+                    "teleop"
+                );
+            }
+        );
+
+
+        byIdV21(
+            "cameraStopV21"
+        )
+        ?.addEventListener(
+            "click",
+            () => {
+
+                if (
+                    cameraStateV21
+                    ===
+                    "idle"
+                ) {
+                    return;
+                }
+
+
+                /*
+                 * UI ONLY.
+                 */
+                applyCameraStateV21(
+                    "idle"
+                );
+            }
+        );
+
+
+        syncPanelStylesV21();
+
+        syncTeleoperationSelectV21();
+
+        syncCameraControlStyleV21();
+
+        applyCameraStateV21(
+            "idle"
+        );
+
+        applyModeV21(
+            false
+        );
+
+
+        /*
+         * One delayed style sync only.
+         * No reordering and no visibility loop.
+         */
+        window.setTimeout(
+            () => {
+
+                syncPanelStylesV21();
+
+                syncTeleoperationSelectV21();
+
+                syncCameraControlStyleV21();
+
+                renderStatusV21();
+            },
+            350
+        );
+
+
+        /*
+         * Text only.
+         * Does not touch layout/display/scroll.
+         */
+        window.setInterval(
+            renderStatusV21,
+            1000
+        );
+    }
+
+
+    if (
+        document.readyState
+        ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV21,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV21();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_TELEOPERATION_POLISH_V22
+
+   Final presentation/visibility owner for:
+   - Teleoperation dropdown dimensions
+   - VR-vs-Camera controller exclusivity
+   - Camera controller typography parity
+   - Battery thresholds
+
+   No DOM reordering.
+   No MutationObserver.
+   No scrollTop writes.
+   No robot/backend commands.
+   ============================================================ */
+
+(() => {
+
+    const byIdV22 = id =>
+        document.getElementById(id);
+
+
+    function cameraModeV22() {
+
+        return (
+            byIdV22(
+                "teleoperationSelectV16"
+            )?.value
+            ===
+            "camera"
+        );
+    }
+
+
+    function cssNameV22(name) {
+
+        return name.replace(
+            /[A-Z]/g,
+            c =>
+                "-"
+                +
+                c.toLowerCase()
+        );
+    }
+
+
+    function copyComputedV22(
+        source,
+        target,
+        properties
+    ) {
+
+        if (!source || !target) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                source
+            );
+
+
+        for (
+            const property
+            of properties
+        ) {
+
+            const value =
+                computed[property];
+
+
+            if (
+                value
+                &&
+                value !== "auto"
+            ) {
+
+                target.style.setProperty(
+                    cssNameV22(
+                        property
+                    ),
+                    value,
+                    "important"
+                );
+            }
+        }
+    }
+
+
+    /* ========================================================
+       TELEOPERATION DROPDOWN
+
+       The visible Composite control is a custom control.
+       healthModeSelect itself can be hidden / near-zero height,
+       which is why V21 could copy the wrong dimensions.
+       ======================================================== */
+
+    function compositeReferenceV22() {
+
+        const selectors = [
+
+            "#stitchHealthDropdownV174 button",
+
+            "#stitchHealthDropdownV174",
+
+            ".stitch-health-dropdown-v174 button",
+
+            ".stitch-health-dropdown-v174",
+
+            "#healthModeSelect",
+        ];
+
+
+        for (
+            const selector
+            of selectors
+        ) {
+
+            const candidates =
+                document.querySelectorAll(
+                    selector
+                );
+
+
+            for (
+                const candidate
+                of candidates
+            ) {
+
+                const rect =
+                    candidate
+                        .getBoundingClientRect();
+
+
+                if (
+                    rect.width >= 60
+                    &&
+                    rect.height >= 20
+                ) {
+
+                    return candidate;
+                }
+            }
+        }
+
+
+        return null;
+    }
+
+
+    function syncTeleoperationDropdownV22() {
+
+        const target =
+            byIdV22(
+                "teleoperationSelectV16"
+            );
+
+
+        if (!target) {
+            return;
+        }
+
+
+        const source =
+            compositeReferenceV22();
+
+
+        if (source) {
+
+            copyComputedV22(
+                source,
+                target,
+                [
+                    "fontFamily",
+                    "fontSize",
+                    "fontWeight",
+                    "fontStyle",
+                    "letterSpacing",
+                    "textTransform",
+
+                    "color",
+
+                    "background",
+                    "backgroundColor",
+                    "backgroundImage",
+                    "backgroundPosition",
+                    "backgroundRepeat",
+                    "backgroundSize",
+
+                    "borderTopWidth",
+                    "borderTopStyle",
+                    "borderTopColor",
+
+                    "borderRightWidth",
+                    "borderRightStyle",
+                    "borderRightColor",
+
+                    "borderBottomWidth",
+                    "borderBottomStyle",
+                    "borderBottomColor",
+
+                    "borderLeftWidth",
+                    "borderLeftStyle",
+                    "borderLeftColor",
+
+                    "borderTopLeftRadius",
+                    "borderTopRightRadius",
+                    "borderBottomRightRadius",
+                    "borderBottomLeftRadius",
+
+                    "boxShadow",
+                ]
+            );
+        }
+
+
+        /*
+         * AUTHORITATIVE dimensions.
+         *
+         * Do not copy height from the hidden native Composite
+         * select again.
+         */
+        target.style.setProperty(
+            "display",
+            "block",
+            "important"
+        );
+
+        target.style.setProperty(
+            "visibility",
+            "visible",
+            "important"
+        );
+
+        target.style.setProperty(
+            "opacity",
+            "1",
+            "important"
+        );
+
+        target.style.setProperty(
+            "pointer-events",
+            "auto",
+            "important"
+        );
+
+        target.style.setProperty(
+            "box-sizing",
+            "border-box",
+            "important"
+        );
+
+        target.style.setProperty(
+            "width",
+            "100%",
+            "important"
+        );
+
+        target.style.setProperty(
+            "min-width",
+            "0",
+            "important"
+        );
+
+        target.style.setProperty(
+            "max-width",
+            "none",
+            "important"
+        );
+
+        target.style.setProperty(
+            "height",
+            "31px",
+            "important"
+        );
+
+        target.style.setProperty(
+            "min-height",
+            "31px",
+            "important"
+        );
+
+        target.style.setProperty(
+            "max-height",
+            "31px",
+            "important"
+        );
+
+        target.style.setProperty(
+            "line-height",
+            "29px",
+            "important"
+        );
+
+        target.style.setProperty(
+            "padding",
+            "0 32px 0 11px",
+            "important"
+        );
+
+        target.style.setProperty(
+            "margin",
+            "0",
+            "important"
+        );
+
+        target.style.setProperty(
+            "cursor",
+            "pointer",
+            "important"
+        );
+    }
+
+
+    /* ========================================================
+       CAMERA BUTTON TYPOGRAPHY
+
+       Real VR Configure remains our visual source.
+       ======================================================== */
+
+    function syncCameraTypographyV22() {
+
+        const source =
+            byIdV22(
+                "controllerConfigureBtn"
+            );
+
+
+        if (!source) {
+            return;
+        }
+
+
+        const typography = [
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "fontStyle",
+            "lineHeight",
+            "letterSpacing",
+            "textTransform",
+        ];
+
+
+        const dimensionProps = [
+            "height",
+            "minHeight",
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+        ];
+
+
+        document
+            .querySelectorAll(
+                "#cameraTeleopSwitchV21 "
+                +
+                ".camera-segment-v21"
+            )
+            .forEach(
+                button => {
+
+                    copyComputedV22(
+                        source,
+                        button,
+                        typography
+                    );
+
+
+                    copyComputedV22(
+                        source,
+                        button,
+                        dimensionProps
+                    );
+
+
+                    button.style.setProperty(
+                        "font-size",
+                        window
+                            .getComputedStyle(
+                                source
+                            )
+                            .fontSize,
+                        "important"
+                    );
+
+
+                    button.style.setProperty(
+                        "font-weight",
+                        window
+                            .getComputedStyle(
+                                source
+                            )
+                            .fontWeight,
+                        "important"
+                    );
+                }
+            );
+
+
+        document
+            .querySelectorAll(
+                "#cameraTeleopSwitchV21 "
+                +
+                ".camera-segment-v21 > span:not("
+                +
+                ".camera-segment-icon-v21"
+                +
+                ")"
+            )
+            .forEach(
+                label => {
+
+                    copyComputedV22(
+                        source,
+                        label,
+                        typography
+                    );
+                }
+            );
+    }
+
+
+    /* ========================================================
+       HARD VR / CAMERA EXCLUSIVITY
+
+       The later controller integration can re-home the original
+       VR controls into #bacaControllerV20, so hiding only the V21
+       wrapper is not enough.
+
+       Camera mode suppresses BOTH the original nodes and the
+       later controller host.
+       ======================================================== */
+
+    const vrSelectorsV22 = [
+
+        "#vrControllerControlsV21",
+
+        "#bacaControllerV20",
+
+        ".controller-process-actions",
+
+        "#controllerProcessSwitchV16",
+
+        "#controllerXrSwitchV16",
+
+        "#controllerSettingsBtn",
+    ];
+
+
+    function hideForCameraV22(
+        element
+    ) {
+
+        if (!element) {
+            return;
+        }
+
+
+        if (
+            element.dataset
+                .fullDashV22Hidden
+            !==
+            "1"
+        ) {
+
+            element.dataset
+                .fullDashV22PreviousHidden =
+                    element.hidden
+                        ? "1"
+                        : "0";
+
+
+            element.dataset
+                .fullDashV22Hidden =
+                    "1";
+        }
+
+
+        element.hidden =
+            true;
+
+
+        element.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+    }
+
+
+    function restoreFromCameraV22(
+        element
+    ) {
+
+        if (
+            !element
+            ||
+            element.dataset
+                .fullDashV22Hidden
+            !==
+            "1"
+        ) {
+            return;
+        }
+
+
+        element.style.removeProperty(
+            "display"
+        );
+
+
+        element.hidden =
+            (
+                element.dataset
+                    .fullDashV22PreviousHidden
+                ===
+                "1"
+            );
+
+
+        delete element.dataset
+            .fullDashV22PreviousHidden;
+
+
+        delete element.dataset
+            .fullDashV22Hidden;
+    }
+
+
+    function syncControllerVisibilityV22() {
+
+        const camera =
+            cameraModeV22();
+
+
+        const cameraControls =
+            byIdV22(
+                "cameraControllerControlsV21"
+            );
+
+
+        for (
+            const selector
+            of vrSelectorsV22
+        ) {
+
+            document
+                .querySelectorAll(
+                    "#view-live "
+                    +
+                    selector
+                )
+                .forEach(
+                    element => {
+
+                        if (camera) {
+
+                            hideForCameraV22(
+                                element
+                            );
+                        }
+
+                        else {
+
+                            restoreFromCameraV22(
+                                element
+                            );
+                        }
+                    }
+                );
+        }
+
+
+        if (cameraControls) {
+
+            if (camera) {
+
+                cameraControls.hidden =
+                    false;
+
+
+                cameraControls.style
+                    .setProperty(
+                        "display",
+                        "block",
+                        "important"
+                    );
+            }
+
+            else {
+
+                cameraControls.hidden =
+                    true;
+
+
+                cameraControls.style
+                    .setProperty(
+                        "display",
+                        "none",
+                        "important"
+                    );
+            }
+        }
+    }
+
+
+    /* ========================================================
+       BATTERY
+
+       Required thresholds:
+         <= 10% = RED
+         <= 50% = AMBER
+         >= 51% = GREEN
+
+       10 and 50 are explicitly included.
+       ======================================================== */
+
+    function findBatteryPercentV22() {
+
+        const candidates =
+            [
+                ...document.querySelectorAll(
+                    "span, strong, div"
+                )
+            ];
+
+
+        const matches =
+            [];
+
+
+        for (
+            const element
+            of candidates
+        ) {
+
+            if (
+                element.childElementCount
+                >
+                0
+            ) {
+                continue;
+            }
+
+
+            const text =
+                (
+                    element.textContent
+                    ||
+                    ""
+                ).trim();
+
+
+            const match =
+                text.match(
+                    /^(\d{1,3})\s*%$/
+                );
+
+
+            if (!match) {
+                continue;
+            }
+
+
+            const value =
+                Number(
+                    match[1]
+                );
+
+
+            if (
+                !Number.isFinite(value)
+                ||
+                value < 0
+                ||
+                value > 100
+            ) {
+                continue;
+            }
+
+
+            const rect =
+                element
+                    .getBoundingClientRect();
+
+
+            /*
+             * Battery is the percentage indicator in the
+             * top-right dashboard header.
+             */
+            if (
+                rect.width <= 0
+                ||
+                rect.height <= 0
+                ||
+                rect.top > 90
+                ||
+                rect.right
+                    <
+                    window.innerWidth
+                    *
+                    0.70
+            ) {
+                continue;
+            }
+
+
+            matches.push({
+                element,
+                value,
+                right:
+                    rect.right,
+            });
+        }
+
+
+        matches.sort(
+            (
+                a,
+                b
+            ) =>
+                b.right
+                -
+                a.right
+        );
+
+
+        return (
+            matches[0]
+            ||
+            null
+        );
+    }
+
+
+    function batteryContainerV22(
+        leaf
+    ) {
+
+        if (!leaf) {
+            return null;
+        }
+
+
+        let node =
+            leaf.parentElement;
+
+
+        let fallback =
+            node;
+
+
+        for (
+            let depth = 0;
+            node && depth < 6;
+            depth += 1
+        ) {
+
+            const rect =
+                node
+                    .getBoundingClientRect();
+
+
+            const identity =
+                (
+                    (
+                        node.id
+                        ||
+                        ""
+                    )
+                    +
+                    " "
+                    +
+                    (
+                        typeof node.className
+                        ===
+                        "string"
+                            ?
+                            node.className
+                            :
+                            ""
+                    )
+                )
+                .toLowerCase();
+
+
+            if (
+                identity.includes(
+                    "battery"
+                )
+            ) {
+
+                return node;
+            }
+
+
+            if (
+                node.querySelector(
+                    "svg"
+                )
+                &&
+                rect.width <= 160
+                &&
+                rect.height <= 70
+            ) {
+
+                return node;
+            }
+
+
+            fallback =
+                node;
+
+
+            node =
+                node.parentElement;
+        }
+
+
+        return (
+            fallback
+            ||
+            leaf.parentElement
+        );
+    }
+
+
+    function syncBatteryV22() {
+
+        const match =
+            findBatteryPercentV22();
+
+
+        if (!match) {
+            return;
+        }
+
+
+        const {
+            element,
+            value,
+        } =
+            match;
+
+
+        const container =
+            batteryContainerV22(
+                element
+            );
+
+
+        if (!container) {
+            return;
+        }
+
+
+        const tone =
+            value <= 10
+                ? "red"
+                :
+            value <= 50
+                ? "amber"
+                :
+                "green";
+
+
+        container.classList.add(
+            "full-dash-battery-v22"
+        );
+
+
+        container.dataset
+            .batteryToneV22 =
+                tone;
+
+
+        element.classList.add(
+            "full-dash-battery-percent-v22"
+        );
+
+
+        element.dataset
+            .batteryToneV22 =
+                tone;
+    }
+
+
+    /* ========================================================
+       SYNC
+       ======================================================== */
+
+    function syncV22() {
+
+        /*
+         * Typography first so the still-existing VR Configure
+         * button can be used as the style reference even if the
+         * current selected mode is Camera.
+         */
+        syncCameraTypographyV22();
+
+        /*
+         * V24:
+         * Native Teleoperation select is state-only now.
+         * V23 owns the visible custom dropdown.
+         *
+         * DO NOT call syncTeleoperationDropdownV22() here.
+         */
+
+        syncControllerVisibilityV22();
+
+        syncBatteryV22();
+    }
+
+
+    document.addEventListener(
+        "change",
+        event => {
+
+            if (
+                event.target?.id
+                ===
+                "teleoperationSelectV16"
+            ) {
+
+                window.setTimeout(
+                    syncV22,
+                    0
+                );
+            }
+        },
+        true
+    );
+
+
+    if (
+        document.readyState
+        ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                syncV22();
+
+
+                window.setTimeout(
+                    syncV22,
+                    500
+                );
+            },
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        syncV22();
+
+
+        window.setTimeout(
+            syncV22,
+            500
+        );
+    }
+
+
+    /*
+     * Tiny defensive sync.
+     *
+     * This does NOT reorder DOM, touch scrollTop, or resize the rail.
+     * It only preserves mode visibility, dropdown dimensions,
+     * typography and battery colour against older presentation code.
+     */
+    window.setInterval(
+        syncV22,
+        1000
+    );
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_VISUAL_PARITY_V23
+
+   Visual-only final parity layer:
+
+   1. Teleoperation dropdown uses a custom control styled from
+      the ACTUAL Composite custom dropdown.
+
+   2. Camera segmented control takes typography, geometry,
+      active colour, border and background from the REAL
+      VR Configure control.
+
+   3. Controller OFFLINE chip takes geometry/font from the
+      Selected Joint NORMAL chip while preserving amber colours.
+
+   NO:
+   - backend actions
+   - robot commands
+   - MutationObserver
+   - scrollTop writes
+   - DOM reordering
+   ============================================================ */
+
+(() => {
+
+    const byIdV23 = id =>
+        document.getElementById(id);
+
+
+    function cssNameV23(name) {
+
+        return name.replace(
+            /[A-Z]/g,
+            c =>
+                "-"
+                +
+                c.toLowerCase()
+        );
+    }
+
+
+    function copyComputedV23(
+        source,
+        target,
+        properties
+    ) {
+
+        if (!source || !target) {
+            return;
+        }
+
+
+        const style =
+            window.getComputedStyle(
+                source
+            );
+
+
+        for (
+            const property
+            of properties
+        ) {
+
+            const value =
+                style[property];
+
+
+            if (
+                value
+                &&
+                value !== "auto"
+            ) {
+
+                target.style.setProperty(
+                    cssNameV23(
+                        property
+                    ),
+                    value,
+                    "important"
+                );
+            }
+        }
+    }
+
+
+    /* ========================================================
+       FULL_DASH_EXACT_COMPOSITE_DROPDOWN_V25
+       --------------------------------------------------------
+       Teleoperation now uses the SAME presentation architecture
+       as STITCH_HEALTH_CUSTOM_DROPDOWN_V174:
+
+       - authoritative hidden native <select>
+       - stitch-health-dropdown-v174 root
+       - stitch-health-trigger-v174 trigger
+       - stitch-health-trigger-label-v174 label
+       - stitch-health-chevron-v174 chevron
+       - stitch-health-menu-v174 BODY-level popup
+       - stitch-health-option-v174 option rows
+       - exact "open" class
+       - exact "selected" class
+       - fixed viewport positioning
+       - same keyboard interaction
+
+       The ONLY contextual difference:
+       Teleoperation fills the available right-rail width.
+       ======================================================== */
+
+
+    function ensureTeleoperationDropdownV23() {
+
+        const select =
+            byIdV23(
+                "teleoperationSelectV16"
+            );
+
+
+        if (!select) {
+            return null;
+        }
+
+
+        const existing =
+            byIdV23(
+                "teleoperationDropdownV23"
+            );
+
+
+        if (existing) {
+
+            select.style.setProperty(
+                "display",
+                "none",
+                "important"
+            );
+
+
+            return existing;
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * ROOT
+         * ----------------------------------------------------
+         */
+
+        const root =
+            document.createElement(
+                "div"
+            );
+
+
+        root.id =
+            "teleoperationDropdownV23";
+
+
+        root.className =
+            "stitch-health-dropdown-v174 "
+            +
+            "teleoperation-health-clone-v25";
+
+
+        /*
+         * ----------------------------------------------------
+         * TRIGGER
+         * ----------------------------------------------------
+         */
+
+        const trigger =
+            document.createElement(
+                "button"
+            );
+
+
+        trigger.id =
+            "teleoperationDropdownTriggerV23";
+
+
+        trigger.type =
+            "button";
+
+
+        trigger.className =
+            "stitch-health-trigger-v174";
+
+
+        trigger.setAttribute(
+            "aria-haspopup",
+            "listbox"
+        );
+
+
+        trigger.setAttribute(
+            "aria-expanded",
+            "false"
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * LABEL
+         * ----------------------------------------------------
+         */
+
+        const label =
+            document.createElement(
+                "span"
+            );
+
+
+        label.id =
+            "teleoperationDropdownLabelV23";
+
+
+        label.className =
+            "stitch-health-trigger-label-v174";
+
+
+        /*
+         * ----------------------------------------------------
+         * CHEVRON
+         * ----------------------------------------------------
+         */
+
+        const chevron =
+            document.createElement(
+                "span"
+            );
+
+
+        chevron.className =
+            "stitch-health-chevron-v174";
+
+
+        chevron.setAttribute(
+            "aria-hidden",
+            "true"
+        );
+
+
+        trigger.append(
+            label,
+            chevron
+        );
+
+
+        root.appendChild(
+            trigger
+        );
+
+
+        /*
+         * Native select remains the state owner.
+         */
+        select.insertAdjacentElement(
+            "afterend",
+            root
+        );
+
+
+        select.style.setProperty(
+            "display",
+            "none",
+            "important"
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * MENU
+         *
+         * EXACTLY like Composite:
+         *
+         * PUT IT DIRECTLY ON BODY.
+         *
+         * This is the key part the previous Teleoperation
+         * implementation did not reproduce correctly.
+         * ----------------------------------------------------
+         */
+
+        const menu =
+            document.createElement(
+                "div"
+            );
+
+
+        menu.id =
+            "teleoperationDropdownMenuV23";
+
+
+        menu.className =
+            "stitch-health-menu-v174 "
+            +
+            "teleoperation-health-menu-v25";
+
+
+        menu.setAttribute(
+            "role",
+            "listbox"
+        );
+
+
+        menu.hidden =
+            true;
+
+
+        document.body.appendChild(
+            menu
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * OPTIONS
+         *
+         * Build from the REAL authoritative Teleoperation select.
+         * ----------------------------------------------------
+         */
+
+        for (
+            const option
+            of select.options
+        ) {
+
+            const button =
+                document.createElement(
+                    "button"
+                );
+
+
+            button.type =
+                "button";
+
+
+            button.className =
+                "stitch-health-option-v174 "
+                +
+                "teleoperation-health-option-v25";
+
+
+            button.dataset.value =
+                option.value;
+
+
+            button.textContent =
+                option.textContent;
+
+
+            button.setAttribute(
+                "role",
+                "option"
+            );
+
+
+            menu.appendChild(
+                button
+            );
+        }
+
+
+        function optionButtons() {
+
+            return [
+                ...menu.querySelectorAll(
+                    ".stitch-health-option-v174"
+                )
+            ];
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * SYNC
+         * ----------------------------------------------------
+         */
+
+        function sync() {
+
+            const selected =
+                select.options[
+                    select.selectedIndex
+                ];
+
+
+            label.textContent =
+                selected
+                    ?
+                    selected.textContent
+                    :
+                    "VR teleoperation";
+
+
+            trigger.disabled =
+                !!select.disabled;
+
+
+            for (
+                const button
+                of optionButtons()
+            ) {
+
+                const active =
+                    button.dataset.value
+                    ===
+                    select.value;
+
+
+                button.classList.toggle(
+                    "selected",
+                    active
+                );
+
+
+                button.setAttribute(
+                    "aria-selected",
+                    active
+                        ?
+                        "true"
+                        :
+                        "false"
+                );
+            }
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * POSITION
+         *
+         * EXACT Composite body-popup mechanic.
+         * ----------------------------------------------------
+         */
+
+        function positionMenu() {
+
+            if (
+                menu.hidden
+            ) {
+                return;
+            }
+
+
+            const rect =
+                trigger.getBoundingClientRect();
+
+
+            menu.style.left =
+                `${Math.round(
+                    rect.left
+                )}px`;
+
+
+            menu.style.top =
+                `${Math.round(
+                    rect.bottom + 5
+                )}px`;
+
+
+            menu.style.width =
+                `${Math.round(
+                    rect.width
+                )}px`;
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * OPEN / CLOSE
+         * ----------------------------------------------------
+         */
+
+        function closeMenu() {
+
+            if (
+                menu.hidden
+            ) {
+                return;
+            }
+
+
+            menu.hidden =
+                true;
+
+
+            root.classList.remove(
+                "open"
+            );
+
+
+            trigger.setAttribute(
+                "aria-expanded",
+                "false"
+            );
+        }
+
+
+        function openMenu() {
+
+            if (
+                trigger.disabled
+            ) {
+                return;
+            }
+
+
+            menu.hidden =
+                false;
+
+
+            root.classList.add(
+                "open"
+            );
+
+
+            trigger.setAttribute(
+                "aria-expanded",
+                "true"
+            );
+
+
+            positionMenu();
+        }
+
+
+        function toggleMenu() {
+
+            if (
+                menu.hidden
+            ) {
+
+                openMenu();
+            }
+
+            else {
+
+                closeMenu();
+            }
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * COMMIT VALUE
+         * ----------------------------------------------------
+         */
+
+        function commitValue(
+            value
+        ) {
+
+            if (
+                value
+                !==
+                select.value
+            ) {
+
+                select.value =
+                    value;
+
+
+                /*
+                 * Existing V21/V22 mode-switching logic receives
+                 * the normal native change event.
+                 */
+                select.dispatchEvent(
+                    new Event(
+                        "change",
+                        {
+                            bubbles:
+                                true,
+                        }
+                    )
+                );
+            }
+
+
+            sync();
+
+            closeMenu();
+
+            trigger.focus();
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * OPTION CLICKS
+         * ----------------------------------------------------
+         */
+
+        for (
+            const button
+            of optionButtons()
+        ) {
+
+            button.addEventListener(
+                "click",
+                () => {
+
+                    commitValue(
+                        button.dataset.value
+                    );
+                }
+            );
+        }
+
+
+        /*
+         * ----------------------------------------------------
+         * TRIGGER CLICK
+         * ----------------------------------------------------
+         */
+
+        trigger.addEventListener(
+            "click",
+            event => {
+
+                event.preventDefault();
+
+                event.stopPropagation();
+
+                toggleMenu();
+            }
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * TRIGGER KEYBOARD
+         *
+         * Mirrors Composite behavior.
+         * ----------------------------------------------------
+         */
+
+        trigger.addEventListener(
+            "keydown",
+            event => {
+
+                const buttons =
+                    optionButtons();
+
+
+                if (
+                    event.key
+                    ===
+                    "ArrowDown"
+                    ||
+                    event.key
+                    ===
+                    "ArrowUp"
+                ) {
+
+                    event.preventDefault();
+
+                    openMenu();
+
+
+                    const selectedIndex =
+                        Math.max(
+                            0,
+                            buttons.findIndex(
+                                button =>
+                                    button.dataset.value
+                                    ===
+                                    select.value
+                            )
+                        );
+
+
+                    const index =
+                        event.key
+                        ===
+                        "ArrowDown"
+                            ?
+                            selectedIndex
+                            :
+                            Math.max(
+                                0,
+                                selectedIndex
+                            );
+
+
+                    buttons[
+                        index
+                    ]?.focus();
+
+
+                    return;
+                }
+
+
+                if (
+                    event.key
+                    ===
+                    "Escape"
+                ) {
+
+                    event.preventDefault();
+
+                    closeMenu();
+
+                    return;
+                }
+
+
+                if (
+                    event.key
+                    ===
+                    "Enter"
+                    ||
+                    event.key
+                    ===
+                    " "
+                ) {
+
+                    event.preventDefault();
+
+                    toggleMenu();
+                }
+            }
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * MENU KEYBOARD
+         * ----------------------------------------------------
+         */
+
+        menu.addEventListener(
+            "keydown",
+            event => {
+
+                const buttons =
+                    optionButtons();
+
+
+                const index =
+                    buttons.indexOf(
+                        document.activeElement
+                    );
+
+
+                if (
+                    event.key
+                    ===
+                    "Escape"
+                ) {
+
+                    event.preventDefault();
+
+                    closeMenu();
+
+                    trigger.focus();
+
+                    return;
+                }
+
+
+                if (
+                    event.key
+                    ===
+                    "ArrowDown"
+                    ||
+                    event.key
+                    ===
+                    "ArrowUp"
+                ) {
+
+                    event.preventDefault();
+
+
+                    const step =
+                        event.key
+                        ===
+                        "ArrowDown"
+                            ?
+                            1
+                            :
+                            -1;
+
+
+                    const next =
+                        (
+                            index
+                            +
+                            step
+                            +
+                            buttons.length
+                        )
+                        %
+                        buttons.length;
+
+
+                    buttons[
+                        next
+                    ]?.focus();
+                }
+            }
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * CLICK ELSEWHERE
+         * ----------------------------------------------------
+         */
+
+        document.addEventListener(
+            "pointerdown",
+            event => {
+
+                if (
+                    root.contains(
+                        event.target
+                    )
+                    ||
+                    menu.contains(
+                        event.target
+                    )
+                ) {
+                    return;
+                }
+
+
+                closeMenu();
+            }
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * AUTHORITATIVE SELECT MAY CHANGE ELSEWHERE
+         * ----------------------------------------------------
+         */
+
+        select.addEventListener(
+            "change",
+            sync
+        );
+
+
+        /*
+         * ----------------------------------------------------
+         * BODY POPUP POSITION TRACKING
+         * ----------------------------------------------------
+         */
+
+        window.addEventListener(
+            "resize",
+            positionMenu
+        );
+
+
+        window.addEventListener(
+            "scroll",
+            positionMenu,
+            true
+        );
+
+
+        sync();
+
+
+        return root;
+    }
+
+
+    /*
+     * These function names remain because syncV23() already
+     * calls them.
+     *
+     * Their old imitation/styling behavior is gone.
+     */
+
+
+    function syncDropdownValueV23() {
+
+        const select =
+            byIdV23(
+                "teleoperationSelectV16"
+            );
+
+
+        const label =
+            byIdV23(
+                "teleoperationDropdownLabelV23"
+            );
+
+
+        const menu =
+            byIdV23(
+                "teleoperationDropdownMenuV23"
+            );
+
+
+        if (
+            !select
+            ||
+            !label
+            ||
+            !menu
+        ) {
+            return;
+        }
+
+
+        const selected =
+            select.options[
+                select.selectedIndex
+            ];
+
+
+        label.textContent =
+            selected
+                ?
+                selected.textContent
+                :
+                "VR teleoperation";
+
+
+        menu
+            .querySelectorAll(
+                ".stitch-health-option-v174"
+            )
+            .forEach(
+                button => {
+
+                    const active =
+                        button.dataset.value
+                        ===
+                        select.value;
+
+
+                    button.classList.toggle(
+                        "selected",
+                        active
+                    );
+
+
+                    button.setAttribute(
+                        "aria-selected",
+                        active
+                            ?
+                            "true"
+                            :
+                            "false"
+                    );
+                }
+            );
+    }
+
+
+    function syncDropdownStyleV23() {
+
+        /*
+         * V25 deliberately does NOT copy/reconstruct styling.
+         *
+         * The Teleoperation control now literally uses the same
+         * CSS classes as Composite.
+         *
+         * Nothing to approximate anymore.
+         */
+    }
+
+
+    /* ========================================================
+       CAMERA CONTROL PARITY WITH REAL CONFIGURE
+       ======================================================== */
+
+    function syncCameraControlV23() {
+
+        const source =
+            byIdV23(
+                "controllerConfigureBtn"
+            );
+
+
+        const host =
+            byIdV23(
+                "cameraControllerControlsV21"
+            );
+
+
+        const indicator =
+            byIdV23(
+                "cameraTeleopIndicatorV21"
+            );
+
+
+        if (
+            !source
+            ||
+            !host
+        ) {
+            return;
+        }
+
+
+        const computed =
+            window.getComputedStyle(
+                source
+            );
+
+
+        host.style.setProperty(
+            "--camera-selected-text-v23",
+            computed.color,
+        );
+
+
+        host.style.setProperty(
+            "--camera-selected-background-v23",
+            computed.backgroundColor,
+        );
+
+
+        host.style.setProperty(
+            "--camera-selected-border-v23",
+            computed.borderTopColor,
+        );
+
+
+        host.style.setProperty(
+            "--camera-selected-shadow-v23",
+            computed.boxShadow,
+        );
+
+
+        const typography = [
+            "fontFamily",
+            "fontSize",
+            "fontWeight",
+            "fontStyle",
+            "lineHeight",
+            "letterSpacing",
+            "textTransform",
+        ];
+
+
+        const geometry = [
+            "height",
+            "minHeight",
+
+            "paddingTop",
+            "paddingRight",
+            "paddingBottom",
+            "paddingLeft",
+
+            "borderTopLeftRadius",
+            "borderTopRightRadius",
+            "borderBottomRightRadius",
+            "borderBottomLeftRadius",
+        ];
+
+
+        document
+            .querySelectorAll(
+                "#cameraTeleopSwitchV21 "
+                +
+                ".camera-segment-v21"
+            )
+            .forEach(
+                button => {
+
+                    copyComputedV23(
+                        source,
+                        button,
+                        [
+                            ...typography,
+                            ...geometry,
+                        ]
+                    );
+
+
+                    button
+                        .querySelectorAll(
+                            "span"
+                        )
+                        .forEach(
+                            span =>
+                                copyComputedV23(
+                                    source,
+                                    span,
+                                    typography
+                                )
+                        );
+                }
+            );
+
+
+        if (indicator) {
+
+            copyComputedV23(
+                source,
+                indicator,
+                [
+                    "background",
+                    "backgroundColor",
+
+                    "borderTopWidth",
+                    "borderTopStyle",
+                    "borderTopColor",
+
+                    "borderRightWidth",
+                    "borderRightStyle",
+                    "borderRightColor",
+
+                    "borderBottomWidth",
+                    "borderBottomStyle",
+                    "borderBottomColor",
+
+                    "borderLeftWidth",
+                    "borderLeftStyle",
+                    "borderLeftColor",
+
+                    "borderTopLeftRadius",
+                    "borderTopRightRadius",
+                    "borderBottomRightRadius",
+                    "borderBottomLeftRadius",
+
+                    "boxShadow",
+                ]
+            );
+        }
+    }
+
+
+    /* ========================================================
+       OFFLINE CHIP GEOMETRY = NORMAL CHIP
+       COLOURS ARE NEVER COPIED.
+       ======================================================== */
+
+    function syncOfflineChipV23() {
+
+        const normal =
+            byIdV23(
+                "selectedHealthChip"
+            );
+
+
+        const offline =
+            byIdV23(
+                "controllerProcessState"
+            );
+
+
+        if (
+            !normal
+            ||
+            !offline
+        ) {
+            return;
+        }
+
+
+        copyComputedV23(
+            normal,
+            offline,
+            [
+                "height",
+                "minHeight",
+                "maxHeight",
+
+                "paddingTop",
+                "paddingRight",
+                "paddingBottom",
+                "paddingLeft",
+
+                "fontFamily",
+                "fontSize",
+                "fontWeight",
+                "fontStyle",
+                "lineHeight",
+                "letterSpacing",
+                "textTransform",
+
+                "borderTopWidth",
+                "borderTopStyle",
+
+                "borderRightWidth",
+                "borderRightStyle",
+
+                "borderBottomWidth",
+                "borderBottomStyle",
+
+                "borderLeftWidth",
+                "borderLeftStyle",
+
+                "borderTopLeftRadius",
+                "borderTopRightRadius",
+                "borderBottomRightRadius",
+                "borderBottomLeftRadius",
+            ]
+        );
+
+
+        offline.style.setProperty(
+            "display",
+            "inline-flex",
+            "important"
+        );
+
+
+        offline.style.setProperty(
+            "align-items",
+            "center",
+            "important"
+        );
+
+
+        offline.style.setProperty(
+            "justify-content",
+            "center",
+            "important"
+        );
+    }
+
+
+    /* ========================================================
+       FINAL V23 SYNC
+       ======================================================== */
+
+    function syncV23() {
+
+        ensureTeleoperationDropdownV23();
+
+        syncDropdownValueV23();
+
+        syncDropdownStyleV23();
+
+        syncCameraControlV23();
+
+        syncOfflineChipV23();
+
+
+        /*
+         * V22 still periodically styles the old native select.
+         * Keep it as the hidden state owner.
+         */
+        const native =
+            byIdV23(
+                "teleoperationSelectV16"
+            );
+
+
+        if (native) {
+
+            native.style.setProperty(
+                "display",
+                "none",
+                "important"
+            );
+        }
+    }
+
+
+    if (
+        document.readyState
+        ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            () => {
+
+                syncV23();
+
+
+                window.setTimeout(
+                    syncV23,
+                    500
+                );
+            },
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        syncV23();
+
+
+        window.setTimeout(
+            syncV23,
+            500
+        );
+    }
+
+    /*
+     * V24:
+     * No periodic V23 presentation loop.
+     *
+     * The dropdown is event-driven and stable.
+     * This prevents recurring geometry/style writes while open.
+     */
+
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_DROPDOWN_STABILITY_V24
+
+   - V22 native-select visibility conflict retired above
+   - V23 periodic dropdown restyling retired above
+   - Dropdown now stable/event-driven
+   - Battery graphic exactly follows percentage text color
+
+   No robot/backend actions.
+   No MutationObserver.
+   No scrollTop writes.
+   ============================================================ */
+
+(() => {
+
+    function findBatteryPercentV24() {
+
+        const nodes =
+            document.querySelectorAll(
+                "span, strong, div"
+            );
+
+
+        const matches = [];
+
+
+        for (
+            const node
+            of nodes
+        ) {
+
+            if (
+                node.childElementCount
+                >
+                0
+            ) {
+                continue;
+            }
+
+
+            const text =
+                (
+                    node.textContent
+                    ||
+                    ""
+                ).trim();
+
+
+            const match =
+                text.match(
+                    /^(\d{1,3})\s*%$/
+                );
+
+
+            if (!match) {
+                continue;
+            }
+
+
+            const value =
+                Number(
+                    match[1]
+                );
+
+
+            if (
+                !Number.isFinite(value)
+                ||
+                value < 0
+                ||
+                value > 100
+            ) {
+                continue;
+            }
+
+
+            const rect =
+                node
+                    .getBoundingClientRect();
+
+
+            /*
+             * Dashboard battery percentage lives in the
+             * upper-right header area.
+             */
+            if (
+                rect.width <= 0
+                ||
+                rect.height <= 0
+                ||
+                rect.top > 90
+                ||
+                rect.right
+                    <
+                    window.innerWidth
+                    *
+                    0.70
+            ) {
+                continue;
+            }
+
+
+            matches.push({
+                node,
+                value,
+                right:
+                    rect.right,
+            });
+        }
+
+
+        matches.sort(
+            (
+                a,
+                b
+            ) =>
+                b.right
+                -
+                a.right
+        );
+
+
+        return (
+            matches[0]
+            ||
+            null
+        );
+    }
+
+
+    function batteryRootV24(
+        percentage
+    ) {
+
+        if (!percentage) {
+            return null;
+        }
+
+
+        let node =
+            percentage.parentElement;
+
+
+        let fallback =
+            node;
+
+
+        for (
+            let depth = 0;
+            node && depth < 6;
+            depth += 1
+        ) {
+
+            const rect =
+                node
+                    .getBoundingClientRect();
+
+
+            const identity =
+                (
+                    (
+                        node.id
+                        ||
+                        ""
+                    )
+                    +
+                    " "
+                    +
+                    (
+                        typeof node.className
+                        ===
+                        "string"
+                            ?
+                            node.className
+                            :
+                            ""
+                    )
+                )
+                .toLowerCase();
+
+
+            if (
+                identity.includes(
+                    "battery"
+                )
+            ) {
+
+                return node;
+            }
+
+
+            if (
+                node.querySelector(
+                    "svg"
+                )
+                &&
+                rect.width <= 180
+                &&
+                rect.height <= 80
+            ) {
+
+                return node;
+            }
+
+
+            fallback =
+                node;
+
+            node =
+                node.parentElement;
+        }
+
+
+        return fallback;
+    }
+
+
+    function syncBatteryGraphicV24() {
+
+        const result =
+            findBatteryPercentV24();
+
+
+        if (!result) {
+            return;
+        }
+
+
+        const percentage =
+            result.node;
+
+
+        const root =
+            batteryRootV24(
+                percentage
+            );
+
+
+        if (!root) {
+            return;
+        }
+
+
+        /*
+         * IMPORTANT:
+         *
+         * Percentage color is already authoritative because V22
+         * applies the requested thresholds.
+         *
+         * We simply mirror the final rendered color.
+         */
+        const color =
+            window
+                .getComputedStyle(
+                    percentage
+                )
+                .color;
+
+
+        if (!color) {
+            return;
+        }
+
+
+        root.classList.add(
+            "full-dash-battery-match-v24"
+        );
+
+
+        root.style.setProperty(
+            "--full-dash-battery-color-v24",
+            color
+        );
+
+
+        /*
+         * Inheritance covers currentColor-based battery artwork.
+         */
+        root.style.setProperty(
+            "color",
+            color,
+            "important"
+        );
+
+
+        /*
+         * SVG artwork:
+         * only recolor stroke/fill channels that are actually used.
+         * Elements explicitly using fill:none stay fill:none.
+         */
+        root
+            .querySelectorAll(
+                "svg, svg *"
+            )
+            .forEach(
+                element => {
+
+                    const style =
+                        window.getComputedStyle(
+                            element
+                        );
+
+
+                    if (
+                        style.stroke
+                        &&
+                        style.stroke
+                        !==
+                        "none"
+                    ) {
+
+                        element.style
+                            .setProperty(
+                                "stroke",
+                                color,
+                                "important"
+                            );
+                    }
+
+
+                    if (
+                        style.fill
+                        &&
+                        style.fill
+                        !==
+                        "none"
+                        &&
+                        style.fill
+                        !==
+                        "rgba(0, 0, 0, 0)"
+                        &&
+                        style.fill
+                        !==
+                        "transparent"
+                    ) {
+
+                        element.style
+                            .setProperty(
+                                "fill",
+                                color,
+                                "important"
+                            );
+                    }
+                }
+            );
+
+
+        /*
+         * Non-SVG battery icon implementations.
+         */
+        root
+            .querySelectorAll(
+                '[class*="battery"], '
+                +
+                '[class*="charge"], '
+                +
+                '[class*="level"], '
+                +
+                '[class*="fill"], '
+                +
+                '[class*="icon"]'
+            )
+            .forEach(
+                element => {
+
+                    if (
+                        element === percentage
+                        ||
+                        element.contains(
+                            percentage
+                        )
+                    ) {
+                        return;
+                    }
+
+
+                    element.style.setProperty(
+                        "color",
+                        color,
+                        "important"
+                    );
+
+
+                    const style =
+                        window.getComputedStyle(
+                            element
+                        );
+
+
+                    const borders = [
+                        ["border-top-color", style.borderTopColor],
+                        ["border-right-color", style.borderRightColor],
+                        ["border-bottom-color", style.borderBottomColor],
+                        ["border-left-color", style.borderLeftColor],
+                    ];
+
+
+                    for (
+                        const [
+                            property,
+                            existing,
+                        ]
+                        of borders
+                    ) {
+
+                        if (
+                            existing
+                            &&
+                            existing
+                            !==
+                            "rgba(0, 0, 0, 0)"
+                            &&
+                            existing
+                            !==
+                            "transparent"
+                        ) {
+
+                            element.style
+                                .setProperty(
+                                    property,
+                                    color,
+                                    "important"
+                                );
+                        }
+                    }
+
+
+                    const identity =
+                        (
+                            typeof element.className
+                            ===
+                            "string"
+                                ?
+                                element.className
+                                :
+                                ""
+                        )
+                        .toLowerCase();
+
+
+                    /*
+                     * Charge/fill bars may be CSS rectangles.
+                     */
+                    if (
+                        identity.includes("charge")
+                        ||
+                        identity.includes("level")
+                        ||
+                        identity.includes("fill")
+                    ) {
+
+                        element.style
+                            .setProperty(
+                                "background-color",
+                                color,
+                                "important"
+                            );
+                    }
+                }
+            );
+    }
+
+
+    function bootV24() {
+
+        syncBatteryGraphicV24();
+
+
+        /*
+         * Battery is telemetry and changes over time.
+         * This interval changes COLOR ONLY.
+         *
+         * It never changes layout, dropdown state or scroll.
+         */
+        window.setInterval(
+            syncBatteryGraphicV24,
+            1000
+        );
+    }
+
+
+    if (
+        document.readyState
+        ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV24,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV24();
+    }
+
+})();
+
+
+
+/* ============================================================
+   FULL_DASH_MICRO_POLISH_V26
+
+   Visual-only:
+   - Teleoperation selected text = exact Composite selected color
+
+   No backend actions.
+   No robot commands.
+   No MutationObserver.
+   No intervals.
+   No scrollTop writes.
+   ============================================================ */
+
+(() => {
+
+    function syncTeleoperationSelectedColorV26() {
+
+        const compositeLabel =
+            document.querySelector(
+                "#stitchHealthDropdownV174 "
+                +
+                ".stitch-health-trigger-label-v174"
+            );
+
+
+        const teleoperationLabel =
+            document.getElementById(
+                "teleoperationDropdownLabelV23"
+            );
+
+
+        if (
+            !compositeLabel
+            ||
+            !teleoperationLabel
+        ) {
+            return;
+        }
+
+
+        const color =
+            window
+                .getComputedStyle(
+                    compositeLabel
+                )
+                .color;
+
+
+        if (!color) {
+            return;
+        }
+
+
+        teleoperationLabel.style
+            .setProperty(
+                "color",
+                color,
+                "important"
+            );
+
+
+        /*
+         * Reuse it for the selected row as well.
+         * The real selected class/mechanics remain V25's.
+         */
+        document.documentElement.style
+            .setProperty(
+                "--full-dash-teleop-selected-v26",
+                color
+            );
+    }
+
+
+    function bootV26() {
+
+        syncTeleoperationSelectedColorV26();
+
+
+        /*
+         * Single delayed pass because the real Composite
+         * custom dropdown is itself created after DOM startup.
+         */
+        window.setTimeout(
+            syncTeleoperationSelectedColorV26,
+            400
+        );
+    }
+
+
+    if (
+        document.readyState
+        ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV26,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV26();
+    }
+
+})();
+
+
+/* ============================================================
+   FULL_DASH_EXACT_BUTTON_GLOW_V29
+
+   Purpose:
+   Tag the REAL currently-rendered Live controls rather than
+   depending on historical IDs/classes.
+
+   GREEN:
+     Reset view
+     Refresh
+     Configure
+     Enter Teleop
+     Connect
+
+   AMBER:
+     Stop
+     Exit Teleop
+     Disconnect
+
+   Disabled controls keep their disabled appearance.
+
+   Presentation only.
+   No backend actions.
+   No robot commands.
+   No polling.
+   No MutationObserver.
+   ============================================================ */
+
+(() => {
+
+    const GREEN_IDS_V29 = [
+        "cameraConnectBtn",
+        "liveRobotModeRefresh",
+
+        "controllerConfigureBtn",
+        "bacaEnterTeleopBtn",
+
+        "cameraConfigureV21",
+        "cameraEnterV21",
+
+        "cameraTeleopConfigureBtnV16",
+        "cameraTeleopEnterBtnV16",
+    ];
+
+
+    const AMBER_IDS_V29 = [
+        "cameraStopBtn",
+
+        "controllerStopBtn",
+        "bacaExitTeleopBtn",
+
+        "cameraStopV21",
+        "cameraTeleopStopBtnV16",
+    ];
+
+
+    function markV29(
+        node,
+        tone
+    ) {
+
+        if (!node) {
+            return;
+        }
+
+
+        node.classList.remove(
+            "fd-action-green-v29",
+            "fd-action-amber-v29"
+        );
+
+
+        node.classList.add(
+            tone === "amber"
+                ? "fd-action-amber-v29"
+                : "fd-action-green-v29"
+        );
+    }
+
+
+    function normalizedButtonTextV29(
+        node
+    ) {
+
+        return (
+            node.textContent
+            ||
+            ""
+        )
+        .replace(
+            /\s+/g,
+            " "
+        )
+        .trim()
+        .toLowerCase();
+    }
+
+
+    function classifyByTextV29(
+        node
+    ) {
+
+        const text =
+            normalizedButtonTextV29(
+                node
+            );
+
+
+        /*
+         * Amber FIRST because "Disconnect" contains "connect".
+         */
+
+        if (
+            text.includes(
+                "disconnect"
+            )
+            ||
+            text.includes(
+                "exit teleop"
+            )
+            ||
+            (
+                text === "stop"
+                ||
+                text.endsWith(
+                    " stop"
+                )
+            )
+        ) {
+
+            return "amber";
+        }
+
+
+        if (
+            text.includes(
+                "reset view"
+            )
+            ||
+            text === "refresh"
+            ||
+            text.includes(
+                "configure"
+            )
+            ||
+            text.includes(
+                "enter teleop"
+            )
+            ||
+            (
+                text === "connect"
+                ||
+                text.endsWith(
+                    " connect"
+                )
+            )
+        ) {
+
+            return "green";
+        }
+
+
+        return null;
+    }
+
+
+    function syncActionGlowV29() {
+
+        /*
+         * Explicit IDs where available.
+         */
+
+        for (
+            const id
+            of GREEN_IDS_V29
+        ) {
+
+            markV29(
+                document.getElementById(
+                    id
+                ),
+                "green"
+            );
+        }
+
+
+        for (
+            const id
+            of AMBER_IDS_V29
+        ) {
+
+            markV29(
+                document.getElementById(
+                    id
+                ),
+                "amber"
+            );
+        }
+
+
+        /*
+         * Text fallback catches rebuilt/proxy controls whose
+         * historical IDs changed.
+         */
+
+        document
+            .querySelectorAll(
+                "#view-live button, "
+                +
+                "#view-live [role='button']"
+            )
+            .forEach(
+                node => {
+
+                    const tone =
+                        classifyByTextV29(
+                            node
+                        );
+
+
+                    if (tone) {
+
+                        markV29(
+                            node,
+                            tone
+                        );
+                    }
+                }
+            );
+    }
+
+
+    function bootV29() {
+
+        syncActionGlowV29();
+
+
+        /*
+         * Some late Live owners build their controls shortly
+         * after initial DOM creation. Finite startup passes only.
+         */
+
+        requestAnimationFrame(
+            syncActionGlowV29
+        );
+
+
+        window.setTimeout(
+            syncActionGlowV29,
+            250
+        );
+
+
+        window.setTimeout(
+            syncActionGlowV29,
+            900
+        );
+
+
+        /*
+         * Switching VR / Camera Teleoperation does not poll.
+         * Re-tag once after the actual authoritative select changes.
+         */
+
+        document
+            .getElementById(
+                "teleoperationSelectV16"
+            )
+            ?.addEventListener(
+                "change",
+                () => {
+
+                    requestAnimationFrame(
+                        syncActionGlowV29
+                    );
+                }
+            );
+    }
+
+
+    if (
+        document.readyState
+        ===
+        "loading"
+    ) {
+
+        document.addEventListener(
+            "DOMContentLoaded",
+            bootV29,
+            {
+                once: true,
+            }
+        );
+    }
+
+    else {
+
+        bootV29();
     }
 
 })();

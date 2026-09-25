@@ -1,32 +1,27 @@
-# Full Dashboard Snapshot
+# BACALBASA Full Dashboard — Current Snapshot
 
-This directory contains the current Full Dashboard source snapshot.
+Snapshot generated: 2026-09-26T01:27:53+08:00
 
-Original robot runtime source:
+This repository snapshot preserves the current validated Full Dashboard system, including:
 
-    /home/unitree/bacalbasa_dashboard_parallel_test_v1
+- current Full Dashboard source
+- current bacalbasa_slam_runtime
+- current SLAM / Nav2 configuration and maps
+- current Quest / VR teleoperation integration
+- current G1 V1.8 XR controller and required assets
+- exact g1demo Unitree SDK used by the XR environment
+- current RealSense camera helper
+- current modified Teleimager configuration
+- current Inspire service source and validated ARM64 binary
+- current robot map and Mid360 configuration
+- current g1_ws local source overrides
 
-Robot host:
+Generated runtime state, secrets, caches, backup history, ROS build/install/log output, and historical SLAM partial maps are intentionally excluded.
 
-    unitree-g1-nx
+## Important validation hashes
 
-Snapshot date:
+```text
+navigate_replanning.xml  1977a16a5be1258accd1059614b02e5b46db856f5a161859ec21e98eaece0bd3
+```
 
-    2026-09-18
-
-The public/project-facing name is:
-
-    Full Dashboard
-
-The "Bacalbasa" name that remains inside the source is intentionally retained for existing Camera Teleop integration and internal functional identifiers.
-
-Runtime, transient, private, and development-artifact files are intentionally excluded from Git, including:
-
-- run/
-- action tokens
-- logs
-- PID/socket files
-- Python caches/bytecode
-- backup_* directories
-- broken edit artifacts
-- .env files
+See `runtime_dependencies/PROVENANCE.txt` and `FULL_SNAPSHOT_SHA256.txt` for additional provenance and file hashes.

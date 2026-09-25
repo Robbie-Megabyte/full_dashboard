@@ -337,13 +337,17 @@
         available
     ){
 
-        if(key === "camera"){
+        /* FULL_DASH_REAL_CAMERA_MIN_V13
+     * Expanded Camera Multiview tray needs a larger true
+     * resize floor. This is the ONLY camera minimum owner.
+     */
+    if(key === "camera"){
 
             return {
 
                 min:
                     Math.max(
-                        320,
+                        520,
                         available * .22
                     ),
 

@@ -1,0 +1,42 @@
+BACALBASA runtime dependency snapshot
+Generated: 2026-09-26T01:22:16+08:00
+
+QUEST_SENDER_SHA256:
+18dca07425f3fb22a1458367c7251a8fee082d2971c74966c24756c7e5572fa7  /home/unitree/g1_quest_fullbody_sender.py
+
+XR_CONTROLLER_SHA256:
+df53901e7c581d7c9734b27d226e377e318da0549cfc604819d403f5374dafc8  /home/unitree/xr_teleoperate_g1demo/teleop/g1_locomotion_xr_handover_live_v6_7_4_symmetric_thumb_control_dashboard_telemetry_v1_8.py
+
+XR_MODEL_CACHE_SHA256:
+1b8f2ecf8c7124e2158f086b95bcd6ba4b97069dee5a7ad9e4a7ca308dd3b615  /home/unitree/xr_teleoperate_g1demo/teleop/g1_29_model_cache.pkl
+
+G1DEMO_SDK_G1_LOCO_CLIENT_SHA256:
+5fbc07b30994676cd2f7994a2389b24e9b51e2c13dfde7e565bfd77898300ce2  /home/unitree/unitree_sdk2_python_g1demo/unitree_sdk2py/g1/loco/g1_loco_client.py
+
+CAMERA_HELPER_SHA256:
+586b63cdb94673b3d8f28b81c5c89f39a4a392498d6b2c5d11f6e113b6e82702  /home/unitree/unitree_sdk2_python/send_video_depth.py
+
+TELEIMAGER:
+branch=main
+head=57cf2a40572227273fa001cd17833b755331ec97
+remote=https://github.com/unitreerobotics/teleimager.git
+2bb17fc33583665092b74fd797f8ca65741b46ab4a61c5233e855ee764629137  /home/unitree/teleimager/cam_config_server.yaml
+
+UNITREE_CAMERA_SDK:
+branch=master
+head=4f12b0134e87ae33f3401bebf1c49f527dff4abd
+remote=https://github.com/unitreerobotics/unitree_sdk2_python.git
+
+INSPIRE:
+branch=master
+head=d6c4eae9bc959990bf87c262f29f62142519e923
+remote=https://github.com/unitreerobotics/dfx_inspire_service.git
+42cb2ada6e76fc610be9eb114b17502e1c2a7f1fde4b27141715484e291f119a  /home/unitree/dfx_inspire_service/CMakeLists.txt
+7894da48dd05e57665b1ac0bdf6a5af4165f163356f7d087d7c9a1fa9e90e460  /home/unitree/dfx_inspire_service/inspire_g1.cpp
+e0bef2bb75001c5da8769456cbe2e506e204670342b19cc82091e56c3ff0d2db  /home/unitree/dfx_inspire_service/include/inspire.h
+7c94d1388fab51fddd9ff183062ff7df541e43b319c226888b1272ff7efdfeda  /home/unitree/dfx_inspire_service/include/SerialPort.h
+cb0d78b41ed60b97ddcc792b064c604a1de91028bce6708f58cb89ef3e56dcd3  /home/unitree/dfx_inspire_service/build/inspire_g1
+
+ROBOT_ASSETS:
+160f1a004b65ef328e227b2772671630c04f3eed4538af09a86080c92534c204  /home/unitree/g1_ws/map/harta_buna_2707.pcd
+8a0ea4c6f56a67e2de0df4ff43f10fa922042c264bf8a8ca7ac94c7f80433617  /home/unitree/g1_ws/assets/mid360.robot.json

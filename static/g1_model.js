@@ -505,10 +505,6 @@ class MeshTwin {
         left:handForward('left',fk.links.left_wrist_yaw_link,this.displayHandFbLeft),
         right:handForward('right',fk.links.right_wrist_yaw_link,this.displayHandFbRight)
       };
-      const commandHands={
-        left:handForward('left',gfk.links.left_wrist_yaw_link,this.displayHandCmdLeft),
-        right:handForward('right',gfk.links.right_wrist_yaw_link,this.displayHandCmdRight)
-      };
       for(const side of ['left','right']){
         for(const [link,mesh] of this.inspireMeasuredMeshes[side]){const m=measuredHands[side].links[link];mesh.visible=!!m;if(m)applyMatrix(mesh,m);}
         for(const [link,mesh] of this.inspireGhostMeshes[side]){mesh.visible=false;}

@@ -40,10 +40,26 @@ const CAMERA_VIEW_ORDER=Object.freeze([
   'lifecam',
 ]);
 
+
+/* FULL_DASH_COMPANION_MULTIVIEW_UI_V1
+ *
+ * CAMERA_VIEW_ORDER remains ROBOT-BACKEND ONLY.
+ *
+ * CAMERA_MULTIVIEW_ORDER is the presentation layer shown by
+ * Live -> Camera Multiview. Companion-PC sources must never be
+ * sent to /api/camera/views or Teleimager.
+ */
+const CAMERA_MULTIVIEW_ORDER=Object.freeze([
+  ...CAMERA_VIEW_ORDER,
+  'raw',
+  'simulation',
+  'keypoints',
+]);
+
 const CAMERA_VIEWS=Object.freeze({
   rgb:Object.freeze({
     id:'rgb',
-    label:'RealSense RGB',
+    label:'Robot RGB',
     shortLabel:'RGB',
     transport:'webrtc',
     port:60001,
@@ -82,6 +98,27 @@ const CAMERA_VIEWS=Object.freeze({
     shortLabel:'EXT CAM',
     transport:'webrtc',
     port:60004,
+  }),
+  raw:Object.freeze({
+    id:'raw',
+    label:'Raw Camera',
+    shortLabel:'RAW',
+    transport:'companion',
+    owner:'companion',
+  }),
+  simulation:Object.freeze({
+    id:'simulation',
+    label:'Simulation',
+    shortLabel:'SIM',
+    transport:'companion',
+    owner:'companion',
+  }),
+  keypoints:Object.freeze({
+    id:'keypoints',
+    label:'Keypoints',
+    shortLabel:'KEYPOINTS',
+    transport:'companion',
+    owner:'companion',
   }),
 });
 
@@ -1329,7 +1366,7 @@ function stitchCameraVisibleSnapshotV1949(){
     }
 
 
-    return CAMERA_VIEW_ORDER.filter(
+    return CAMERA_MULTIVIEW_ORDER.filter(
         id => {
 
             const tile =
@@ -2432,7 +2469,7 @@ function stitchCameraApplyExpandedLayoutV1951(){
 
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         const tile =
@@ -3672,7 +3709,7 @@ function stitchCameraStartCleanJiggleV1953(
 
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         if(
@@ -5069,7 +5106,7 @@ function ensureCameraTiles(){
   if(!stage||stage.dataset.initialized==='true')return;
 
   stage.dataset.initialized='true';
-  stage.innerHTML=CAMERA_VIEW_ORDER.map(id=>{
+  stage.innerHTML=CAMERA_MULTIVIEW_ORDER.map(id=>{
     const view=CAMERA_VIEWS[id];
     const media=view.transport==='webgl'
       ?'<canvas id="pointCloudCanvas" class="pointcloud-canvas" aria-label="Interactive camera-relative 3-D point cloud"></canvas>'
@@ -5098,8 +5135,16 @@ function ensureCameraTiles(){
           ${media}
           <div class="camera-tile-overlay" data-camera-overlay="${id}">
             <div class="camera-overlay-icon">◉</div>
-            <strong data-camera-overlay-title="${id}">Not connected</strong>
-            <span data-camera-overlay-text="${id}">Waiting for camera connection.</span>
+            <strong data-camera-overlay-title="${id}">${
+              view.owner==='companion'
+                ?'Camera Teleop source'
+                :'Not connected'
+            }</strong>
+            <span data-camera-overlay-text="${id}">${
+              view.owner==='companion'
+                ?'UI ready — companion functionality will be connected later.'
+                :'Waiting for camera connection.'
+            }</span>
           </div>
         </div>
       </article>`;
@@ -5294,7 +5339,7 @@ function renderCameraGrid(){
 
   stitchCameraApplyExpandedLayoutV1951();
 
-  for(const id of CAMERA_VIEW_ORDER){
+  for(const id of CAMERA_MULTIVIEW_ORDER){
     const tile=cameraTileElement(id);
     if(!tile)continue;
 
@@ -7522,6 +7567,44 @@ async function fullDashConnectOneV3(id){
 }
 
 
+/* FULL_DASH_VISIBLE_ROBOT_CONNECT_V2
+ *
+ * The six-slot workspace is the UI source of truth.
+ *
+ * Only robot-owned sources are sent to Teleimager.
+ * Browser-local companion sources must never enter
+ * /api/camera/passive/prepare.
+ */
+function fullDashVisibleRobotViewsV2(){
+
+  /*
+   * D15 owns the actual six-slot presentation after page setup.
+   */
+  if(
+    typeof stitchCameraSlotByIdV151 !== 'undefined'
+    &&
+    stitchCameraSlotByIdV151.size
+  ){
+
+    return CAMERA_VIEW_ORDER.filter(
+      id=>
+        Number.isInteger(
+          stitchCameraSlotByIdV151.get(id)
+        )
+        &&
+        !stitchCameraParkedV151.has(id)
+    );
+  }
+
+  /*
+   * Safe fallback before D15 initialization.
+   */
+  return activeCameraViews.filter(
+    id=>CAMERA_VIEW_ORDER.includes(id)
+  );
+}
+
+
 /*
  * Override only the Full Dash Connect action.
  */
@@ -7551,77 +7634,81 @@ startAndConnectCamera=async function(){
   try{
 
     const wanted=
-      CAMERA_VIEW_ORDER.slice();
-
-    activeCameraViews=
-      wanted.slice();
-
-
-    await fullDashCameraPostV2(
-      '/api/camera/passive/prepare',
-      {
-        views:wanted
-      }
-    );
-
+      fullDashVisibleRobotViewsV2();
 
     /*
-     * Wait for the camera runner to acknowledge all products.
+     * Companion-only layouts are legal.
+     * They do not require the robot camera backend.
      */
-    let backendReady=false;
+    let backendReady=
+      wanted.length === 0;
 
-    for(
-      let attempt=0;
-      attempt<80;
-      attempt++
-    ){
+    if(wanted.length){
 
-      const status=
-        await pollCameraProcess();
-
-      const actual=
-        normalizeCameraViews(
-          status?.web_views_actual
-          ||
-          []
-        );
-
-      if(
-        wanted.every(
-          id=>
-            actual.includes(id)
-        )
-      ){
-        backendReady=true;
-        break;
-      }
-
-      await new Promise(
-        resolve=>
-          setTimeout(
-            resolve,
-            100
-          )
+      await fullDashCameraPostV2(
+        '/api/camera/passive/prepare',
+        {
+          views:wanted
+        }
       );
+
+
+      /*
+       * Wait only for the selected ROBOT products.
+       */
+      for(
+        let attempt=0;
+        attempt<80;
+        attempt++
+      ){
+
+        const status=
+          await pollCameraProcess();
+
+        const actual=
+          normalizeCameraViews(
+            status?.web_views_actual
+            ||
+            []
+          );
+
+        if(
+          wanted.every(
+            id=>
+              actual.includes(id)
+          )
+        ){
+          backendReady=true;
+          break;
+        }
+
+        await new Promise(
+          resolve=>
+            setTimeout(
+              resolve,
+              100
+            )
+        );
+      }
     }
 
 
     if(!backendReady){
-      throw new Error(
-        'Camera backend did not activate all six views.'
+      /*
+       * FULL_DASH_VR_WEBRTC_LATE_ACK_V1
+       *
+       * Quest/VR camera delivery and browser WebRTC publication share
+       * the managed camera runner.  The global web_views acknowledgement
+       * can lag behind the actual publishers becoming available.
+       *
+       * Do not abort here.  The per-view waitCameraViewReady() checks
+       * below are authoritative for the dashboard browser connection.
+       */
+      console.warn(
+        'Camera view acknowledgement was late; '
+        +'continuing with per-view publisher readiness checks.'
       );
     }
-
-
-    activeCameraViews=
-      wanted.slice();
-
-    renderCameraModes();
-
-    activeCameraViews=
-      wanted.slice();
-
-    renderCameraGrid();
 
 
     const ids=
@@ -7777,7 +7864,7 @@ function renderSelectedJoint(t){
   const r=t?.robot||{},a=t?.arms||{},i=Math.max(0,Math.min(28,selectedJointIndex));
   const names=Array.isArray(r.joint_names)&&r.joint_names.length>=29?r.joint_names:(G1Twin.jointNames||[]);
   const name=names[i]||`joint_${i}`; const local=armLocalIndex(i);
-  $('selectedJointName').textContent=name; $('selectedJointIndex').textContent=`#${i}`; $('selectedJointGroup').textContent=jointGroup(i);
+  $('selectedJointName').textContent=name; $('selectedJointGroup').textContent=jointGroup(i);
   $('selectedMeasuredQ').textContent=n(arrAt(r.measured_q_rad,i),2,' rad'); $('selectedDq').textContent=n(arrAt(r.measured_dq_rps,i),2,' rad/s'); $('selectedTau').textContent=n(arrAt(r.tau_est,i),2);
   $('selectedTemp').textContent=formatTemps(arrAt(r.temperatures_c,i)); const ms=arrAt(r.motor_state,i); $('selectedMotorState').textContent=ms==null?'motor —':`motor ${ms}`;
   const h=G1Twin.getJointHealth(i);
@@ -8109,6 +8196,19 @@ function renderActionReadiness(t){
 
 function render(env){
   latestEnv=env; const t=env.telemetry; const bridge=env.bridge||{};
+
+  /*
+   * FULL_DASH_HEADER_CONNECTION_OWNER_V1
+   *
+   * Header ornament is an idle/disconnected indicator.
+   * Reuse the real bridge telemetry state already consumed by
+   * this render path.  No duplicate polling/observer.
+   */
+  document.body.classList.toggle(
+    "full-dash-robot-connected",
+    bridge.telemetry_online === true
+  );
+
   renderTeleopXr(env);
   // BACA_HANDS_POINT_FIX_V1
   if(!t)renderHandMatrix([],[],[]);
@@ -8326,7 +8426,7 @@ async function requestServiceState(name,enabled){
     showManagementKeyPrompt(`Enter the management key to switch ${name} ${desiredWord}.`,()=>requestServiceState(name,enabled));
     return;
   }
-  if(!window.confirm(`Switch Unitree service "${name}" ${desiredWord}?\n\nOnly explicitly ALLOWED services can reach ServiceSwitch. The worker will re-read ServiceList and report success only if the requested state is verified.`))return;
+  /* FULL_DASH_DIRECT_SERVICE_TOGGLE_V1: direct verified toggle */
   serviceActionBusyName=name;renderServiceList();
   try{
     const action=await postServiceState(name,enabled);
@@ -8770,6 +8870,61 @@ async function poll(){
 
 
 function stitchCameraIconV147(id){
+  /* FULL_DASH_RGB_ICON_CORE_V8 */
+  if(id==='rgb'){
+    return `
+      <svg
+        class="full-dash-robot-rgb-icon-v8"
+        viewBox="0 0 24 24"
+        aria-hidden="true"
+      >
+        <rect x="3.5" y="7" width="17" height="10.5" rx="2"/>
+        <path d="M7.8 7L9.2 5.2h5.6L16.2 7"/>
+
+        <circle cx="9.2" cy="12.2" r="2.35"/>
+        <circle cx="14.8" cy="12.2" r="2.35"/>
+
+        <circle cx="9.2" cy="12.2" r=".8"/>
+        <circle cx="14.8" cy="12.2" r=".8"/>
+
+        <path d="M12 9.5v5.4"/>
+        <circle cx="12" cy="12.2" r=".65"/>
+      </svg>`;
+  }
+
+
+  if(id==='raw'){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="3.5" y="6" width="17" height="12" rx="2"/>
+        <circle cx="12" cy="12" r="3.5"/>
+        <circle cx="12" cy="12" r="1.3"/>
+        <path d="M7 6l1.5-2h7L17 6"/>
+      </svg>`;
+  }
+
+  if(id==='simulation'){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M12 3l7 4v9l-7 4-7-4V7l7-4Z"/>
+        <path d="M5 7l7 4 7-4"/>
+        <path d="M12 11v9"/>
+      </svg>`;
+  }
+
+  if(id==='keypoints'){
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <circle cx="12" cy="4.5" r="1.6"/>
+        <circle cx="8" cy="9" r="1.4"/>
+        <circle cx="16" cy="9" r="1.4"/>
+        <circle cx="12" cy="13" r="1.4"/>
+        <circle cx="8.5" cy="18" r="1.4"/>
+        <circle cx="15.5" cy="18" r="1.4"/>
+        <path d="M12 6.1v5.5M9.2 9.5l2 2M14.8 9.5l-2 2M11.2 14l-2 2.7M12.8 14l2 2.7"/>
+      </svg>`;
+  }
+
 
   /* STITCH_CAMERA_ICON_FUNCTION_V152 */
 
@@ -9203,7 +9358,7 @@ function stitchCameraInitializeSlotsV151(){
      */
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         if(
@@ -9256,7 +9411,7 @@ function stitchCameraInitializeSlotsV151(){
      */
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         if(
@@ -9373,7 +9528,7 @@ function stitchCameraApplyLayoutV151(){
 
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         const tile =
@@ -9521,10 +9676,20 @@ function stitchCameraSyncDockV151(){
             );
 
 
+        button.classList.toggle(
+            'active',
+            !parked
+        );
+
+        button.setAttribute(
+            'aria-pressed',
+            parked ? 'false' : 'true'
+        );
+
         button.title =
             parked
             ?
-            `Drag ${CAMERA_VIEWS[id].label} into an empty workspace position`
+            `Drag ${CAMERA_VIEWS[id].label} onto a workspace position`
             :
             `${CAMERA_VIEWS[id].label} is currently on the workspace`;
     }
@@ -9657,6 +9822,8 @@ function stitchCameraCreateSlotLayerV151(
         const available =
             (
                 mode === 'window'
+                ||
+                mode === 'restore'
                 ||
                 empty
             );
@@ -9791,7 +9958,7 @@ function stitchCameraStartJiggleV151(
 
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         if(
@@ -9911,7 +10078,7 @@ function stitchCameraCaptureRectsV151(){
 
     for(
         const id
-        of CAMERA_VIEW_ORDER
+        of CAMERA_MULTIVIEW_ORDER
     ){
 
         if(
@@ -10037,8 +10204,25 @@ function stitchCameraLocalViewStateV151(
     shouldBeActive
 ){
 
+    const localPreview =
+        stitchCameraUiPreviewV142();
+
+    const connectedRuntime =
+        (
+            cameraPeers.size > 0
+            ||
+            pointCloudActive()
+        );
+
+    /*
+     * Local preview always mirrors tile state.
+     * On the real dashboard, mirror tile state into the backend only
+     * while an existing camera session is connected.
+     */
     if(
-        !stitchCameraUiPreviewV142()
+        !localPreview
+        &&
+        !connectedRuntime
     ){
         return;
     }
@@ -10914,9 +11098,34 @@ function stitchCameraFinishIconV151(
         drag.targetSlot.available
     ){
 
+        const targetIndex =
+            drag.targetSlot.index;
+
+        const displacedId =
+            stitchCameraOccupantV151(
+                targetIndex,
+                drag.id
+            );
+
+        /*
+         * Icon -> occupied window means REPLACE.
+         *
+         * Incoming source takes the exact slot.
+         * Displaced source returns to the icon dock.
+         *
+         * This applies even when fewer than six windows are
+         * currently present.
+         */
+        if(displacedId){
+
+            stitchCameraParkV151(
+                displacedId
+            );
+        }
+
         stitchCameraRestoreV151(
             drag.id,
-            drag.targetSlot.index
+            targetIndex
         );
     }
 

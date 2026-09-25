@@ -1,0 +1,8 @@
+WORKSPACE=/home/unitree/g1_ws
+DATE=2026-09-26T01:22:16+08:00
+BRANCH=main
+HEAD=e3270e886d876941281299686c9d87e70f43a498
+
+REMOTES:
+origin	https://github.com/trcp/g1_ws.git (fetch)
+origin	https://github.com/trcp/g1_ws.git (push)

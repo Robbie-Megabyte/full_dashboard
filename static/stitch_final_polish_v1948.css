@@ -142,3 +142,36 @@ body.stitch-live-v12
 
     align-items: center !important;
 }
+
+
+
+/* ================================================================
+   FULL_DASH_HEADER_IDLE_ONLY_V1
+
+   The green/amber flow ornament is an IDLE / DISCONNECTED visual.
+
+   When the real dashboard bridge reports live robot telemetry,
+   remove both ornament pseudo-elements completely.
+   ================================================================ */
+
+body.full-dash-robot-connected
+header.topbar
+.tabs::before,
+
+body.full-dash-robot-connected
+header.topbar
+.tabs::after {
+
+    display:
+        none !important;
+
+    content:
+        none !important;
+
+    background:
+        none !important;
+
+    opacity:
+        0 !important;
+}
+

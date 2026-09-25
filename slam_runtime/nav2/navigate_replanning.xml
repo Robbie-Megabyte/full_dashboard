@@ -1,0 +1,34 @@
+<!--
+  Replanificare Nav2 la 2 Hz. Obstacolele live nu sunt șterse ca recovery:
+  plannerul trebuie să găsească o rută în jurul lor sau să aștepte în siguranță.
+
+  Netezirea rulează o singură dată pentru fiecare plan nou (2 Hz), în același
+  pas cu planificarea. Rulată la fiecare tick (~100 Hz), smoother_server primea
+  cereri noi care anulau netezirea în curs, iar anularea repetată îl făcea să
+  crape (SIGSEGV), oprind întreaga lansare Nav2.
+-->
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <RecoveryNode number_of_retries="6" name="NavigateG1">
+      <PipelineSequence name="PlanAndFollow">
+        <RateController hz="2.0">
+          <RecoveryNode number_of_retries="1" name="PlanPath">
+            <Sequence name="ComputeAndSmoothPath">
+              <ComputePathToPose goal="{goal}" path="{unsmoothed_path}" planner_id="GridBased"/>
+              <SmoothPath unsmoothed_path="{unsmoothed_path}" smoothed_path="{path}" smoother_id="SimpleSmoother"/>
+            </Sequence>
+            <Wait wait_duration="0.5"/>
+          </RecoveryNode>
+        </RateController>
+        <RecoveryNode number_of_retries="1" name="FollowPath">
+          <FollowPath path="{path}" controller_id="FollowPath"/>
+          <Wait wait_duration="0.5"/>
+        </RecoveryNode>
+      </PipelineSequence>
+      <ReactiveFallback name="RecoveryFallback">
+        <GoalUpdated/>
+        <Wait wait_duration="1.0"/>
+      </ReactiveFallback>
+    </RecoveryNode>
+  </BehaviorTree>
+</root>
