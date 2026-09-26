@@ -55,6 +55,23 @@ SLAM_RUNTIME_TOKEN_FILE = Path(
 )
 SLAM_RUNTIME_PROXY_PREFIX = "/slam-runtime"
 
+# Camera pose teleoperation runs on the PC that views the dashboard. Its
+# companion service (camera_pose_teleop/dashboard_demo_v2/companion) listens on
+# that PC; the bridge forwards these routes to the requesting browser's IP.
+# Camera frames are not relayed: the page loads them from that PC directly
+# (frames_origin in the health answer), keeping them off the robot's Wi-Fi.
+CAMERA_TELEOP_PREFIX = "/api/camera-teleop"
+CAMERA_TELEOP_PORT = int(os.environ.get("G1_CAMERA_TELEOP_COMPANION_PORT", "8088"))
+CAMERA_TELEOP_GET_ROUTES = {
+    "/health": ("/api/health", 1.5),
+    "/status": ("/api/status", 3.0),
+}
+CAMERA_TELEOP_POST_ROUTES = {
+    "/configure": ("/api/system/robot/deploy", 120.0),
+    "/enter": ("/api/system/robot/start", 120.0),
+    "/stop": ("/api/system/robot/stop", 120.0),
+}
+
 SLAM_STATE_DIR = Path(
     os.environ.get(
         "G1_DASHBOARD_SLAM_STATE_DIR",
@@ -1774,6 +1791,129 @@ class DashboardHandler(BaseHTTPRequestHandler):
         finally:
             connection.close()
 
+    # Camera teleop needs the robot's internal network as quiet as it is
+    # without the Full Dashboard: the LiDAR point clouds that lidar_driver /
+    # unitree_slam put on it share the link and the main board (.161) with
+    # SONIC's motor commands. Configure switches them off and Stop restores
+    # the ones that were on.
+    CAMERA_TELEOP_QUIET_SERVICES = ("unitree_slam", "lidar_driver")
+
+    def _camera_teleop_quiet(self) -> None:
+        server = self.server
+        client = server.service_action_client  # type: ignore[attr-defined]
+        with server.camera_teleop_lock:  # type: ignore[attr-defined]
+            if server.camera_teleop_paused is not None:  # type: ignore[attr-defined]
+                return
+            try:
+                listing = client.request("LIST_SERVICES")
+                services = listing.get("services") or {}
+            except Exception as exc:
+                print(f"camera teleop: cannot list services: {exc}", flush=True)
+                return
+            paused = [
+                name for name in self.CAMERA_TELEOP_QUIET_SERVICES
+                if (services.get(name) or {}).get("enabled") is True
+            ]
+            # unitree_slam depends on lidar_driver: stop it first.
+            for name in paused:
+                try:
+                    client.request("SET_SERVICE", service=name, enabled=False)
+                except Exception as exc:
+                    print(f"camera teleop: cannot stop {name}: {exc}", flush=True)
+            server.camera_teleop_paused = paused  # type: ignore[attr-defined]
+            print(f"camera teleop: paused services {paused}", flush=True)
+
+    def _camera_teleop_restore(self) -> None:
+        server = self.server
+        client = server.service_action_client  # type: ignore[attr-defined]
+        with server.camera_teleop_lock:  # type: ignore[attr-defined]
+            paused = server.camera_teleop_paused  # type: ignore[attr-defined]
+            server.camera_teleop_paused = None  # type: ignore[attr-defined]
+            # Start lidar_driver before unitree_slam.
+            for name in reversed(paused or []):
+                try:
+                    client.request("SET_SERVICE", service=name, enabled=True)
+                except Exception as exc:
+                    print(f"camera teleop: cannot restart {name}: {exc}", flush=True)
+            if paused:
+                print(f"camera teleop: restored services {paused}", flush=True)
+
+    def _proxy_camera_teleop(self, path: str) -> None:
+        """Forward one allowlisted request to the viewing PC's companion."""
+        route = path[len(CAMERA_TELEOP_PREFIX):]
+        post = self.command == "POST"
+        if post:
+            # Consume the (ignored) body first so a rejected request never
+            # leaves bytes on a kept-alive connection.
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+            except ValueError:
+                length = 0
+            if length > 65536:
+                self.close_connection = True
+            elif length > 0:
+                self.rfile.read(length)
+        target = (CAMERA_TELEOP_POST_ROUTES if post else CAMERA_TELEOP_GET_ROUTES).get(route)
+        if target is None:
+            self._send_json(HTTPStatus.NOT_FOUND, {"error": "unknown camera teleop route"})
+            return
+        if post and not self._trusted_session_authorized():
+            self._send_json(
+                HTTPStatus.UNAUTHORIZED,
+                {"error": "trusted dashboard session is required for camera teleop actions"},
+            )
+            return
+        upstream_path, timeout = target
+        if route == "/configure":
+            self._camera_teleop_quiet()
+
+        # The companion that matters is the one on the PC this browser runs on.
+        host = self.client_address[0]
+        if host.startswith("::ffff:"):
+            host = host[len("::ffff:"):]
+        if host in {"::1", "localhost"}:
+            host = "127.0.0.1"
+
+        body = b"{}" if post else None
+        headers = {"Connection": "close", "Accept": "*/*"}
+        if post:
+            headers["Content-Type"] = "application/json"
+            headers["Content-Length"] = str(len(body))
+
+        connection = http.client.HTTPConnection(host, CAMERA_TELEOP_PORT, timeout=timeout)
+        response_started = False
+        try:
+            connection.request(self.command, upstream_path, body=body, headers=headers)
+            response = connection.getresponse()
+            content_type = response.getheader("Content-Type", "application/octet-stream")
+            payload = response.read()
+            if route == "/stop" or (route == "/configure" and response.status != 200):
+                self._camera_teleop_restore()
+            if route == "/health" and response.status == 200:
+                try:
+                    health = json.loads(payload)
+                except ValueError:
+                    health = {}
+                if isinstance(health, dict):
+                    url_host = f"[{host}]" if ":" in host else host
+                    health["frames_origin"] = f"http://{url_host}:{CAMERA_TELEOP_PORT}"
+                    payload = json.dumps(health).encode("utf-8")
+            response_started = True
+            self._send_bytes(response.status, payload, content_type, cache=False)
+        except (OSError, http.client.HTTPException) as exc:
+            if route == "/configure":
+                self._camera_teleop_restore()
+            if not response_started:
+                try:
+                    self._send_json(
+                        HTTPStatus.SERVICE_UNAVAILABLE,
+                        {"error": f"no camera teleop companion on {host}: {exc}"},
+                    )
+                except OSError:
+                    pass
+        finally:
+            connection.close()
+
     def _read_json_body(self, *, max_bytes: int = 65536) -> Any:
         content_type = self.headers.get("Content-Type", "").split(";", 1)[0].strip().lower()
         if content_type != "application/json":
@@ -2079,6 +2219,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == SLAM_RUNTIME_PROXY_PREFIX or path.startswith(SLAM_RUNTIME_PROXY_PREFIX + "/"):
             self._proxy_slam_runtime(parsed)
+            return
+
+        if path.startswith(CAMERA_TELEOP_PREFIX + "/"):
+            self._proxy_camera_teleop(path)
             return
 
         if path == "/":
@@ -2455,6 +2599,10 @@ class DashboardHandler(BaseHTTPRequestHandler):
 
         if path == SLAM_RUNTIME_PROXY_PREFIX or path.startswith(SLAM_RUNTIME_PROXY_PREFIX + "/"):
             self._proxy_slam_runtime(parsed)
+            return
+
+        if path.startswith(CAMERA_TELEOP_PREFIX + "/"):
+            self._proxy_camera_teleop(path)
             return
 
         # FULL DASH CAMERA PASSIVE ROUTES V2
@@ -2856,6 +3004,17 @@ class DashboardHandler(BaseHTTPRequestHandler):
         # ------------------------------------------------
 
         if path == "/api/session/bootstrap":
+
+            # The body is unused; drain it so it cannot prefix the next
+            # request on a kept-alive connection.
+            try:
+                length = int(self.headers.get("Content-Length", "0") or "0")
+            except ValueError:
+                length = 0
+            if 0 < length <= 65536:
+                self.rfile.read(length)
+            elif length > 65536:
+                self.close_connection = True
 
             if not self.server.process_actions_enabled:  # type: ignore[attr-defined]
                 self._send_json(
@@ -3976,6 +4135,8 @@ def main() -> int:
             "full-dash-browser-lease-watchdog",
     ).start()
     service_action_client = ServiceActionClient()
+    server.camera_teleop_lock = threading.Lock()  # type: ignore[attr-defined]
+    server.camera_teleop_paused = None  # type: ignore[attr-defined]
     if args.enable_service_actions and not service_action_client.configured():
         raise SystemExit("--enable-service-actions requires G1_DASHBOARD_SERVICE_SOCKET and G1_DASHBOARD_SERVICE_TOKEN")
     if args.enable_service_actions and not args.enable_process_actions:

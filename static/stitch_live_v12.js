@@ -13357,6 +13357,16 @@ if (document.readyState === 'loading') {
             node.appendChild(
                 host
             );
+
+
+            // Re-centre whenever this window is resized or maximized.
+            if ("ResizeObserver" in window) {
+                new ResizeObserver(
+                    schedule
+                ).observe(
+                    node
+                );
+            }
         }
 
 
@@ -13365,48 +13375,11 @@ if (document.readyState === 'loading') {
 
 
     /*
-     * RGB+Depth is the requested Y reference.
-     *
-     * Position the WHOLE companion unit using the reference
-     * reticle center, never the child SVG independently.
+     * Each companion unit is centred in its OWN tile body (the same
+     * place the robot views draw their reticles), so it stays correct
+     * whatever other windows are on the workspace, and when maximized.
      */
     function alignHosts() {
-
-        const reference =
-            tile("overlay");
-
-
-        const referenceReticle =
-            reference?.querySelector(
-                ".stitch-idle-reticle"
-            );
-
-
-        if (
-            !reference
-            ||
-            !referenceReticle
-        ) {
-            return;
-        }
-
-
-        const referenceTileRect =
-            reference.getBoundingClientRect();
-
-        const referenceRect =
-            referenceReticle.getBoundingClientRect();
-
-
-        const referenceCenter =
-            (
-                referenceRect.top
-                +
-                referenceRect.height / 2
-            )
-            -
-            referenceTileRect.top;
-
 
         for (
             const id
@@ -13420,24 +13393,29 @@ if (document.readyState === 'loading') {
                     id
                 );
 
+            const node =
+                tile(id);
 
-            if (!host) {
+            const body =
+                node?.querySelector(
+                    ".camera-tile-body"
+                );
+
+
+            if (!host || !node || !body) {
                 continue;
             }
 
 
-            /*
-             * User requested a little lower than previous passes.
-             */
+            const center =
+                body.offsetTop
+                +
+                body.offsetHeight / 2;
+
+
             host.style.setProperty(
                 "top",
-                `${
-                    (
-                        referenceCenter
-                        +
-                        10
-                    ).toFixed(2)
-                }px`,
+                `${center.toFixed(2)}px`,
                 "important"
             );
         }
@@ -15529,6 +15507,17 @@ if (document.readyState === 'loading') {
 
     function cameraStatusValuesV21() {
 
+        const runtime =
+            window.fullDashCameraTeleopRuntime;
+
+
+        if (
+            runtime
+            && typeof runtime.statusRows === "function"
+        ) {
+            return runtime.statusRows();
+        }
+
         const doc =
             cameraDocumentV21();
 
@@ -16039,27 +16028,16 @@ if (document.readyState === 'loading') {
             );
 
 
-        let saved =
-            "vr";
-
-
         try {
 
-            const candidate =
-                window.localStorage.getItem(
-                    STORAGE_KEY_V21
-                );
-
-
-            if (
-                candidate === "vr"
-                ||
-                candidate === "camera"
-            ) {
-
-                saved =
-                    candidate;
-            }
+            /*
+             * A fresh dashboard load always starts in the robot-native VR
+             * mode. Camera remains selectable after the capability check.
+             */
+            window.localStorage.setItem(
+                STORAGE_KEY_V21,
+                "vr"
+            );
         }
 
         catch (_) {}
@@ -16068,7 +16046,7 @@ if (document.readyState === 'loading') {
         if (select) {
 
             select.value =
-                saved;
+                "vr";
 
 
             select.addEventListener(

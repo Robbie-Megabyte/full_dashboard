@@ -5110,7 +5110,9 @@ function ensureCameraTiles(){
     const view=CAMERA_VIEWS[id];
     const media=view.transport==='webgl'
       ?'<canvas id="pointCloudCanvas" class="pointcloud-canvas" aria-label="Interactive camera-relative 3-D point cloud"></canvas>'
-      :`<video data-camera-video="${id}" autoplay playsinline muted></video>`;
+      :view.transport==='companion'
+        ?`<img data-camera-companion="${id}" alt="${view.label}" draggable="false" />`
+        :`<video data-camera-video="${id}" autoplay playsinline muted></video>`;
 
     /* V1.9.49: old per-tile _blank/CERT control removed. */
     const maximize=
@@ -5705,6 +5707,16 @@ function renderCameraModes(){
     &&
     !requested.includes(
       stitchCameraMaximizeStateV1949.id
+    )
+    /*
+     * Camera-teleop companion views are browser-local workspace
+     * windows, never robot camera-server views.
+     */
+    &&
+    !(
+      CAMERA_VIEWS[stitchCameraMaximizeStateV1949.id]?.owner==='companion'
+      &&
+      !stitchCameraParkedV151.has(stitchCameraMaximizeStateV1949.id)
     )
   ){
     stitchCameraMaximizeStateV1949=null;

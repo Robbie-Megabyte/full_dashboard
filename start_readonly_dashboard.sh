@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-TARGET="$HOME/bacalbasa_dashboard_parallel_test_v1"
+TARGET="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 RUN="$TARGET/run"
 
 G1XR_PY="$HOME/miniconda3/envs/g1_xr/bin/python"

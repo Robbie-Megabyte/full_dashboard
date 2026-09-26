@@ -679,7 +679,8 @@ button,a{font:inherit}.topbar{height:var(--top);display:grid;grid-template-colum
   background:#000;
 }
 
-.camera-tile-body video{
+.camera-tile-body video,
+.camera-tile-body [data-camera-companion]{
   display:block;
   width:100%;
   height:100%;
@@ -745,6 +746,46 @@ button,a{font:inherit}.topbar{height:var(--top);display:grid;grid-template-colum
   color:#78d9ad;
 }
 
+#view-live .twin-panel{
+  position:relative;
+}
+
+/* Covers the Live tab's main (robot twin) panel. */
+.camera-teleop-mainbar-unavailable-v1{
+  position:absolute;
+  inset:0;
+  z-index:30;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  pointer-events:none;
+  text-align:center;
+  background:#080b0f;
+  border-radius:inherit;
+}
+
+.camera-teleop-mainbar-unavailable-v1[hidden]{
+  display:none !important;
+}
+
+/* Same typography as the FULL DASHBOARD STOPPED screen. */
+.camera-teleop-mainbar-unavailable-v1{
+  color:#d7e6ee;
+  font-family:system-ui,sans-serif;
+}
+
+.camera-teleop-mainbar-unavailable-v1 strong{
+  display:block;
+  font-size:20px;
+  margin-bottom:8px;
+}
+
+.camera-teleop-mainbar-unavailable-v1 span{
+  opacity:.65;
+  font-size:13px;
+}
+
 @media(max-width:1380px){
   .camera-tile-head{
     height:22px;
@@ -778,4 +819,138 @@ button,a{font:inherit}.topbar{height:var(--top);display:grid;grid-template-colum
   border: 0;
   border-radius: 14px;
   background: #0b0f14;
+}
+
+/* No camera-teleop pipeline on this PC: no highlighted step. */
+.stitch-live-v12 #view-live
+#cameraControllerControlsV21[data-camera-state="unavailable"]
+.camera-segment-v21{
+  opacity:.36 !important;
+  border-color:transparent !important;
+  background:transparent !important;
+  box-shadow:none !important;
+}
+
+.stitch-live-v12 #view-live
+#cameraControllerControlsV21[data-camera-state="unavailable"]
+#cameraTeleopIndicatorV21{
+  opacity:0 !important;
+}
+
+/* Camera-teleop views: no idle animation/label over live frames. */
+.stitch-live-v12 #view-live
+.camera-tile[data-companion-live="true"] .fd11-host{
+  display:none !important;
+}
+
+/* ============================================================
+   Camera teleop switch: Configure / Enter Teleop / Stop
+   Stop matches the SLAM tab Stop (amber, SLAM "right-amber" ring).
+   ============================================================ */
+html body.stitch-live-v12 #view-live #cameraControllerControlsV21 #cameraStopV21{
+  color:rgb(242,170,33) !important;
+  opacity:.42 !important;
+}
+html body.stitch-live-v12 #view-live #cameraControllerControlsV21 #cameraStopV21:not(:disabled){
+  opacity:1 !important;
+  cursor:pointer !important;
+}
+html body.stitch-live-v12 #view-live
+#cameraControllerControlsV21:is([data-camera-state="teleop"],[data-camera-state="stopping"]) #cameraStopV21{
+  opacity:1 !important;
+  background:rgba(245,164,0,.16) !important;
+  box-shadow:inset 0 0 0 1px rgba(245,164,0,.28) !important;
+  border-radius:3px !important;
+}
+html body.stitch-live-v12 #view-live
+#cameraControllerControlsV21:is([data-camera-state="teleop"],[data-camera-state="stopping"],[data-camera-state="unavailable"])
+#cameraTeleopIndicatorV21{
+  opacity:0 !important;
+}
+html body.stitch-live-v12 #view-live
+#cameraControllerControlsV21[data-camera-state="entering"] #cameraTeleopIndicatorV21{
+  transform:translateX(100%) !important;
+}
+/* The step being worked on keeps its green look while it loads. */
+html body.stitch-live-v12 #view-live
+#cameraControllerControlsV21[data-camera-state="configuring"] #cameraConfigureV21,
+html body.stitch-live-v12 #view-live
+#cameraControllerControlsV21[data-camera-state="entering"] #cameraEnterV21{
+  color:var(--camera-selected-text-v23,#8fd486) !important;
+  opacity:1 !important;
+}
+
+/* ============================================================
+   Loading spinner for Live tab buttons. It takes the button's own
+   text color: green buttons spin green, amber amber, gray gray.
+   fd-state-busy: state-driven (camera teleop steps)
+   fd-req-busy:   while the button's request is in flight
+   ============================================================ */
+#view-live :is(.fd-state-busy,.fd-req-busy){
+  position:relative !important;
+  cursor:progress !important;
+}
+#view-live :is(.fd-state-busy,.fd-req-busy) .camera-segment-icon-v21{
+  display:inline-block !important;
+  width:9px !important;
+  height:9px !important;
+  font-size:0 !important;
+  vertical-align:middle !important;
+}
+#view-live :is(.fd-state-busy,.fd-req-busy) .camera-segment-icon-v21::after,
+#view-live :is(.fd-state-busy,.fd-req-busy):not(:has(.camera-segment-icon-v21))::after{
+  content:"" !important;
+  display:block !important;
+  box-sizing:border-box !important;
+  width:9px !important;
+  height:9px !important;
+  border:1.5px solid currentColor !important;
+  border-right-color:transparent !important;
+  border-radius:50% !important;
+  animation:fd-live-busy-spin .7s linear infinite !important;
+  pointer-events:none !important;
+}
+#view-live :is(.fd-state-busy,.fd-req-busy):not(:has(.camera-segment-icon-v21))::after{
+  position:absolute !important;
+  top:50% !important;
+  right:7px !important;
+  margin-top:-4.5px !important;
+}
+@keyframes fd-live-busy-spin{ to{ transform:rotate(360deg); } }
+
+/* Simulation view: MuJoCo preview camera controls (live only). */
+#view-live [data-camera-view-tile="simulation"][data-companion-live="true"] .camera-tile-body{
+  cursor:grab;
+  touch-action:none;
+}
+#view-live [data-camera-view-tile="simulation"] .camera-tile-body.camera-sim-dragging{
+  cursor:grabbing;
+}
+#view-live .camera-sim-toolbar{
+  position:absolute;
+  right:8px;
+  bottom:8px;
+  z-index:6;
+  display:none;
+  gap:4px;
+}
+#view-live [data-camera-view-tile="simulation"][data-companion-live="true"] .camera-sim-toolbar{
+  display:flex;
+}
+#view-live .camera-sim-toolbar button{
+  height:22px;
+  padding:0 8px;
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:4px;
+  background:rgba(8,11,15,.72);
+  color:#b8c6d6;
+  font:600 10px/1 "Plus Jakarta Sans",system-ui,sans-serif;
+  cursor:pointer;
+}
+#view-live .camera-sim-toolbar button:hover{
+  border-color:rgba(142,203,127,.55);
+  color:#8ecb7f;
+}
+#view-live [data-camera-companion]:not([src]){
+  visibility:hidden;
 }

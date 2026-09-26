@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>G1 Teleop Control Center</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="/static/styles.css?v=camera-multiview-v1" />
+  <link rel="stylesheet" href="/static/styles.css?v=camera-teleop-v7" />
   <link
     rel="stylesheet"
     href="/static/stitch_live_v12.css?v=controller-ui-v16"
@@ -421,7 +421,6 @@
       <button class="tab active" data-view="live">Live</button>
       <button class="tab" data-view="slam">SLAM</button>
       <button class="tab" data-view="inspect">Inspect</button>
-      <button class="tab" data-view="bacalbasa">Camera Teleop</button>
     </nav>
 
     <div class="header-status">
@@ -714,6 +713,17 @@
         </section>
 
         <section class="panel twin-panel baca-ui-major-panel">
+          <div
+            id="cameraTeleopMainbarUnavailableV1"
+            class="camera-teleop-mainbar-unavailable-v1"
+            role="status"
+            aria-live="polite"
+            aria-hidden="true"
+            hidden
+          >
+            <strong>CAMERA TELEOPERATION UNAVAILABLE</strong>
+            <span>The camera teleoperation pipeline is not installed or running on this PC.</span>
+          </div>
           <div class="panel-head twin-head">
             <div class="twin-title-block">
               <div class="panel-kicker">ROBOT · 29 DOF</div>
@@ -1808,16 +1818,6 @@
       </div>
     </section>
 
-    <!-- BACALBASA / CAMERA POSE TELEOP INTEGRATION -->
-    <section id="view-bacalbasa" class="view bacalbasa-integration-view">
-      <iframe
-        id="bacalbasaFrame"
-        class="bacalbasa-integration-frame"
-        src="/static/bacalbasa/index.html?v=camera-final-16723"
-        title="Bacalbasa Camera Teleoperation"
-      ></iframe>
-    </section>
-
     <!-- STATUS VIEW -->
     <section id="view-status" class="view">
       <div class="status-grid">
@@ -1955,8 +1955,8 @@
   </div>
 
   <script src="/static/bacalbasa_ui_v2000.js?v=2104"></script>
-<script type="module" src="/static/app.js?v=V21_6_ORIGINAL_TWIN"></script>
-  <script src="/static/stitch_live_v12.js?v=ctrl-only-v13c"></script>
+<script type="module" src="/static/app.js?v=V21_8_CAMERA_TELEOP"></script>
+  <script src="/static/stitch_live_v12.js?v=camera-teleop-v3"></script>
 
   <script src="/static/stitch_bacalbasa_shell_v1917.js?v=live-startup-clean5-rollback1"></script>
 
@@ -3294,8 +3294,10 @@ body.stitch-live-v12 #view-live
   src="/static/bacalbasa_runtime_sync_v20_3.js?v=20-3-runtime-1"
 ></script>
 
+  <script src="/static/live_button_busy.js?v=1"></script>
+  <script src="/static/camera_teleop_integration.js?v=10"></script>
   <script src="/static/bacalbasa_browser_lease_v20_7.js?v=21-2b-eventsource"></script>
-  <script src="/static/fd_final_header_action.js?v=2"></script>
+  <script src="/static/fd_final_header_action.js?v=3"></script>
 </body>
 </html>
 
