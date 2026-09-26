@@ -13,7 +13,6 @@
   let resizeState = null;
   let resizeFrame = null;
   let queuedResize = null;
-  let leftScrollOwner = null;
   let panelWidthObserver = null;
   let buttonStyleGuardInstalled = false;
   let buttonStyleRepairQueued = false;
@@ -368,19 +367,86 @@
     return group;
   }
 
+  /* Visible buttons that stand for a hidden original, so the loading state of
+     the original is also shown on what the operator actually clicked. */
+  const busyProxies = new Map();
+  window.slamButtonBusy = (button, busy) => {
+    if (!button) return;
+    for (const element of [button, ...(busyProxies.get(button) || [])]) {
+      element.classList.toggle("fd18-busy", busy);
+      if (busy) element.setAttribute("aria-busy", "true");
+      else element.removeAttribute("aria-busy");
+    }
+  };
+
+  function registerBusyProxies() {
+    const pairs = [
+      ["fd15MappingControls", [["start-map", 0, ".fd15-left"], ["stop-map", 0, ".fd15-right"],
+        ["pause-map", 1, ".fd15-left"], ["pause-map", 1, ".fd15-right"]]],
+      ["fd15NavigationControls", [["navigate", 0, ".fd15-left"], ["stop-navigation", 0, ".fd15-right"],
+        ["pause", 1, ".fd15-left"], ["resume", 1, ".fd15-right"]]],
+    ];
+    for (const [rootId, entries] of pairs) {
+      const switches = $(rootId)?.querySelectorAll(".fd15-live-switch");
+      if (!switches) continue;
+      for (const [id, index, side] of entries) {
+        const original = $(id);
+        const proxy = switches[index]?.querySelector(side);
+        if (!original || !proxy) continue;
+        const list = busyProxies.get(original) || [];
+        if (!list.includes(proxy)) busyProxies.set(original, [...list, proxy]);
+      }
+    }
+  }
+
+  // The car Pause/Resume switch is the robot Navigation Pause/Resume switch,
+  // cloned without its listeners and wired to the hidden car buttons.
+  function buildCarPauseResume() {
+    const pause = $("car-pause");
+    const resume = $("car-resume");
+    const source = $("fd15NavigationControls")?.querySelectorAll(".fd15-live-switch")[1];
+    if (!pause || !resume || !source) return null;
+    let group = $("fd18-car-pause-switch");
+    if (!group) {
+      group = source.cloneNode(true);
+      group.id = "fd18-car-pause-switch";
+      group.removeAttribute("style");
+      const left = group.querySelector(".fd15-left");
+      const right = group.querySelector(".fd15-right");
+      left.addEventListener("click", () => { if (!pause.disabled) pause.click(); });
+      right.addEventListener("click", () => { if (!resume.disabled) resume.click(); });
+      busyProxies.set(pause, [left]);
+      busyProxies.set(resume, [right]);
+      const row = pause.parentElement;
+      const originals = document.createElement("div");
+      originals.id = "fd18-car-pause-originals";
+      originals.hidden = true;
+      originals.append(pause, resume);
+      row?.replaceWith(originals);
+    }
+    return group;
+  }
+
   function splitCarSidebar() {
     const navigation = $("car-panel");
     const navigationBody = navigation?.querySelector(":scope > .card-body");
     const scroll = navigation?.parentElement;
     if (!navigation || !navigationBody || !scroll) return;
 
+    // Nodes that leave the old card must be placed before its body is rebuilt.
+    placeCarAlignInTopbar();
+
     const mapping = makeCard("fd18-car-mapping-section", "Mapping", "Car map", navigation);
+    const localizationCard = makeCard(
+      "fd18-car-localization-section", "Map & Localization", "Car map and initial pose", navigation
+    );
     const manual = makeCard(
       "fd18-car-manual-section", "Manual Correction", "Map alignment and correction", navigation
     );
     const mappingBody = mapping.querySelector(":scope > .card-body");
+    const localizationBody = localizationCard.querySelector(":scope > .card-body");
     const manualBody = manual.querySelector(":scope > .card-body");
-    if (!mappingBody || !manualBody) return;
+    if (!mappingBody || !localizationBody || !manualBody) return;
 
     const mappingButton = $("car-mapping");
     const mapName = $("car-map-name")?.closest(".input-action");
@@ -389,12 +455,15 @@
 
     const oldTitle = navigation.querySelector(":scope > .card-title");
     if (!navigation.dataset.fd18Retitled) {
-      const title = titleFromLeft("Navigation", "Car localization and routes");
+      const title = titleFromLeft("Navigation", "Car routes");
       if (oldTitle && title) oldTitle.replaceWith(title);
       navigation.dataset.fd18Retitled = "1";
     }
 
     const localization = $("car-localization");
+    const mapRow = $("car-maps")?.closest(".select-row");
+    const mapActions = $("car-map-actions");
+    const clearView = $("car-clear-view");
     const initialGrid = $("car-pose-x")?.closest(".field-grid");
     const initialLabel = labelBefore("car-pose-x");
     const initialButton = $("car-initial-pose");
@@ -402,13 +471,12 @@
     const goalLabel = labelBefore("car-goal-x");
     const preview = $("car-preview");
     const startStop = buildCarStartStop();
+    // Until the robot switch it is cloned from exists, keep the plain row.
+    const pauseResume = buildCarPauseResume() || $("car-pause-row");
     const status = $("car-status");
-    const mapRow = $("car-maps")?.closest(".select-row");
-    const align = $("car-align");
     const tfGrid = $("car-tf-x")?.closest(".field-grid");
     const flip = $("car-tf-flip");
     const standalone = $("car-standalone");
-    const center = $("car-center");
     const transform = $("car-transform");
     const mapFile = $("car-map-file");
     const slamParams = $("car-slam-params");
@@ -418,10 +486,13 @@
     if (initialLabel) initialLabel.textContent = "Initial pose";
     if (goalLabel) goalLabel.textContent = "Destination";
 
-    /* Resolve every live node before either body is rebuilt. */
+    /* Resolve every live node before any body is rebuilt. */
+    localizationBody.replaceChildren(...[
+      localization, mapRow, mapActions, clearView, initialLabel, initialGrid, initialButton
+    ].filter(Boolean));
     navigationBody.replaceChildren(...[
-      localization, mapRow, align, initialLabel, initialGrid, initialButton,
-      goalLabel, goalGrid, preview, startStop, status
+      goalLabel, goalGrid, preview, startStop, pauseResume,
+      $("fd18-car-pause-originals"), status
     ].filter(Boolean));
     let pair = $("fd18-manual-pair");
     if (!pair) {
@@ -436,8 +507,70 @@
     ].filter(Boolean));
 
     scroll.prepend(mapping);
-    mapping.insertAdjacentElement("afterend", navigation);
+    mapping.insertAdjacentElement("afterend", localizationCard);
+    localizationCard.insertAdjacentElement("afterend", navigation);
     navigation.insertAdjacentElement("afterend", manual);
+  }
+
+  // The car "Align" action sits next to Fit view with the same toolbar look.
+  function placeCarAlignInTopbar() {
+    const align = $("car-align");
+    const fit = $("fit-map");
+    if (!align || !fit) return;
+    align.textContent = "Align";
+    align.className = fit.className;
+    align.removeAttribute("style");
+    if (fit.nextElementSibling !== align) fit.after(align);
+  }
+
+  // Robot Navigation: Preview above the Start/Stop switch, as in Car Control.
+  function placeRobotPreviewFirst() {
+    const root = $("fd15NavigationControls");
+    const preview = $("preview-route");
+    if (root && preview && root.firstElementChild !== preview) root.prepend(preview);
+  }
+
+  // Same scroll indicator and animation as the left rail, on the right rail.
+  const railScrollOwners = new Map();
+  function installRailScroll(side) {
+    const selector = side === "left"
+      ? ".app-shell > .control-panel:not(.car-side) > .panel-scroll"
+      : ".app-shell > .control-panel.car-side > .panel-scroll";
+    const rail = document.querySelector(selector);
+    if (!rail || railScrollOwners.has(side)) return;
+    const indicator = document.createElement("div");
+    indicator.className = "fd18-live-scroll-indicator";
+    indicator.setAttribute("aria-hidden", "true");
+    document.body.append(indicator);
+    let hideTimer = null;
+    let frame = null;
+    const update = () => {
+      frame = null;
+      const rect = rail.getBoundingClientRect();
+      if (rail.scrollHeight <= rail.clientHeight + 2) {
+        indicator.classList.remove("visible");
+        return;
+      }
+      const height = Math.max(20, Math.min(46, rect.height * rail.clientHeight / rail.scrollHeight));
+      const progress = rail.scrollTop / Math.max(1, rail.scrollHeight - rail.clientHeight);
+      indicator.style.height = `${height}px`;
+      indicator.style.top = `${rect.top + (rect.height - height) * progress}px`;
+      indicator.style.left = side === "left" ? `${rect.left + 1}px` : `${rect.right - 3}px`;
+    };
+    const schedule = () => {
+      if (frame !== null) return;
+      frame = requestAnimationFrame(update);
+    };
+    rail.style.setProperty("scroll-behavior", "smooth");
+    rail.addEventListener("scroll", () => {
+      schedule();
+      indicator.classList.add("visible");
+      if (hideTimer) clearTimeout(hideTimer);
+      hideTimer = setTimeout(() => indicator.classList.remove("visible"), 480);
+    }, { passive: true });
+    window.addEventListener("resize", schedule, { passive: true });
+    railScrollOwners.set(side, { rail, indicator, schedule });
+    schedule();
   }
 
   function placeFollowCarInTopbar() {
@@ -569,6 +702,8 @@
     originals.append(...[enter, stop, capture].filter(Boolean));
 
     teleopUi = { root, enter, stop, left, right, capture };
+    busyProxies.set(enter, [left]);
+    busyProxies.set(stop, [right]);
     const observer = new MutationObserver(syncTeleopSwitch);
     for (const node of [enter, stop]) {
       observer.observe(node, { attributes: true, attributeFilter: ["disabled"] });
@@ -639,8 +774,23 @@
     // every application so it follows that state.
     const carSwitch = $("fd18-car-nav-switch");
     const carGo = $("car-go");
+    const carNav = () => (typeof window.carNavState === "function" ? window.carNavState() : "idle");
     if (carSwitch && carGo) {
-      plans.push([carSwitch, () => ({ mode: carGo.disabled ? "none" : "left-green" })]);
+      plans.push([carSwitch, () => ({
+        mode: carNav() !== "idle" ? "right-amber" : carGo.disabled ? "none" : "left-green",
+      })]);
+    }
+    const carPause = $("fd18-car-pause-switch");
+    if (carPause) {
+      plans.push([carPause, () => {
+        const state = carNav();
+        return {
+          mode: state === "paused" ? "right-green" : state === "navigating" ? "left-amber" : "none",
+          leftEnabled: state === "navigating",
+          rightEnabled: state === "paused",
+          manageDisabled: true,
+        };
+      }]);
     }
     if (!switchObserver) {
       switchObserver = new MutationObserver((records) => {
@@ -665,6 +815,10 @@
   function installRunStateSync() {
     if (runStateSyncInstalled || typeof window.fullDashSyncV15 !== "function") return;
     runStateSyncInstalled = true;
+    // The car navigation state changes between runtime refreshes.
+    window.addEventListener("car-nav-state", () => {
+      for (const shell of switchPlans.keys()) applySwitchPlan(shell);
+    });
     const prior = window.fullDashSyncV15;
     window.fullDashSyncV15 = (next) => {
       prior(next);
@@ -743,7 +897,8 @@
       $("car-mapping"),
       $("follow-robot"),
       $("car-center"),
-      $("fit-map")
+      $("fit-map"),
+      $("car-align")
     ].filter(Boolean);
   }
 
@@ -1052,43 +1207,6 @@
     resizeOwner = { layout };
     updateResizeEdges(layout);
     restorePanelWidths(layout);
-  }
-
-  function installLiveLeftScroll() {
-    const rail = document.querySelector(".app-shell > .control-panel:not(.car-side) > .panel-scroll");
-    if (!rail || leftScrollOwner) return;
-    const indicator = document.createElement("div");
-    indicator.className = "fd18-live-scroll-indicator";
-    indicator.setAttribute("aria-hidden", "true");
-    document.body.append(indicator);
-    let hideTimer = null;
-    let frame = null;
-    const update = () => {
-      frame = null;
-      const rect = rail.getBoundingClientRect();
-      if (rail.scrollHeight <= rail.clientHeight + 2) {
-        indicator.classList.remove("visible");
-        return;
-      }
-      const height = Math.max(20, Math.min(46, rect.height * rail.clientHeight / rail.scrollHeight));
-      const progress = rail.scrollTop / Math.max(1, rail.scrollHeight - rail.clientHeight);
-      indicator.style.height = `${height}px`;
-      indicator.style.top = `${rect.top + (rect.height - height) * progress}px`;
-      indicator.style.left = `${rect.left + 1}px`;
-    };
-    const schedule = () => {
-      if (frame !== null) return;
-      frame = requestAnimationFrame(update);
-    };
-    rail.addEventListener("scroll", () => {
-      schedule();
-      indicator.classList.add("visible");
-      if (hideTimer) clearTimeout(hideTimer);
-      hideTimer = setTimeout(() => indicator.classList.remove("visible"), 480);
-    }, { passive: true });
-    window.addEventListener("resize", schedule, { passive: true });
-    leftScrollOwner = { rail, indicator, schedule };
-    schedule();
   }
 
   function installLivePanelDrag() {
@@ -1487,9 +1605,12 @@
     splitCarSidebar();
     restoreCompositeSelects();
     placeFollowCarInTopbar();
+    placeCarAlignInTopbar();
+    placeRobotPreviewFirst();
     placePoseUnderViewTools();
     copyMappingPauseIcons();
     installTeleopSwitch();
+    registerBusyProxies();
     installRunStateSync();
     installCarOnlineChip();
     installButtonStyleGuard();
@@ -1498,7 +1619,8 @@
     installLivePanelResize();
     installPanelWidthObserver();
     synchronizePanelWidths();
-    installLiveLeftScroll();
+    installRailScroll("left");
+    installRailScroll("right");
     fd23InstallCameraIdleParity();
     installLateOwnerGuard();
   }
@@ -1518,7 +1640,7 @@
     window.addEventListener("resize", () => {
       placePoseUnderViewTools();
       synchronizePanelWidths();
-      leftScrollOwner?.schedule();
+      for (const owner of railScrollOwners.values()) owner.schedule();
     });
   }
 

@@ -17,14 +17,17 @@
   window.robotCarLayersRevision = 0;
   function update(data) {
     car = {...car, ...data};
-    const layers = [car.map_points, car.scan_points, car.path].map(layerSignature).join('|');
+    // The live scan is redrawn in the overlay; only the map and the route
+    // invalidate the cached base layer.
+    const layers = [car.map_points, car.path].map(layerSignature).join('|');
     if (layers !== lastLayerSignature) {
       lastLayerSignature = layers;
       window.robotCarLayersRevision += 1;
     }
     window.dispatchEvent(new CustomEvent('robot-car-state', { detail: car }));
+    updateScanMatch();
+    trackCarArrival();
     renderCarStatus();
-    autoAlignIfNeeded();
     $('car-go').disabled = !(car.preview?.ready && car.preview.request_id === previewId);
     if (!car.connected) previewId = null;
     const maps = car.available_maps || [];
@@ -37,6 +40,37 @@
     }
     requestDraw();
   }
+  // Localization quality: share of the live car LiDAR scan that falls on the
+  // walls of the car map. Both come through the same car->robot transform, so
+  // the value does not depend on the alignment, only on the car's AMCL pose.
+  const MATCH_RADIUS_M = 0.2;
+  const START_MIN_MATCH = 0.6;
+  let mapGrid = null, mapGridRevision = -1, scanMatch = null;
+  function updateScanMatch() {
+    const mapPoints = car.map_points || [];
+    const scan = car.scan_points || [];
+    if (!mapPoints.length || !scan.length || !car.pose || Number(car.pose_age) > 3) {
+      scanMatch = null;
+      return;
+    }
+    if (mapGridRevision !== window.robotCarLayersRevision) {
+      mapGridRevision = window.robotCarLayersRevision;
+      mapGrid = new Set(mapPoints.map((p) => `${Math.round(p.x / 0.1)},${Math.round(p.y / 0.1)}`));
+    }
+    const reach = Math.round(MATCH_RADIUS_M / 0.1);
+    let hits = 0;
+    for (const p of scan) {
+      const cx = Math.round(p.x / 0.1), cy = Math.round(p.y / 0.1);
+      search: for (let i = -reach; i <= reach; i += 1) {
+        for (let j = -reach; j <= reach; j += 1) {
+          if (mapGrid.has(`${cx + i},${cy + j}`)) { hits += 1; break search; }
+        }
+      }
+    }
+    scanMatch = hits / scan.length;
+  }
+  const matchText = () => (scanMatch === null ? '' : ` · LiDAR match ${Math.round(scanMatch * 100)}%`);
+
   // Car progress line: what the car is doing and what is still missing.
   const POSE_STALE_S = 3;
   let alignInProgress = '';
@@ -54,13 +88,17 @@
       return { text: 'Car connected · no mode active · press Car localization (or Car mapping)', ready: false };
     }
     if (status !== 'running') return { text: `Car localization ${status}…`, ready: false };
-    if (!hasPose) return { text: 'Car localization running · set Car initial pose on the map and press Send pose', ready: false };
+    if (!hasPose) return { text: 'Car localization running · set Car initial pose on the map and press Load & Localize', ready: false };
     if (age > POSE_STALE_S) {
-      return { text: `Car pose is stale (${Math.round(age)} s) · the car sends no data; check AMCL/TF on the car or send the pose again`, ready: false };
+      return { text: `Car pose is stale (${Math.round(age)} s) · the car sends no data; check AMCL/TF on the car or press Load & Localize again`, ready: false };
     }
+    const route = { navigating: ' · driving to the destination', paused: ' · route paused' }[carNav.state] || '';
+    const poor = scanMatch !== null && scanMatch < START_MIN_MATCH;
     return {
-      text: `Car localized · X ${car.pose.x.toFixed(2)} Y ${car.pose.y.toFixed(2)} yaw ${degrees(car.pose.yaw).toFixed(0)}° · pose age ${age.toFixed(1)} s`,
-      ready: true,
+      text: poor
+        ? `Car localization is poor${matchText()} · its pose does not match the map; set the initial pose again (Load & Localize)`
+        : `Car localized · X ${car.pose.x.toFixed(2)} Y ${car.pose.y.toFixed(2)} yaw ${degrees(car.pose.yaw).toFixed(0)}°${matchText()}${route}`,
+      ready: !poor,
     };
   }
   function alignmentText() {
@@ -77,44 +115,53 @@
     const element = $('car-status');
     element.className = `route-summary${progress.ready ? ' ready' : ''}`;
     element.textContent = `${progress.text}\nAlignment: ${alignmentText()}`;
-    if (progress.text !== lastProgressText && !/pose age|stale \(/.test(progress.text)) log(progress.text);
+    if (progress.text !== lastProgressText && !/LiDAR match|stale \(/.test(progress.text)) log(progress.text);
     lastProgressText = progress.text;
   }
 
-  // Keeps the car map aligned with the robot map shown in the dashboard: when a
-  // saved robot map is selected and the car publishes a map, auto-align runs
-  // once for that (robot map, car map) pair. Direct mode or a manual transform
-  // chosen by the operator is left untouched until another map is selected.
-  let lastAlignKey = '';
-  async function autoAlignIfNeeded() {
-    const source = window.robotMapSource || {};
-    if (source.kind !== 'saved' || !car.connected || alignInProgress) return;
-    if (!car.map_source) return;  // the car has not published a /map yet
-    const key = `${source.name}|${car.map_file || ''}`;
-    if (key === lastAlignKey) return;
-    lastAlignKey = key;
-    alignInProgress = source.name;
+
+  // Car route state. The car bridge has no cancel command, so Pause sends the
+  // car's current pose as its goal (its planner stops there) and Resume sends
+  // the saved destination again; Stop switches the car mode off, as in the
+  // standalone dashboard.
+  const ARRIVAL_TOLERANCE_M = 0.35;
+  const carNav = { state: 'idle', goal: null };
+  window.carNavState = () => carNav.state;
+  function setCarNav(state, goal = carNav.goal) {
+    carNav.state = state;
+    carNav.goal = goal;
+    $('car-pause').disabled = state !== 'navigating';
+    $('car-resume').disabled = state !== 'paused';
+    window.dispatchEvent(new CustomEvent('car-nav-state', { detail: { state } }));
     renderCarStatus();
-    log(`Aligning the car map to ${source.name}…`);
-    try {
-      const result = await post('/api/car/auto_align', { g1_map: source.name });
-      const message = translateRuntimeMessage(result.alignment?.message || 'Car map aligned');
-      log(message);
-      toast(message);
-      update(result);
-    } catch (error) {
-      const message = translateRuntimeMessage(error.message);
-      log(`Car alignment: ${message}`);
-      toast(`Car alignment: ${message}`, true);
-    } finally {
-      alignInProgress = '';
-      renderCarStatus();
+  }
+  function trackCarArrival() {
+    if (carNav.state !== 'navigating' || !carNav.goal || !car.pose) return;
+    if (!car.connected || car.current_mode === 'none') {
+      setCarNav('idle', null);
+      return;
+    }
+    const distance = Math.hypot(car.pose.x - carNav.goal.x, car.pose.y - carNav.goal.y);
+    if (distance <= ARRIVAL_TOLERANCE_M) {
+      log('The car reached its destination');
+      toast('The car reached its destination');
+      setCarNav('idle', null);
     }
   }
-  window.addEventListener('robot-map-source', () => autoAlignIfNeeded());
+
+  // The runtime resets the car transform to identity on the next preview,
+  // goal or initial pose while an alignment is not usable (failed/waiting).
+  // Poses already sent under the previous transform would then disagree with
+  // the new ones, so these commands wait for an explicit choice.
+  function requireUsableAlignment() {
+    if (car.alignment_ready === false) {
+      throw new Error('The last car alignment failed; press Align again or choose Direct mode before sending car poses');
+    }
+  }
 
   async function operation(button, fn) {
     button.disabled = true;
+    window.slamButtonBusy?.(button, true);
     try {
       const result = await fn();
       if (result.success === false) throw new Error(result.error || 'Command rejected');
@@ -125,41 +172,111 @@
       say(message);
       toast(message, true);
       return null;
-    } finally { button.disabled = false; }
+    } finally {
+      button.disabled = false;
+      window.slamButtonBusy?.(button, false);
+      // Pause/Resume availability follows the car route state.
+      if (button.id === 'car-pause' || button.id === 'car-resume') setCarNav(carNav.state);
+    }
   }
   function bind(id, fn) { $(id).addEventListener('click', event => operation(event.currentTarget, fn)); }
   const mode = name => post('/api/car/mode', {mode:name, map_file:$('car-map-file').value, slam_params_file:$('car-slam-params').value});
   bind('car-mapping', () => mode('mapping'));
   bind('car-localization', () => mode('localization'));
-  bind('car-stop', () => mode('stop'));
+  // Stop also forgets the previous route: its preview, the route drawn from the
+  // car's last plan and the route state, as the robot side does.
+  let hiddenRoute = null;  // signature of the route removed by Stop
+  window.carRouteVisible = () => Boolean(car.path?.length) && layerSignature(car.path) !== hiddenRoute;
+  bind('car-stop', async () => {
+    const result = await mode('stop');
+    previewId = null;
+    $('car-go').disabled = true;
+    hiddenRoute = car.path?.length ? layerSignature(car.path) : null;
+    window.robotCarLayersRevision += 1;
+    setCarNav('idle', null);
+    requestDraw();
+    return result;
+  });
+  async function holdCar() {
+    if (!car.pose) throw new Error('The car position is unknown');
+    const hold = { x: car.pose.x, y: car.pose.y, yaw_deg: degrees(car.pose.yaw) };
+    const result = await post('/api/car/goal', hold);
+    setCarNav('paused');
+    return result;
+  }
+  bind('car-pause', async () => ({ ...(await holdCar()), message: 'Car route paused' }));
+  bind('car-resume', async () => {
+    if (!carNav.goal) throw new Error('No paused car route');
+    const { x, y, yaw_deg } = carNav.goal;
+    const result = await post('/api/car/goal', { x, y, yaw_deg });
+    setCarNav('navigating');
+    return { ...result, message: 'Car route resumed' };
+  });
   bind('car-standalone', async () => {
     $('car-tf-x').value = '0';
     $('car-tf-y').value = '0';
     $('car-tf-yaw').value = '0';
     return await post('/api/car/standalone');
   });
+  // Follow car: keeps the car centered in 2D and 3D (app.js owns the follow target).
   $('car-center').addEventListener('click', () => {
-    const pts = (car.map_points && car.map_points.length) ? car.map_points : (car.scan_points || []);
-    if (!pts.length && !car.pose) {
-      toast('No car map or scan points are available');
+    if (!car.pose) {
+      toast('The car position is unknown');
       return;
     }
-    let minX = car.pose ? car.pose.x - 2 : Infinity;
-    let maxX = car.pose ? car.pose.x + 2 : -Infinity;
-    let minY = car.pose ? car.pose.y - 2 : Infinity;
-    let maxY = car.pose ? car.pose.y + 2 : -Infinity;
-    for (const p of pts) {
-      if (p.x < minX) minX = p.x;
-      if (p.x > maxX) maxX = p.x;
-      if (p.y < minY) minY = p.y;
-      if (p.y > maxY) maxY = p.y;
-    }
-    const pad = Math.max(1.0, Math.max(maxX - minX, maxY - minY) * 0.15);
-    if (window.centerOnBounds) {
-      window.centerOnBounds({minX: minX - pad, maxX: maxX + pad, minY: minY - pad, maxY: maxY + pad});
-      say('View centered on the car.');
-    }
+    window.toggleFollowTarget('car');
   });
+  window.getCarPose = () => (car.connected ? car.pose : null);
+
+  // Car map actions, matching the robot Map & Localization card. The car only
+  // publishes the map it has loaded (Car localization with the selected map).
+  window.carMapCleared = false;
+  $('car-view-map').addEventListener('click', () => {
+    const points = car.map_points || [];
+    if (!points.length) {
+      toast('No car map is loaded; select a map and press Car localization', true);
+      return;
+    }
+    window.carMapCleared = false;
+    window.robotCarLayersRevision += 1;
+    window.dispatchEvent(new CustomEvent('robot-car-state', { detail: car }));
+    const xs = points.map((p) => p.x), ys = points.map((p) => p.y);
+    const pad = 0.8;
+    window.centerOnBounds?.({ minX: Math.min(...xs) - pad, maxX: Math.max(...xs) + pad, minY: Math.min(...ys) - pad, maxY: Math.max(...ys) + pad });
+    const loaded = (car.map_file || '').split('/').pop();
+    say(`Showing the car map ${loaded}`);
+  });
+  // Occupied cells of the published car map, in car-map coordinates, as PCD.
+  $('car-download-map').addEventListener('click', () => {
+    const points = car.map_points || [];
+    if (!points.length) {
+      toast('No car map is loaded; select a map and press Car localization', true);
+      return;
+    }
+    const t = car.transform || { x: 0, y: 0, yaw: 0 };
+    const cos = Math.cos(t.yaw), sin = Math.sin(t.yaw);
+    const rows = points.map((p) => {
+      const dx = p.x - t.x, dy = p.y - t.y;
+      return `${(cos * dx + sin * dy).toFixed(4)} ${(-sin * dx + cos * dy).toFixed(4)} 0`;
+    });
+    const header = ['# .PCD v0.7 - car map occupied cells (car map frame)', 'VERSION 0.7', 'FIELDS x y z',
+      'SIZE 4 4 4', 'TYPE F F F', 'COUNT 1 1 1', `WIDTH ${rows.length}`, 'HEIGHT 1',
+      'VIEWPOINT 0 0 0 1 0 0 0', `POINTS ${rows.length}`, 'DATA ascii'];
+    const blob = new Blob([`${header.join('\n')}\n${rows.join('\n')}\n`], { type: 'text/plain' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `${((car.map_file || 'car_map').split('/').pop()).replace(/\.ya?ml$/, '')}_occupied.pcd`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+  });
+  $('car-clear-view').addEventListener('click', () => {
+    window.carMapCleared = true;
+    window.robotCarLayersRevision += 1;
+    window.dispatchEvent(new CustomEvent('robot-car-state', { detail: car }));
+    requestDraw();
+    toast('The car map was removed from the view only; it is still loaded on the car');
+  });
+
   bind('car-transform', () => post('/api/car/transform', pose('car-tf')));
   function normalizeDegrees(deg) {
     let d = (deg + 180) % 360;
@@ -203,19 +320,28 @@
     if (car.current_mode !== 'localization') {
       throw new Error(`Start Car localization first (the car is in mode "${car.current_mode || 'none'}"); then send the pose.`);
     }
+    requireUsableAlignment();
     return post('/api/car/initial_pose', pose('car-pose'));
   });
   bind('car-refresh-maps', () => post('/api/car/maps/refresh'));
   bind('car-save-map', () => post('/api/car/map/save', {map_name:$('car-map-name').value}));
   bind('car-preview', async () => {
+    requireUsableAlignment();
+    hiddenRoute = null;
     $('car-go').disabled = true;
     const result = await post('/api/car/path/preview', pose('car-goal'));
     previewId = result.request_id;
     return result;
   });
   $('car-go').addEventListener('click', async event => {
-    if (!previewId || !confirm('Start the CAR on the displayed route? The robot does not receive this goal.')) return;
-    await operation(event.currentTarget, () => post('/api/car/goal', {...pose('car-goal'), preview_id:previewId}));
+    if (!previewId) return;
+    if (!confirm('Start the CAR on the displayed route? The robot does not receive this goal.')) return;
+    const goal = pose('car-goal');
+    const result = await operation(event.currentTarget, () => {
+      requireUsableAlignment();
+      return post('/api/car/goal', {...goal, preview_id:previewId});
+    });
+    if (result) setCarNav('navigating', result.map_goal ? { ...result.map_goal, yaw_deg: degrees(result.map_goal.yaw) } : goal);
     previewId = null;
     $('car-go').disabled = true;
   });
@@ -449,11 +575,8 @@
   window.drawRobotCarLayers = (context, view) => {
     context.save();
     const points = (items, color, size) => {context.fillStyle=color; for(const p of items || []) {const [x,y]=view.point(p.x,p.y); context.fillRect(x-size/2,y-size/2,size,size);}};
-    if (carMapVisible()) {
-      points(car.map_points, COLORS.carMap, 2);
-      points(car.scan_points, COLORS.carScan, 2);
-    }
-    if (car.path?.length) {
+    if (carMapVisible() && !window.carMapCleared) points(car.map_points, COLORS.carMap, 2);
+    if (window.carRouteVisible()) {
       context.strokeStyle=COLORS.carRoute; context.lineWidth=2; context.setLineDash([4,4]); context.beginPath();
       car.path.forEach((p,i)=>{const [x,y]=view.point(p.x,p.y); i ? context.lineTo(x,y) : context.moveTo(x,y);}); context.stroke(); context.setLineDash([]);
     }
@@ -463,6 +586,13 @@
   // Car pose, pose markers and the active drag HUD, redrawn every frame.
   window.drawRobotCarOverlay = (context, view) => {
     context.save();
+    if (carMapVisible() && !window.carMapCleared) {
+      context.fillStyle = COLORS.carScan;
+      for (const p of car.scan_points || []) {
+        const [x, y] = view.point(p.x, p.y);
+        context.fillRect(x - 1, y - 1, 2, 2);
+      }
+    }
     if (car.pose) {
       const [x,y]=view.point(car.pose.x,car.pose.y);
       const live = car.connected && car.pose_age < 2;

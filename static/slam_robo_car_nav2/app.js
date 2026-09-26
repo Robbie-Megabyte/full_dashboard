@@ -159,7 +159,8 @@ function updateLiveNavigationPath(navigation) {
 
 let dashboardControlConnected = null;
 let pointerInteraction = null;
-let followRobot = false;
+// Follow target of the 2D and 3D views: null, "robot" or "car".
+let followTarget = null;
 let stateRefreshRunning = false;
 let teleopPendingKey = null;
 let teleopKeySending = false;
@@ -395,20 +396,41 @@ function setHealth(id, age) {
 }
 
 function updateFollowButton() {
-  const button = $("follow-robot");
-  button.classList.toggle("active", followRobot);
-  button.textContent = followRobot ? "Following robot" : "Follow robot";
-  button.setAttribute("aria-pressed", String(followRobot));
+  for (const [id, target, label] of [["follow-robot", "robot", "robot"], ["car-center", "car", "car"]]) {
+    const button = $(id);
+    if (!button) continue;
+    const active = followTarget === target;
+    button.classList.toggle("active", active);
+    button.textContent = active ? `Following ${label}` : `Follow ${label}`;
+    button.setAttribute("aria-pressed", String(active));
+  }
 }
 
-function centerOnRobot() {
-  if (!state || !state.pose) return;
+function followTargetPose() {
+  if (followTarget === "robot") return state?.pose || null;
+  if (followTarget === "car") return window.getCarPose?.() || null;
+  return null;
+}
+
+function setFollowTarget(target) {
+  followTarget = target;
+  updateFollowButton();
+  window.followTarget = target;
+  window.dispatchEvent(new CustomEvent("follow-target", { detail: { target } }));
+  requestDraw();
+}
+window.toggleFollowTarget = (target) => setFollowTarget(followTarget === target ? null : target);
+window.getFollowTargetPose = followTargetPose;
+
+function centerOnFollowTarget() {
+  const pose = followTargetPose();
+  if (!pose) return;
   const rect = canvas.getBoundingClientRect();
   const visibleBounds = boundsForViewport(rect.width, rect.height);
   const spanX = Math.max(10, visibleBounds.maxX - visibleBounds.minX);
   const spanY = Math.max(10, visibleBounds.maxY - visibleBounds.minY);
-  const x = Number(state.pose.x || 0);
-  const y = Number(state.pose.y || 0);
+  const x = Number(pose.x || 0);
+  const y = Number(pose.y || 0);
   bounds = {
     minX: x - spanX / 2,
     maxX: x + spanX / 2,
@@ -637,7 +659,7 @@ function setPoints(points, shouldFit = false) {
   mapPointsRevision += 1;
   // Fit the view once, after the first non-empty cloud.
   if (mapPoints.length && (shouldFit || firstMapFrame)) fitBounds(mapPoints);
-  if (followRobot && state && state.mode === "mapping") centerOnRobot();
+  if (followTarget) centerOnFollowTarget();
   if (mapPoints.length) firstMapFrame = false;
   setText("render-count", mapPoints.length.toLocaleString("en-US") + " 2D points");
   $("empty-map").classList.toggle("hidden", mapPoints.length > 0);
@@ -842,6 +864,7 @@ function drawBaseLayer(layer, view, width, height) {
 }
 
 function draw() {
+  if (followTarget) centerOnFollowTarget();
   const { width, height } = viewport();
   const view = projection(width, height);
   const key = [
@@ -947,6 +970,7 @@ async function action(button, busyText, operation) {
   const original = button.textContent;
   button.disabled = true;
   button.textContent = busyText;
+  window.slamButtonBusy?.(button, true);
   try {
     const result = await operation();
     const message = result.message || (result.success ? "Command confirmed" : result.error) || "Operation finished";
@@ -961,6 +985,7 @@ async function action(button, busyText, operation) {
   } finally {
     button.disabled = false;
     button.textContent = original;
+    window.slamButtonBusy?.(button, false);
     await refreshState();
   }
 }
@@ -1018,8 +1043,7 @@ $("start-map").addEventListener("click", async (event) => {
     setRobotMapSource({ kind: "live" });
     lastRevision = -1;
     firstMapFrame = true;
-    followRobot = false;
-    updateFollowButton();
+    setFollowTarget(null);
     goal = null;
     const result = await api("/api/slam/start_mapping", { method: "POST" });
     if (result.success) setText("viewer-subtitle", "Stabilized 3D map projected to XY · new session");
@@ -1055,13 +1079,10 @@ $("save-map").addEventListener("click", async (event) => {
 
 $("refresh-maps").addEventListener("click", refreshMaps);
 $("refresh-partials").addEventListener("click", refreshMaps);
+// Selecting a map does not load it; View map or Load & Localize does.
 $("maps").addEventListener("change", () => {
   updateMapReadiness();
   invalidateRoute("Selected map changed; preview the route again");
-  // Like the standalone 3D view, a selected map is shown immediately.
-  if ($("maps").value) {
-    viewSavedMap().catch((error) => toast(error.message, true));
-  }
 });
 $("view-map").addEventListener("click", async (event) => {
   await action(event.currentTarget, "Loading…", viewSavedMap);
@@ -1438,17 +1459,11 @@ $("semantic-clear")?.addEventListener("click", async (event) => {
 });
 
 $("fit-map").addEventListener("click", () => {
-  followRobot = false;
-  updateFollowButton();
+  setFollowTarget(null);
   fitBounds(mapPoints);
   requestDraw();
 });
-$("follow-robot").addEventListener("click", () => {
-  followRobot = !followRobot;
-  updateFollowButton();
-  if (followRobot) centerOnRobot();
-  requestDraw();
-});
+$("follow-robot").addEventListener("click", () => window.toggleFollowTarget("robot"));
 $("clear-log").addEventListener("click", () => { $("log").textContent = ""; });
 
 $("goal-yaw").addEventListener("input", () => {
@@ -1510,10 +1525,7 @@ canvas.addEventListener("pointermove", (event) => {
   const dy = event.clientY - pointerInteraction.startY;
   if (Math.hypot(dx, dy) > 3) pointerInteraction.moved = true;
   if (pointerInteraction.mode === "pan") {
-    if (pointerInteraction.moved && followRobot) {
-      followRobot = false;
-      updateFollowButton();
-    }
+    if (pointerInteraction.moved && followTarget) setFollowTarget(null);
     const original = pointerInteraction.startBounds;
     const shiftX = -dx / pointerInteraction.scale;
     const shiftY = dy / pointerInteraction.scale;

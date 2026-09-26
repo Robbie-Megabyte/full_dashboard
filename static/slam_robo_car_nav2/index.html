@@ -257,7 +257,7 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
             <div id="map-readiness" class="readiness neutral">No map selected</div>
             <div class="button-row">
               <button id="view-map" class="btn btn-muted">View map</button>
-              <button id="download-map" class="btn btn-muted">Download PCD</button>
+              <button id="download-map" class="btn btn-muted">Download map</button>
             </div>
             <button id="clear-view" class="btn btn-muted btn-full">Clear visualization</button>
             <div class="field-label">Initial pose</div>
@@ -442,12 +442,17 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
               <button class="btn btn-purple" id="car-localization">Car localization</button>
             </div>
             <button class="btn btn-danger btn-full" id="car-stop">Stop car Nav2</button>
-            <div class="select-row"><select id="car-maps"></select><button class="icon-btn" id="car-refresh-maps">↻</button></div>
+            <div class="select-row"><select id="car-maps"></select><button class="icon-btn" id="car-refresh-maps" title="Reload list">↻</button></div>
+            <div class="button-row" id="car-map-actions">
+              <button id="car-view-map" class="btn btn-muted">View map</button>
+              <button id="car-download-map" class="btn btn-muted">Download map</button>
+            </div>
+            <button id="car-clear-view" class="btn btn-muted btn-full">Clear visualization</button>
             <input id="car-map-file" value="/root/humble_ws/harta_masina_1.yaml" aria-label="Car YAML map">
             <input id="car-slam-params" value="/root/humble_ws/custom_params.yaml" aria-label="Car SLAM parameters">
             <div class="input-action"><input id="car-map-name" placeholder="Car map name"><button class="btn btn-success" id="car-save-map">Save</button></div>
             <div class="button-row">
-              <button class="btn btn-muted btn-full" id="car-align">Auto-align maps</button>
+              <button class="btn btn-muted btn-full" id="car-align">Align</button>
             </div>
             <p class="help">Runs directly on the geometry of both maps (visual features, with automatic geometric refinement if needed) — no manual positioning is required beforehand.</p>
             <div class="field-label">Manual correction (optional)</div>
@@ -473,14 +478,18 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
               <label>Y (m)<input id="car-pose-y" type="number" value="0" step=".1"></label>
               <label>Yaw (°)<input id="car-pose-yaw" type="number" value="0"></label>
             </div>
-            <button class="btn btn-muted btn-full" id="car-initial-pose">Send pose</button>
+            <button class="btn btn-muted btn-full" id="car-initial-pose">Load & Localize</button>
             <div class="field-label">Car destination on G1 map</div>
             <div class="field-grid three">
               <label>X (m)<input id="car-goal-x" type="number" value="0" step=".1"></label>
               <label>Y (m)<input id="car-goal-y" type="number" value="0" step=".1"></label>
               <label>Yaw (°)<input id="car-goal-yaw" type="number" value="0"></label>
             </div>
-            <div class="button-row"><button class="btn btn-muted" id="car-preview">Preview car</button><button class="btn btn-warning" id="car-go" disabled>Confirm car</button></div>
+            <div class="button-row"><button class="btn btn-muted" id="car-preview">Preview</button><button class="btn btn-warning" id="car-go" disabled>Confirm car</button></div>
+            <div class="button-row" id="car-pause-row">
+              <button class="btn btn-danger" id="car-pause" disabled>Pause</button>
+              <button class="btn btn-muted" id="car-resume" disabled>Resume</button>
+            </div>
             <div class="readiness neutral" id="car-result">Car commands do not control G1.</div>
           </div>
         </section>

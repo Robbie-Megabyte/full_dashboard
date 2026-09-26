@@ -283,13 +283,30 @@
     camera.updateProjectionMatrix();
   }
 
+  // Follow robot / Follow car: pan the camera and its orbit target together so
+  // the followed pose stays centered with the current viewing angle.
+  function followCamera() {
+    const pose = window.getFollowTargetPose?.();
+    if (!pose) return false;
+    const flat = worldToThree(pose.x, pose.y);
+    const dx = flat.x - controls.target.x;
+    const dz = flat.z - controls.target.z;
+    if (Math.abs(dx) + Math.abs(dz) < 1e-3) return false;
+    controls.target.x += dx;
+    controls.target.z += dz;
+    camera.position.x += dx;
+    camera.position.z += dz;
+    return true;
+  }
+
   // Renders only while the 3D pane is visible: every frame while the camera
   // moves, otherwise at 10 Hz for pose/route markers.
   let lastRender = 0;
   function animate(now) {
     requestAnimationFrame(animate);
     if (!renderer || !window.slamViewVisible() || pane3d?.classList.contains("pane-hidden")) return;
-    const moved = controls.update();
+    const followed = followCamera();
+    const moved = controls.update() || followed;
     if (!moved && now - lastRender < 100) return;
     lastRender = now;
     if (referenceGrid) {
@@ -401,17 +418,23 @@
 
   // car.js polls the car state once and shares it through 'robot-car-state'.
   let carLayersRevision = -1;
+  // The car map is rebuilt only when its layer revision changes; the live scan
+  // whenever a new scan array arrives.
+  let carScanSource = null;
   function applyCarState(nextState) {
     carState = nextState || {};
-    if (window.robotCarLayersRevision === carLayersRevision) return;
-    carLayersRevision = window.robotCarLayersRevision;
-    const visible = document.getElementById("car-show-map").checked;
-    const mapPoints = (carState.map_points || []).map((p) => [p.x, p.y, 0]);
-    const scanPoints = (carState.scan_points || []).map((p) => [p.x, p.y, 0.02]);
-    fillGeometry(carPointsMesh, mapPoints, null);
-    fillGeometry(carScanMesh, scanPoints, null);
-    carPointsMesh.visible = visible && mapPoints.length > 0;
-    carScanMesh.visible = visible && scanPoints.length > 0;
+    const visible = document.getElementById("car-show-map").checked && !window.carMapCleared;
+    if (window.robotCarLayersRevision !== carLayersRevision) {
+      carLayersRevision = window.robotCarLayersRevision;
+      const mapPoints = (carState.map_points || []).map((p) => [p.x, p.y, 0]);
+      fillGeometry(carPointsMesh, mapPoints, null);
+      carPointsMesh.visible = visible && mapPoints.length > 0;
+    }
+    if (carState.scan_points !== carScanSource) {
+      carScanSource = carState.scan_points;
+      fillGeometry(carScanMesh, (carScanSource || []).map((p) => [p.x, p.y, 0.02]), null);
+    }
+    carScanMesh.visible = visible && (carScanSource || []).length > 0;
   }
 
   function updateLiveMarkers() {
@@ -461,9 +484,10 @@
     } else {
       carMarker.visible = false;
     }
-    if (carRouteLine.userData.source !== carState.path) {
-      carRouteLine.userData.source = carState.path;
-      setLine(carRouteLine, (carState.path || []).map((p) => [p.x, p.y]), 0.06);
+    const carRoute = window.carRouteVisible?.() ? carState.path : null;
+    if (carRouteLine.userData.source !== carRoute) {
+      carRouteLine.userData.source = carRoute;
+      setLine(carRouteLine, (carRoute || []).map((p) => [p.x, p.y]), 0.06);
     }
   }
 

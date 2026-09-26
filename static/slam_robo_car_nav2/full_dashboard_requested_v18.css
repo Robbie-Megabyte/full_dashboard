@@ -255,39 +255,17 @@ body > .fd18-dropdown-menu[hidden] {
 
 /* Right rail card order and full-width actions requested by the user. */
 #fd18-car-mapping-section #car-mapping,
-#car-panel #car-localization,
+#fd18-car-localization-section #car-localization,
 #car-panel #car-preview,
-#fd18-car-manual-section #car-align,
 #fd18-car-manual-section #car-transform {
   width: 100% !important;
 }
 
-#car-panel #car-preview {
-  height: 30px !important;
-  min-height: 30px !important;
-  background: rgba(142,203,127,.07) !important;
-  border: 1px solid rgba(142,203,127,.46) !important;
-  color: #8fce7f !important;
-}
-
-#car-panel #car-preview:hover:not(:disabled) {
-  background: rgba(142,203,127,.11) !important;
-  border-color: rgba(142,203,127,.7) !important;
-}
 
 #fd18-car-manual-section #car-tf-flip {
   margin: 0 !important;
 }
 
-/* The requested compact right rail fits without a scrollbar. */
-.control-panel.car-side .panel-scroll {
-  overflow: hidden !important;
-  scrollbar-width: none !important;
-}
-
-.control-panel.car-side .panel-scroll::-webkit-scrollbar {
-  display: none !important;
-}
 
 /* Car progress/status line, same presentation as the route summary. */
 #car-status {
@@ -300,7 +278,8 @@ body > .fd18-dropdown-menu[hidden] {
   #car-localization,
   #car-mapping,
   #follow-robot,
-  #fit-map
+  #fit-map,
+  #car-align
 ) {
   box-sizing: border-box !important;
   height: 30px !important;
@@ -330,7 +309,8 @@ body > .fd18-dropdown-menu[hidden] {
   #follow-robot.fd18-preview-action,
   #zoom-out.fd18-preview-action,
   #zoom-in.fd18-preview-action,
-  #fit-map.fd18-preview-action
+  #fit-map.fd18-preview-action,
+  #car-align.fd18-preview-action
 ) {
   border: 1px solid rgba(142,203,127,.46) !important;
   background: rgba(142,203,127,.07) !important;
@@ -341,7 +321,8 @@ body > .fd18-dropdown-menu[hidden] {
   #car-localization,
   #car-mapping,
   #follow-robot,
-  #fit-map
+  #fit-map,
+  #car-align
 ):hover:not(:disabled) {
   background: rgba(142,203,127,.11) !important;
   border-color: rgba(142,203,127,.7) !important;
@@ -353,7 +334,8 @@ body > .fd18-dropdown-menu[hidden] {
   #car-localization,
   #car-mapping,
   #follow-robot,
-  #fit-map
+  #fit-map,
+  #car-align
 ):active:not(:disabled) {
   transform: translateY(1px) !important;
 }
@@ -580,8 +562,8 @@ body.stitch-major-resizing-v1931 .app-shell > .stitch-major-v1924 {
   transition: none !important;
 }
 
-/* Left rail: exact Live right-rail scroll mechanics and transient indicator. */
-.app-shell > .control-panel:not(.car-side) > .panel-scroll {
+/* Both rails: exact Live right-rail scroll mechanics and transient indicator. */
+.app-shell > .control-panel > .panel-scroll {
   overflow-x: hidden !important;
   overflow-y: auto !important;
   overscroll-behavior-y: contain !important;
@@ -589,7 +571,7 @@ body.stitch-major-resizing-v1931 .app-shell > .stitch-major-v1924 {
   scrollbar-width: none !important;
 }
 
-.app-shell > .control-panel:not(.car-side) > .panel-scroll::-webkit-scrollbar {
+.app-shell > .control-panel > .panel-scroll::-webkit-scrollbar {
   width: 0 !important;
   height: 0 !important;
 }
@@ -1039,10 +1021,11 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
  * Keep the same generic hover/disabled mechanics as .btn.
  */
 #view-map:not(:disabled):hover,
+#car-view-map:not(:disabled):hover,
 #clear-view:not(:disabled):hover,
+#car-clear-view:not(:disabled):hover,
 #localize:not(:disabled):hover,
 #preview-route:not(:disabled):hover,
-#car-align:not(:disabled):hover,
 #car-initial-pose:not(:disabled):hover,
 #car-preview:not(:disabled):hover,
 #car-tf-flip:not(:disabled):hover,
@@ -1057,10 +1040,11 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
 }
 
 #view-map:disabled,
+#car-view-map:disabled,
 #clear-view:disabled,
+#car-clear-view:disabled,
 #localize:disabled,
 #preview-route:disabled,
-#car-align:disabled,
 #car-initial-pose:disabled,
 #car-preview:disabled,
 #car-tf-flip:disabled,
@@ -1180,7 +1164,9 @@ body,
 /* Download-PCD is the one gray-button visual owner from first paint. */
 :is(
     #view-map,
+    #car-view-map,
     #clear-view,
+    #car-clear-view,
     #localize,
     #preview-route,
     #teleop-capture,
@@ -1189,9 +1175,7 @@ body,
     [data-robot-mode="damp"],
     [data-robot-mode="ready"],
     [data-robot-mode="run"],
-    #car-align,
     #car-initial-pose,
-    #car-preview,
     #car-tf-flip,
     #car-standalone,
     #car-transform
@@ -1219,7 +1203,9 @@ body,
 
 :is(
     #view-map,
+    #car-view-map,
     #clear-view,
+    #car-clear-view,
     #localize,
     #preview-route,
     #teleop-capture,
@@ -1228,9 +1214,7 @@ body,
     [data-robot-mode="damp"],
     [data-robot-mode="ready"],
     [data-robot-mode="run"],
-    #car-align,
     #car-initial-pose,
-    #car-preview,
     #car-tf-flip,
     #car-standalone,
     #car-transform
@@ -1248,18 +1232,6 @@ body,
     color: #c4cbd0 !important;
 }
 
-#car-panel #car-preview,
-#car-panel #car-preview:hover:not(:disabled) {
-    background: rgba(255,255,255,.02) !important;
-    border-color: rgba(255,255,255,.06) !important;
-    color: #8c96a7 !important;
-}
-
-#car-panel #car-preview:hover:not(:disabled) {
-    background: rgba(255,255,255,.045) !important;
-    border-color: rgba(255,255,255,.11) !important;
-    color: #aab2bb !important;
-}
 
 /* Clear objects on the left; compact YOLO checkbox on the right. */
 .control-panel:not(.car-side) .perception-actions {
@@ -1444,4 +1416,84 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
 /* Title-to-first-section gap equals the card heading-to-first-control gap. */
 .app-shell > .control-panel {
     padding-top: 58px !important;
+}
+
+
+/* ============================================================
+   Loading indicator for buttons whose action is still running.
+   ============================================================ */
+.fd18-busy {
+    position: relative !important;
+    cursor: progress !important;
+}
+
+.fd18-busy::after {
+    content: "" !important;
+    position: absolute !important;
+    top: 50% !important;
+    right: 8px !important;
+    width: 10px !important;
+    height: 10px !important;
+    margin-top: -6px !important;
+    box-sizing: content-box !important;
+    border: 1.5px solid currentColor !important;
+    border-right-color: transparent !important;
+    border-radius: 50% !important;
+    opacity: .85 !important;
+    pointer-events: none !important;
+    animation: fd18-busy-spin .7s linear infinite !important;
+}
+
+@keyframes fd18-busy-spin {
+    to { transform: rotate(360deg); }
+}
+
+
+/* ============================================================
+   Preview (robot and car) uses the Car localization button box; Car
+   localization and Car mapping use the Preview text.
+   ============================================================ */
+html body .control-panel :is(#preview-route, #car-preview, #car-localization, #car-mapping) {
+    box-sizing: border-box !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    max-height: 30px !important;
+    padding: 0 11px !important;
+    border: 1px solid rgba(142,203,127,.46) !important;
+    border-radius: 5px !important;
+    background: rgba(142,203,127,.07) !important;
+    box-shadow: none !important;
+    color: rgb(142,203,127) !important;
+    font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 650 !important;
+    line-height: 16px !important;
+    filter: none !important;
+    transform: none !important;
+    transition: background 140ms ease, border-color 140ms ease, color 140ms ease,
+        transform 120ms ease !important;
+}
+
+html body .control-panel :is(#preview-route, #car-preview, #car-localization, #car-mapping):hover:not(:disabled) {
+    background: rgba(142,203,127,.11) !important;
+    border-color: rgba(142,203,127,.7) !important;
+}
+
+html body .control-panel :is(#preview-route, #car-preview, #car-localization, #car-mapping):active:not(:disabled) {
+    transform: translateY(1px) !important;
+}
+
+html body .control-panel :is(#preview-route, #car-preview):disabled {
+    opacity: .45 !important;
+    cursor: not-allowed !important;
+}
+
+/* Car "Download map" = robot "Download map": undo the right-rail button
+   typography override for this one button. */
+.control-panel.car-side .card-body button.btn#car-download-map {
+    min-height: 28px !important;
+    min-width: auto !important;
+    font-size: 10px !important;
+    line-height: 1 !important;
+    letter-spacing: .005em !important;
 }

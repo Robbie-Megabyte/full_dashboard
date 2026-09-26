@@ -5996,7 +5996,9 @@ input[type="number"]::-webkit-outer-spin-button {
 #view-partial,
 #download-partial,
 #view-map,
+#car-view-map,
 #download-map,
+#car-download-map,
 #clear-view {
     border: 1px solid #3b403d !important;
     border-radius: 5px !important;
@@ -6025,7 +6027,9 @@ input[type="number"]::-webkit-outer-spin-button {
 #view-partial:not(:disabled):hover,
 #download-partial:not(:disabled):hover,
 #view-map:not(:disabled):hover,
+#car-view-map:not(:disabled):hover,
 #download-map:not(:disabled):hover,
+#car-download-map:not(:disabled):hover,
 #clear-view:not(:disabled):hover {
     background:
         linear-gradient(
@@ -6735,7 +6739,9 @@ input[type="number"]::-webkit-outer-spin-button {
 #view-partial,
 #download-partial,
 #view-map,
+#car-view-map,
 #download-map,
+#car-download-map,
 #clear-view {
     border:
         1px solid
@@ -6772,7 +6778,9 @@ input[type="number"]::-webkit-outer-spin-button {
 #view-partial:not(:disabled):hover,
 #download-partial:not(:disabled):hover,
 #view-map:not(:disabled):hover,
+#car-view-map:not(:disabled):hover,
 #download-map:not(:disabled):hover,
+#car-download-map:not(:disabled):hover,
 #clear-view:not(:disabled):hover {
     background:
         linear-gradient(

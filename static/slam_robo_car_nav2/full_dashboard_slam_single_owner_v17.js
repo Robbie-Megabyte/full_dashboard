@@ -7027,6 +7027,9 @@
                 "view-map",
                 "download-map",
                 "clear-view",
+                "car-view-map",
+                "car-download-map",
+                "car-clear-view",
             ]
         ) {
 

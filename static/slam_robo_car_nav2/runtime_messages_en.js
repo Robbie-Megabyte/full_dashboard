@@ -190,9 +190,6 @@
     ["Trimiterea poziției a eșuat: {}", "Sending the pose failed: $1"],
     ["Trimiterea țintei a eșuat: {}", "Sending the target failed: $1"],
     ["hartă OccupancyGrid invalidă", "invalid OccupancyGrid map"],
-    ["geometrică 2D", "2D geometric"],
-    ["trăsături vizuale", "visual features"],
-    ["neconfirmată", "not confirmed"],
   ];
 
   const escape = (text) => text.replace(/[.*+?^$()|[\]\\]/g, "\\$&");
@@ -201,11 +198,21 @@
     english,
   }));
 
+  // Romanian words the runtime inserts as values inside other messages.
+  const FRAGMENTS = [
+    ["geometrică 2D", "2D geometric"],
+    ["trăsături vizuale", "visual features"],
+    ["neconfirmată", "not confirmed"],
+  ];
+  function translateFragments(text) {
+    return FRAGMENTS.reduce((result, [source, english]) => result.split(source).join(english), text);
+  }
+
   function translateOne(text) {
     for (const { pattern, english } of compiled) {
-      if (pattern.test(text)) return text.replace(pattern, english);
+      if (pattern.test(text)) return translateFragments(text.replace(pattern, english));
     }
-    return text;
+    return translateFragments(text);
   }
 
   // Runtime messages are sometimes joined with " · " or "; " or prefixed.

@@ -8,6 +8,20 @@
 
   let busy = false;
 
+  // Loading indicator while the whole dashboard shuts down (can take seconds).
+  const busyStyle = document.createElement("style");
+  busyStyle.textContent = `
+    #fd-final-close.fd-busy { position: relative; color: transparent !important; cursor: progress !important; }
+    #fd-final-close.fd-busy::after {
+      content: ""; position: absolute; top: 50%; left: 50%;
+      width: 11px; height: 11px; margin: -7px 0 0 -7px;
+      border: 1.5px solid #d7e6ee; border-right-color: transparent; border-radius: 50%;
+      animation: fd-close-spin .7s linear infinite;
+    }
+    @keyframes fd-close-spin { to { transform: rotate(360deg); } }
+  `;
+  document.head.append(busyStyle);
+
   function showClosedScreen() {
     document.documentElement.innerHTML = `
       <head>
@@ -76,6 +90,7 @@
 
     busy = true;
     close.disabled = true;
+    close.classList.add("fd-busy");
     close.setAttribute(
       "aria-busy",
       "true"
@@ -135,6 +150,7 @@
     } catch (error) {
       busy = false;
       close.disabled = false;
+      close.classList.remove("fd-busy");
       close.removeAttribute(
         "aria-busy"
       );
