@@ -863,6 +863,96 @@ def _render_mode(
     rendered[mode] = output
     return output
 
+_SLAM_FEED = None
+
+
+def _slam_runtime_feed():
+    global _SLAM_FEED
+    if _SLAM_FEED is None:
+        _SLAM_FEED = SlamRuntimeFeed()
+    return _SLAM_FEED
+
+
+class SlamRuntimeFeed:
+    """Raw color + depth frames for the SLAM runtime's own camera (and YOLO).
+
+    The Full Dashboard owns the RealSense, so the SLAM runtime cannot open it.
+    While the runtime asks for frames (it touches SLAM_FEED_WANTED), the newest
+    raw frame is sent to its receiver on 127.0.0.1:5005 at SLAM_FEED_FPS, in the
+    packet format of send_video_depth.py: color JPEG + depth PNG (mm, uint16).
+    Frames are taken before any Live YOLO annotation, so the SLAM tab and the
+    Live tab each show only their own detections. Encoding and sending run on
+    this thread; the camera loop only hands over the newest frame.
+    """
+
+    ADDRESS = ("127.0.0.1", 5005)
+    FPS = 10.0
+    WANTED = Path(f"/tmp/g1_slam_camera_wanted_{os.getuid()}")
+    WANTED_FRESH_S = 5.0
+
+    def __init__(self):
+        self._lock = threading.Condition()
+        self._frame = None
+        self._socket = None
+        self._next_send = 0.0
+        self._wanted_until = 0.0
+        self._next_wanted_check = 0.0
+        threading.Thread(target=self._run, name="slam-runtime-feed", daemon=True).start()
+
+    def _wanted(self, now):
+        if now >= self._next_wanted_check:
+            self._next_wanted_check = now + 0.5
+            try:
+                age = time.time() - self.WANTED.stat().st_mtime
+                self._wanted_until = now + (self.WANTED_FRESH_S - age)
+            except OSError:
+                self._wanted_until = 0.0
+        return now < self._wanted_until
+
+    def submit(self, bgr, depth_z16, depth_scale):
+        now = time.monotonic()
+        if depth_z16 is None or now < self._next_send or not self._wanted(now):
+            if self._socket is not None and not self._wanted(now):
+                self._close()
+            return
+        self._next_send = now + 1.0 / self.FPS
+        with self._lock:
+            self._frame = (bgr, depth_z16, depth_scale)
+            self._lock.notify()
+
+    def _close(self):
+        sock, self._socket = self._socket, None
+        if sock is not None:
+            try:
+                sock.close()
+            except OSError:
+                pass
+
+    def _run(self):
+        import socket
+        while True:
+            with self._lock:
+                while self._frame is None:
+                    self._lock.wait()
+                bgr, depth_z16, depth_scale = self._frame
+                self._frame = None
+            depth_mm = np.clip(depth_z16.astype(np.float32) * (depth_scale * 1000.0), 0, 65535).astype(np.uint16)
+            color_ok, color = cv2.imencode(".jpg", bgr, [int(cv2.IMWRITE_JPEG_QUALITY), 70])
+            depth_ok, depth = cv2.imencode(".png", depth_mm)
+            if not color_ok or not depth_ok:
+                continue
+            color, depth = color.tobytes(), depth.tobytes()
+            payload = struct.pack(">II", len(color), len(depth)) + color + depth
+            try:
+                if self._socket is None:
+                    self._socket = socket.create_connection(self.ADDRESS, timeout=0.5)
+                    self._socket.settimeout(2.0)
+                self._socket.sendall(struct.pack(">I", len(payload)) + payload)
+            except OSError:
+                # The runtime is not listening (yet); try again with a later frame.
+                self._close()
+
+
 def _publish_dashboard_views(
     camera,
     bgr: np.ndarray,
@@ -1107,6 +1197,8 @@ class _LatestDerivedFrameWorker:
         frame_cache = {
             "yolo_detections": detections,
         }
+
+        _slam_runtime_feed().submit(bgr, depth_z16, depth_scale)
 
         if self._pointcloud_only:
             products = _depth_products(

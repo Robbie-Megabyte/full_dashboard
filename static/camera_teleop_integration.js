@@ -16,8 +16,11 @@
     keypoints: "/api/camera/keypoints.jpg",
     simulation: "/api/mujoco/frame.jpg",
   };
-  // 10 fps, as the pipeline dashboard refreshed its previews.
+  // Match the pipeline dashboard while configuring. During physical teleop,
+  // slightly reduce presentation-only JPEG work so tracking/control retains
+  // CPU/GPU priority. This does not change the motion-control rate.
   const FRAME_INTERVAL_MS = 100;
+  const LIVE_FRAME_INTERVAL_MS = 125;
   const companionIds = ["raw", "simulation", "keypoints"];
   const runtime = {
     capability: null,
@@ -26,18 +29,43 @@
     pollBusy: false,
     frameTimer: null,
     framesOrigin: "",
+    lastFrameAt: 0,
+    priorityActive: false,
   };
 
   // Physical stack states as the pipeline dashboard labels them.
-  const SYSTEM_LABELS = {
+  // Status values are kept to one short word so a label and its value always
+  // fit side by side in the Status grid.
+  const SHORT_STATES = {
     off: "OFF",
-    ready_to_start: "READY TO START",
+    none: "OFF",
+    idle: "IDLE",
+    ready_to_start: "READY",
+    ready: "READY",
+    running: "LIVE",
     live: "LIVE",
     stopping: "STOPPING",
     error: "ERROR",
-    validation_failed: "VALIDATION FAILED",
-    physical_init_failed: "PHYSICAL INIT FAILED",
+    validation_failed: "FAILED",
+    physical_init_failed: "FAILED",
+    init_done: "INIT",
+    reference: "REF",
+    policy_requested: "POLICY",
+    connected: "ON",
+    streaming: "LIVE",
+    waiting: "WAITING",
+    aligned: "ALIGNED",
+    unavailable: "N/A",
   };
+
+  function short(value) {
+    const key = String(value || "off").trim().toLowerCase().replaceAll(" ", "_");
+    if (SHORT_STATES[key]) return SHORT_STATES[key];
+    if (/^(starting|waiting|releasing|going|launching|opening|connecting)/.test(key)) return "STARTING";
+    if (/fail|error/.test(key)) return "FAILED";
+    const word = key.split("_")[0].toUpperCase();
+    return word.length > 8 ? `${word.slice(0, 7)}.` : word;
+  }
 
   const byId = id => document.getElementById(id);
   const upper = value => String(value || "off").replaceAll("_", " ").toUpperCase();
@@ -56,21 +84,19 @@
     };
   }
 
-  function processState(value, prefix = "") {
-    if (!value?.process_alive) return "OFF";
-    const state = upper(value.state || "starting");
-    return prefix ? `${prefix} · ${state}` : state;
+  function processState(value) {
+    return value?.process_alive ? short(value.state || "starting") : "OFF";
   }
 
   function statusRows() {
     const capability = runtime.capability;
     if (!capability?.available) {
       return [
-        ["System", capability ? "UNAVAILABLE" : "CHECKING"],
-        ["Simulation", "OFF"],
+        ["System", capability ? "N/A" : "CHECKING"],
+        ["Sim", "OFF"],
         ["SONIC", "OFF"],
         ["Camera", "OFF"],
-        ["Alignment", "WAITING"],
+        ["Align", "OFF"],
         ["Tracking", "OFF"],
       ];
     }
@@ -90,11 +116,11 @@
 
     let sonic = "OFF";
     if (physicalSonic.process_alive) {
-      sonic = processState(physicalSonic, "ROBOT");
+      sonic = processState(physicalSonic);
     } else if (validationSonic.process_alive) {
-      sonic = processState(validationSonic, "SIM");
+      sonic = processState(validationSonic);
     } else if (fallbackSonic.process_alive) {
-      sonic = processState(fallbackSonic, "SIM");
+      sonic = processState(fallbackSonic);
     }
 
     let tracking = "OFF";
@@ -105,11 +131,11 @@
     }
 
     return [
-      ["System", SYSTEM_LABELS[stack.state] || upper(stack.state)],
-      ["Simulation", data.mujoco_preview?.live ? "LIVE" : "OFF"],
+      ["System", short(stack.state)],
+      ["Sim", data.mujoco_preview?.live ? "LIVE" : "OFF"],
       ["SONIC", sonic],
-      ["Camera", upper(cameraState)],
-      ["Alignment", stack.active ? upper(alignment) : "OFF"],
+      ["Camera", short(cameraState)],
+      ["Align", stack.active ? short(alignment) : "OFF"],
       ["Tracking", tracking],
     ];
   }
@@ -121,9 +147,9 @@
 
   function toneFor(value) {
     const text = upper(value);
-    if (/ERROR|FAULT|FAILED|UNAVAILABLE/.test(text)) return "bad";
-    if (/WAITING|STARTING|STOPPING|PENDING|ALIGN/.test(text)) return "warn";
-    if (/READY|RUNNING|LIVE|OK|ON|CONNECTED|TRACKING/.test(text)) return "good";
+    if (/ERROR|FAULT|FAILED|N\/A/.test(text)) return "bad";
+    if (/WAITING|STARTING|STOPPING|PENDING|CHECKING|INIT|POLICY/.test(text)) return "warn";
+    if (/READY|LIVE|^ON$|ALIGNED|REF/.test(text)) return "good";
     return "neutral";
   }
 
@@ -165,7 +191,12 @@
 
   function mediaVisible(id) {
     const root = tile(id);
-    return Boolean(root && root.isConnected && !root.classList.contains("hidden"));
+    if (!cameraMode() || document.visibilityState !== "visible") return false;
+    if (!root || !root.isConnected || root.classList.contains("hidden")) return false;
+    if (!root.getClientRects().length) return false;
+    const bounds = root.getBoundingClientRect();
+    return bounds.bottom > 0 && bounds.right > 0
+      && bounds.top < window.innerHeight && bounds.left < window.innerWidth;
   }
 
   function clearMedia(id) {
@@ -220,8 +251,8 @@
   }
 
   // MuJoCo preview camera, as in the pipeline dashboard: drag to orbit,
-  // wheel to zoom, double-click to reset, and the view presets. Sent straight
-  // to this PC's companion; it only moves the preview camera.
+  // wheel to zoom, double-click to reset. Sent straight to this PC's
+  // companion; it only moves the preview camera.
   function sendSimulationCamera(command) {
     if (!runtime.framesOrigin) return;
     fetch(`${runtime.framesOrigin}/api/mujoco/camera`, {
@@ -238,17 +269,6 @@
     if (!body || body.dataset.simControls === "bound") return;
     body.dataset.simControls = "bound";
 
-    const toolbar = document.createElement("div");
-    toolbar.className = "camera-sim-toolbar";
-    toolbar.innerHTML = ["front", "side", "rear", "reset"].map(name =>
-      `<button type="button" data-sim-camera="${name}">${name[0].toUpperCase()}${name.slice(1)}</button>`
-    ).join("");
-    body.appendChild(toolbar);
-    toolbar.addEventListener("click", event => {
-      const button = event.target.closest("[data-sim-camera]");
-      if (button) sendSimulationCamera({op: "preset", name: button.dataset.simCamera});
-    });
-
     let drag = null;
     let pending = {dx: 0, dy: 0};
     let timer = null;
@@ -259,7 +279,7 @@
       if (dx || dy) sendSimulationCamera({op: "orbit", dx, dy});
     };
     body.addEventListener("pointerdown", event => {
-      if (event.button !== 0 || event.target.closest(".camera-sim-toolbar")) return;
+      if (event.button !== 0) return;
       if (root.dataset.companionLive !== "true") return;
       drag = {x: event.clientX, y: event.clientY};
       body.classList.add("camera-sim-dragging");
@@ -287,7 +307,7 @@
       if (delta) sendSimulationCamera({op: "zoom", delta});
     }, {passive: false});
     body.addEventListener("dblclick", event => {
-      if (root.dataset.companionLive !== "true" || event.target.closest(".camera-sim-toolbar")) return;
+      if (root.dataset.companionLive !== "true") return;
       sendSimulationCamera({op: "reset"});
     });
   }
@@ -310,6 +330,11 @@
     const stop = byId("cameraStopV21");
     const mainbarUnavailable = byId("cameraTeleopMainbarUnavailableV1");
     const pending = runtime.pending;
+
+    // Keep the high-priority state across a transient failed poll. Only a
+    // successful status response saying the stack is inactive releases it.
+    // Multiview must stay live alongside camera teleop.
+    window.fullDashSetCameraTeleopPriorityV1?.(false);
 
     // One UI step: which segment is current, and which one is loading.
     let step = "idle";
@@ -367,7 +392,8 @@
   async function companionFetch(path, options = {}) {
     const controller = new AbortController();
     // Actions (Stop waits for the pipeline threads) get longer than polls.
-    const limit = options.method === "POST" ? 60000 : 2500;
+    // Health may wait for a socket-activated companion to start.
+    const limit = options.method === "POST" ? 60000 : path === "/health" ? 16000 : 2500;
     const timeout = window.setTimeout(() => controller.abort(), limit);
     try {
       return await fetch(`${COMPANION}${path}`, {
@@ -403,6 +429,12 @@
       if (!response.ok) throw new Error(`status HTTP ${response.status}`);
       const status = await response.json();
       const stack = status?.physical || {};
+      runtime.priorityActive = Boolean(stack.active);
+      // Raw Camera is on by default once this PC's pipeline is found (once per
+      // page load, so a user who docks it again keeps that choice).
+      if (!runtime.rawShown && window.fullDashShowCameraViewV1?.("raw")) {
+        runtime.rawShown = true;
+      }
       runtime.capability = {
         schema: "g1_dashboard.camera_teleop.local.v1",
         available: true,
@@ -432,6 +464,11 @@
     // Stop always goes through, even while Configure is still running.
     if (runtime.pending && (action !== "stop" || runtime.pending === "stop")) return;
     runtime.pending = action;
+    if (action === "configure" || action === "enter") {
+      // Yield the browser rendering budget before pipeline startup begins,
+      // instead of waiting up to one status-poll interval.
+      runtime.priorityActive = true;
+    }
     renderControls();
     try {
       const path = ACTION_PATHS[action];
@@ -495,10 +532,14 @@
     runtime.frameTimer = window.setInterval(() => {
       const active = runtime.capability?.available && physical().active;
       if (!active) return;
+      const now = performance.now();
+      const interval = physical().live ? LIVE_FRAME_INTERVAL_MS : FRAME_INTERVAL_MS;
+      if (now - runtime.lastFrameAt < interval) return;
+      runtime.lastFrameAt = now;
       refreshSnapshot("raw");
       refreshSnapshot("keypoints");
       if (simulationLive()) refreshSnapshot("simulation");
-    }, FRAME_INTERVAL_MS);
+    }, 25);
     poll();
     window.setInterval(poll, 750);
   }

@@ -8,13 +8,16 @@ import json
 import math
 import os
 import secrets
+import io
+import re
 import threading
 import time
+import zipfile
 from pathlib import Path
 from typing import List, Optional
 
-from fastapi import APIRouter, Depends, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
-from fastapi.responses import JSONResponse
+from fastapi import APIRouter, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi.responses import JSONResponse, Response
 from feature_stiching import align_point_maps
 from local_lidar_localization import _GridNearestNeighbor
 from pcd_grid_map import PCDGridPlanner
@@ -312,6 +315,13 @@ def _car_public_state(
         "map_source": car_state.get("map_source"),
         "slam_params_file": car_state.get("slam_params_file", "/root/humble_ws/custom_params.yaml"),
         "available_maps": car_state.get("available_maps", [{"name": "harta_masina_1.yaml", "path": "/root/humble_ws/harta_masina_1.yaml"}]),
+        "teleop_enabled": bool(car_state.get("teleop_enabled")),
+        "servo_offset": car_state.get("servo_offset"),
+        "mapping_session": car_mapping.get("session"),
+        "snapshots": car_mapping.get("index", 0),
+        "snapshot_interval": CAR_SNAPSHOT_INTERVAL_SECONDS,
+        "last_snapshot": car_mapping.get("last"),
+        "snapshot_error": car_mapping.get("error", ""),
     }
     if include_scan:
         state["scan_points"] = car_state["scan_points"]
@@ -443,6 +453,9 @@ def _car_update_path(data: dict) -> None:
     poses = data.get("poses")
     if not isinstance(poses, list):
         return
+    # A plan still in flight when the operator pressed Stop is dropped.
+    if time.time() < float(car_state.get("path_suppressed_until") or 0.0):
+        return
     source_path = []
     step = max(1, math.ceil(len(poses) / 2000))
     for item in poses[::step]:
@@ -505,6 +518,14 @@ def _car_update_map(data: dict) -> None:
             "x": origin_x + cos_origin * local_x - sin_origin * local_y,
             "y": origin_y + sin_origin * local_x + cos_origin * local_y,
         })
+    car_state["map_raw"] = {
+        "width": width,
+        "height": height,
+        "resolution": resolution,
+        "origin": {"x": origin_x, "y": origin_y, "yaw": origin_yaw},
+        "occupied_indices": occupied_indices,
+        "frame_id": str(data.get("frame_id") or "map"),
+    }
     car_state["map_source_points"] = source_points
     car_state["map_points"] = _car_source_points_to_g1_map(source_points)
     car_state["map_resolution"] = resolution * step
@@ -768,6 +789,7 @@ async def car_websocket_endpoint(ws: WebSocket):
             pass
     car_state["connected"] = True
     car_state["last_seen"] = time.time()
+    _ensure_car_capture_loop()
     await broadcast(_car_public_state())
     try:
         while True:
@@ -795,6 +817,12 @@ async def car_websocket_endpoint(ws: WebSocket):
                     if pending_preview and data.get("request_id") == pending_preview["request_id"]:
                         pending_preview["ready"] = data.get("status") == "ready" and int(data.get("points", 0)) > 0
                     public_state = {"type": "car_path_status", **data}
+                elif topic == "/servo_offset_status":
+                    if data.get("status") == "success":
+                        car_state["servo_offset"] = data.get("value")
+                    public_state = {"type": "car_servo_offset_status", **data}
+                elif topic == "/navigation_status":
+                    public_state = {"type": "car_navigation_status", **data}
                 elif topic == "/initial_pose_status":
                     public_state = {"type": "car_initial_pose_status", **data}
                 elif topic == "/mode_status":
@@ -842,6 +870,7 @@ async def car_websocket_endpoint(ws: WebSocket):
             car_ws = None
             pending_preview = None
             car_state["connected"] = False
+            car_state["teleop_enabled"] = False
             await broadcast(_car_public_state())
 
 
@@ -1011,6 +1040,7 @@ async def auto_align_car_maps(request: Request):
 @router.post("/api/car/goal")
 async def send_car_goal(request: Request):
     global pending_preview
+    car_state["path_suppressed_until"] = 0.0  # a new route is wanted
     if car_ws is None or not car_state["connected"]:
         return JSONResponse(
             {"success": False, "error": "Mașina nu este conectată"},
@@ -1163,6 +1193,8 @@ async def set_car_mode(request: Request):
     car_state["slam_params_file"] = slam_params_file
     car_state["current_mode"] = "none" if mode in ("stop", "none", "off") else mode
     if mode == "mapping":
+        _start_car_mapping_session()
+        car_state["map_raw"] = None
         # Nu permite hărții salvate anterior să fie confundată cu /map live.
         car_state["map_source_points"] = []
         car_state["map_points"] = []
@@ -1261,6 +1293,7 @@ async def save_car_map_endpoint(request: Request):
 @router.post("/api/car/path/preview")
 async def preview_car_path(request: Request):
     global pending_preview
+    car_state["path_suppressed_until"] = 0.0  # a new route is wanted
     """Ask the car planner for a path without publishing a navigation goal."""
     if car_ws is None or not car_state["connected"]:
         return JSONResponse(
@@ -1650,7 +1683,274 @@ async def agents_world(
     }
 
 
+# ---------------------------------------------------------------------------
+# Car partial maps: while the car is mapping, the live /map is captured every
+# CAR_SNAPSHOT_INTERVAL_SECONDS into maps/car_partial_maps/car_mapping_<stamp>/,
+# as the robot mapping does. Each capture keeps the raw OccupancyGrid cells.
+# ---------------------------------------------------------------------------
+CAR_SNAPSHOT_INTERVAL_SECONDS = 5.0
+CAR_PARTIAL_MAPS = Path(__file__).resolve().parent.parent / "maps" / "car_partial_maps"
+car_mapping = {"session": None, "dir": None, "index": 0, "last": None, "error": "", "revision": None}
+car_capture_task: Optional[asyncio.Task] = None
+_CAR_NAME = re.compile(r"^[A-Za-z0-9_.-]{1,120}$")
+
+
+def _start_car_mapping_session() -> None:
+    session = time.strftime("car_mapping_%Y%m%d_%H%M%S")
+    car_mapping.update(
+        session=session, dir=CAR_PARTIAL_MAPS / session, index=0,
+        last=None, error="", revision=None,
+    )
+
+
+def _write_json_atomic(path: Path, payload: dict) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    temporary = path.with_suffix(".tmp")
+    temporary.write_text(json.dumps(payload, separators=(",", ":")), encoding="utf-8")
+    temporary.replace(path)
+
+
+async def _car_capture_loop() -> None:
+    next_at = time.monotonic() + CAR_SNAPSHOT_INTERVAL_SECONDS
+    while True:
+        await asyncio.sleep(max(0.0, next_at - time.monotonic()))
+        next_at += CAR_SNAPSHOT_INTERVAL_SECONDS
+        raw = car_state.get("map_raw")
+        revision = car_state.get("map_revision")
+        if (
+            car_state.get("current_mode") != "mapping"
+            or car_mapping.get("dir") is None
+            or not raw
+            or revision == car_mapping.get("revision")
+        ):
+            continue
+        car_mapping["index"] += 1
+        car_mapping["revision"] = revision
+        name = f"partial_{car_mapping['index']:06d}_{time.strftime('%Y%m%d_%H%M%S')}"
+        try:
+            await asyncio.to_thread(
+                _write_json_atomic, car_mapping["dir"] / f"{name}.json",
+                {**raw, "captured_at": time.time()},
+            )
+            car_mapping["last"] = name
+            car_mapping["error"] = ""
+        except Exception as exc:
+            car_mapping["error"] = str(exc)
+        await broadcast(_car_public_state(False, False, False))
+
+
+def _ensure_car_capture_loop() -> None:
+    global car_capture_task
+    if car_capture_task is None or car_capture_task.done():
+        car_capture_task = asyncio.get_running_loop().create_task(_car_capture_loop())
+
+
+def _car_partial_session(name: str) -> Path:
+    if not _CAR_NAME.match(name or "") or not name.startswith("car_mapping_"):
+        raise HTTPException(400, "Invalid car partial-map session")
+    path = CAR_PARTIAL_MAPS / name
+    if not path.is_dir():
+        raise HTTPException(404, f"Session not found: {name}")
+    return path
+
+
+def _car_partial_capture(session: str, capture: str) -> Path:
+    if not _CAR_NAME.match(capture or ""):
+        raise HTTPException(400, "Invalid capture name")
+    path = _car_partial_session(session) / f"{capture}.json"
+    if not path.is_file():
+        raise HTTPException(404, f"Capture not found: {capture}")
+    return path
+
+
+def _grid_source_points(grid: dict) -> List[dict]:
+    width, resolution = int(grid["width"]), float(grid["resolution"])
+    origin = grid.get("origin") or {}
+    ox, oy, oyaw = float(origin.get("x", 0.0)), float(origin.get("y", 0.0)), float(origin.get("yaw", 0.0))
+    cos_o, sin_o = math.cos(oyaw), math.sin(oyaw)
+    indices = grid.get("occupied_indices") or []
+    step = max(1, math.ceil(len(indices) / 60000))
+    points = []
+    for index in indices[::step]:
+        row, column = divmod(int(index), width)
+        lx, ly = (column + 0.5) * resolution, (row + 0.5) * resolution
+        points.append({"x": ox + cos_o * lx - sin_o * ly, "y": oy + sin_o * lx + cos_o * ly})
+    return points
+
+
+def _grid_ros_map_zip(name: str, grid: dict) -> bytes:
+    """map_server pair (PGM + YAML): occupied cells black, the rest unknown."""
+    width, height = int(grid["width"]), int(grid["height"])
+    pixels = bytearray([205]) * (width * height)
+    for index in grid.get("occupied_indices") or []:
+        index = int(index)
+        if 0 <= index < width * height:
+            row, column = divmod(index, width)
+            # PGM rows run top-down; OccupancyGrid rows run bottom-up.
+            pixels[(height - 1 - row) * width + column] = 0
+    pgm = f"P5\n{width} {height}\n255\n".encode("ascii") + bytes(pixels)
+    origin = grid.get("origin") or {}
+    yaml = (
+        f"image: {name}.pgm\n"
+        f"mode: trinary\n"
+        f"resolution: {float(grid['resolution'])}\n"
+        f"origin: [{float(origin.get('x', 0.0))}, {float(origin.get('y', 0.0))}, {float(origin.get('yaw', 0.0))}]\n"
+        f"negate: 0\noccupied_thresh: 0.65\nfree_thresh: 0.25\n"
+    )
+    buffer = io.BytesIO()
+    with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
+        archive.writestr(f"{name}.pgm", pgm)
+        archive.writestr(f"{name}.yaml", yaml)
+    return buffer.getvalue()
+
+
+@router.get("/api/car/partial-maps")
+async def list_car_partial_sessions():
+    sessions = []
+    if CAR_PARTIAL_MAPS.is_dir():
+        for directory in sorted(CAR_PARTIAL_MAPS.glob("car_mapping_*"), reverse=True):
+            captures = sorted(directory.glob("partial_*.json"))
+            sessions.append({"name": directory.name, "snapshots": len(captures)})
+    return {"success": True, "partial_sessions": sessions}
+
+
+@router.get("/api/car/partial-maps/{session}")
+async def list_car_partial_captures(session: str):
+    directory = _car_partial_session(session)
+    captures = sorted(directory.glob("partial_*.json"))
+    return {
+        "success": True,
+        "session": directory.name,
+        "snapshots": [{"name": path.stem, "size": path.stat().st_size} for path in captures],
+    }
+
+
+@router.post("/api/car/partial-maps/{session}/{capture}/view")
+async def view_car_partial_capture(session: str, capture: str):
+    """Shows a capture as the car map layer (the live /map replaces it again)."""
+    path = _car_partial_capture(session, capture)
+    grid = json.loads(await asyncio.to_thread(path.read_text, encoding="utf-8"))
+    source_points = _grid_source_points(grid)
+    car_state["map_source_points"] = source_points
+    car_state["map_points"] = _car_source_points_to_g1_map(source_points)
+    car_state["map_resolution"] = float(grid["resolution"]) * max(1, math.ceil(len(grid.get("occupied_indices") or []) / 60000))
+    car_state["map_occupied_count"] = len(grid.get("occupied_indices") or [])
+    car_state["map_source"] = f"partial:{session}/{capture}"
+    car_state["map_revision"] = int(car_state.get("map_revision", 0)) + 1
+    car_state["map_updated_at"] = time.time()
+    await broadcast(_car_public_state(False, False, True))
+    return {"success": True, "session": session, "name": capture, "points": len(source_points)}
+
+
+@router.get("/api/car/partial-maps/{session}/{capture}/file")
+async def download_car_partial_capture(session: str, capture: str):
+    path = _car_partial_capture(session, capture)
+    grid = json.loads(await asyncio.to_thread(path.read_text, encoding="utf-8"))
+    name = f"{session}_{capture}"
+    body = await asyncio.to_thread(_grid_ros_map_zip, name, grid)
+    return Response(
+        body, media_type="application/zip",
+        headers={"Content-Disposition": f'attachment; filename="{name}.zip"'},
+    )
+
+
+# ---------------------------------------------------------------------------
+# Car navigation Stop: cancels the Nav2 goal on the car (its mapping or
+# localization keeps running) and forgets the route and the preview here.
+# ---------------------------------------------------------------------------
+@router.post("/api/car/navigation/cancel")
+async def cancel_car_navigation():
+    global pending_preview
+    if car_ws is None or not car_state["connected"]:
+        return JSONResponse({"success": False, "error": "The car is not connected"}, status_code=409)
+    pending_preview = None
+    try:
+        await car_ws.send_text(json.dumps({"type": "cancel_navigation"}))
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Sending to the car failed: {exc}"}, status_code=503)
+    car_state["path_source"] = []
+    car_state["path"] = []
+    car_state["path_point_count"] = 0
+    car_state["path_updated_at"] = time.time()
+    car_state["path_suppressed_until"] = time.time() + 2.0
+    await broadcast(_car_public_state(False, True, False))
+    return {"success": True, "message": "Car navigation stopped"}
+
+
+# ---------------------------------------------------------------------------
+# Wheel (steering servo) offset: the car's bridge node parameter servo_offset,
+# set through the car's own set_servo_offset command.
+# ---------------------------------------------------------------------------
+@router.post("/api/car/servo_offset")
+async def set_car_servo_offset(request: Request):
+    if car_ws is None or not car_state["connected"]:
+        return JSONResponse({"success": False, "error": "The car is not connected"}, status_code=409)
+    body = await request.json()
+    try:
+        value = int(body.get("value"))
+    except (TypeError, ValueError):
+        return JSONResponse({"success": False, "error": "The offset must be an integer"}, status_code=400)
+    if not 50 <= value <= 150:
+        return JSONResponse({"success": False, "error": "The offset must be between 50 and 150"}, status_code=400)
+    try:
+        await car_ws.send_text(json.dumps({"type": "set_servo_offset", "value": value}))
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Sending to the car failed: {exc}"}, status_code=503)
+    return {"success": True, "value": value, "message": f"Wheel offset {value} sent to the car"}
+
+
+# ---------------------------------------------------------------------------
+# Car keyboard teleop. The dashboard sends the held command every 100 ms; the
+# car bridge stops the car when commands stop arriving (0.5 s).
+# ---------------------------------------------------------------------------
+async def _send_car_velocity(linear: float, angular: float) -> None:
+    if car_ws is None:
+        return
+    await car_ws.send_text(json.dumps({"type": "cmd_vel", "linear": linear, "angular": angular}))
+
+
+@router.post("/api/car/teleop/enable")
+async def enable_car_teleop():
+    if car_ws is None or not car_state["connected"]:
+        return JSONResponse({"success": False, "error": "The car is not connected"}, status_code=409)
+    car_state["teleop_enabled"] = True
+    await broadcast(_car_public_state(False, False, False))
+    return {"success": True, "teleop_enabled": True}
+
+
+@router.post("/api/car/teleop/disable")
+async def disable_car_teleop():
+    car_state["teleop_enabled"] = False
+    try:
+        await _send_car_velocity(0.0, 0.0)
+    except Exception:
+        pass
+    await broadcast(_car_public_state(False, False, False))
+    return {"success": True, "teleop_enabled": False}
+
+
+@router.post("/api/car/teleop/cmd")
+async def car_teleop_command(request: Request):
+    if not car_state.get("teleop_enabled"):
+        return JSONResponse({"success": False, "error": "Car teleop is not enabled"}, status_code=409)
+    if car_ws is None or not car_state["connected"]:
+        return JSONResponse({"success": False, "error": "The car is not connected"}, status_code=409)
+    body = await request.json()
+    try:
+        linear = max(-0.6, min(0.6, float(body.get("linear", 0.0))))
+        angular = max(-1.5, min(1.5, float(body.get("angular", 0.0))))
+    except (TypeError, ValueError):
+        return JSONResponse({"success": False, "error": "Invalid velocity"}, status_code=400)
+    try:
+        await _send_car_velocity(linear, angular)
+    except Exception as exc:
+        return JSONResponse({"success": False, "error": f"Sending to the car failed: {exc}"}, status_code=503)
+    return {"success": True}
+
+
 async def shutdown():
+    if car_capture_task and not car_capture_task.done():
+        car_capture_task.cancel()
     if car_auto_align_task and not car_auto_align_task.done():
         car_auto_align_task.cancel()
     for ws in [*active_ws, car_ws]:

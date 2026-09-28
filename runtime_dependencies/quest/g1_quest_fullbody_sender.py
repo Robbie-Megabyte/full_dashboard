@@ -42,6 +42,7 @@ SEND_HZ = float(os.environ.get(
     "30",
 ))
 NUM_JOINTS = 29
+LOWSTATE_POLL_HZ = 2.0 * SEND_HZ
 
 DASHBOARD_HOST = os.environ.get(
     "G1_DASHBOARD_ROBOT_TELEMETRY_HOST",
@@ -283,13 +284,30 @@ def main():
         HgLowState,
     )
 
-    # queueLen = 0 executes the constant-time callback directly on the
-    # DDS reader notification. Heavy snapshot parsing stays in the 30 Hz
-    # sender loop so controller startup cannot build a parsing backlog.
+    # No per-sample callback: LowState arrives at ~500 Hz and deserializing
+    # every sample in Python kept one core busy, which delayed this stream
+    # (and the dashboard twin) whenever the robot was loaded. The reader keeps
+    # only the newest sample (DDS KEEP_LAST 1); a small thread takes it at
+    # LOWSTATE_POLL_HZ, well above SEND_HZ.
     subscriber.Init(
-        lowstate_callback,
+        None,
         0,
     )
+
+    def poll_lowstate():
+        period = 1.0 / LOWSTATE_POLL_HZ
+        while not stop_event.is_set():
+            started = time.monotonic()
+            msg = subscriber.Read(1.0)
+            if msg is not None:
+                lowstate_callback(msg)
+            stop_event.wait(max(0.0, period - (time.monotonic() - started)))
+
+    threading.Thread(
+        target=poll_lowstate,
+        name="lowstate-poll",
+        daemon=True,
+    ).start()
 
     # BACALBASA_BMS_SOC_V20_5
     # Separate read-only Unitree BMS state stream.

@@ -248,7 +248,8 @@
     const standard = [
       ["partial-sessions", "refresh-partials", "No saved sessions"],
       ["maps", "refresh-maps", "Select map"],
-      ["car-maps", "car-refresh-maps", "Select map"]
+      ["car-maps", "car-refresh-maps", "Select map"],
+      ["car-partial-sessions", "car-refresh-partials", "No saved sessions"]
     ];
     for (const [selectId, refreshId, fallback] of standard) {
       const select = $(selectId);
@@ -355,7 +356,7 @@
     start.classList.add("fd15-left");
     stop.classList.add("fd15-right");
     // The car reports no "route in progress" state: Start is highlighted only
-    // when a previewed route is ready to send; Stop always stays available.
+    // when a previewed route is ready to send.
     group.dataset.mode = start.disabled ? "none" : "left-green";
     group.replaceChildren(start, stop);
     if (!group.dataset.fd18ModeObserver) {
@@ -427,6 +428,137 @@
     return group;
   }
 
+  /* Car Enter/Stop switches (Teleop, Mapping, Localization): the same switch
+     as Robot Mode teleop (cloned from the Mapping Start/Stop switch). The
+     visible segments forward clicks to hidden buttons that car.js and
+     car_mapping_extras.js own; `active()` tells which side is highlighted and
+     `event` announces state changes. */
+  function buildCarSwitch({ id, enterId, stopId, enterText, stopText, active, event, removeRow }) {
+    const enter = $(enterId);
+    const stop = $(stopId);
+    const mapping = $("fd15MappingControls")?.querySelector(".fd15-live-switch");
+    const startSegment = mapping?.querySelector(".fd15-left");
+    const stopSegment = mapping?.querySelector(".fd15-right");
+    let root = $(id);
+    if (root) return root;
+    if (!enter || !stop || !startSegment || !stopSegment) return null;
+
+    const segment = (source, text, original) => {
+      const button = source.cloneNode(true);
+      button.removeAttribute("id");
+      const label = [...button.children].find(node => !node.hasAttribute("aria-hidden"));
+      if (label) label.textContent = text;
+      button.addEventListener("click", () => {
+        if (!original.disabled) original.click();
+      });
+      return button;
+    };
+    root = document.createElement("div");
+    root.id = id;
+    root.className = "fd15-live-switch";
+    const indicator = document.createElement("span");
+    indicator.className = "fd15-live-indicator";
+    indicator.setAttribute("aria-hidden", "true");
+    const left = segment(startSegment, enterText, enter);
+    const right = segment(stopSegment, stopText, stop);
+    root.append(indicator, left, right);
+
+    const originals = document.createElement("div");
+    originals.id = `${id}-originals`;
+    originals.hidden = true;
+    const row = removeRow ? $(removeRow) : null;
+    originals.append(enter, stop);
+    row?.remove();
+    busyProxies.set(enter, [left]);
+    busyProxies.set(stop, [right]);
+
+    const sync = () => {
+      left.disabled = enter.disabled;
+      right.disabled = stop.disabled;
+      const on = Boolean(active());
+      root.dataset.side = on ? "right" : "left";
+      root.dataset.mode = on ? "right-amber" : enter.disabled ? "none" : "left-green";
+    };
+    const observer = new MutationObserver(sync);
+    for (const node of [enter, stop]) {
+      observer.observe(node, { attributes: true, attributeFilter: ["disabled"] });
+    }
+    window.addEventListener(event, sync);
+    sync();
+    root.fd18Originals = originals;
+    return root;
+  }
+
+  function buildCarTeleopSwitch() {
+    return buildCarSwitch({
+      id: "fd18-car-teleop-switch", enterId: "car-enable-teleop", stopId: "car-disable-teleop",
+      enterText: "Enter Teleop", stopText: "Stop Teleop", removeRow: "car-teleop-row",
+      active: () => typeof window.carTeleopArmed === "function" && window.carTeleopArmed(),
+      event: "car-teleop-state",
+    });
+  }
+
+  function buildCarModeSwitch(mode) {
+    const mapping = mode === "mapping";
+    return buildCarSwitch({
+      id: `fd18-car-${mode}-switch`,
+      enterId: mapping ? "car-mapping" : "car-localization",
+      stopId: mapping ? "car-mapping-stop" : "car-localization-stop",
+      enterText: mapping ? "Enter Mapping" : "Enter Localization",
+      stopText: mapping ? "Stop Mapping" : "Stop Localization",
+      active: () => typeof window.carModeActive === "function" && window.carModeActive(mode),
+      event: "car-mode-state",
+    });
+  }
+
+  /* The car Mapping captures and partial-map buttons wear exactly what the
+     robot Mapping counterparts wear (class and inline style). Legacy passes
+     restyle car controls, so an observer mirrors again whenever they do. */
+  function carMappingPairs() {
+    const robotBox = $("snapshots")?.closest(".mapping-progress");
+    const carBox = $("car-mapping-progress");
+    const pairs = [[$("view-partial"), $("car-view-partial")], [$("download-partial"), $("car-download-partial")]];
+    if (robotBox && carBox) {
+      pairs.push([robotBox, carBox]);
+      [...carBox.children].forEach((row, index) => {
+        const source = robotBox.children[Math.min(index, robotBox.children.length - 1)];
+        pairs.push([source, row]);
+        pairs.push([source?.querySelector("span"), row.querySelector("span")]);
+        pairs.push([source?.querySelector("b"), row.querySelector("b")]);
+      });
+    }
+    return pairs.filter(([source, target]) => source && target);
+  }
+
+  function mirrorCarMappingStyles() {
+    const box = $("car-mapping-progress");
+    for (const [source, target] of carMappingPairs()) {
+      // Not "mapping-progress": a legacy typography pass restyles those labels.
+      const className = target === box
+        ? source.className.replace(/\bmapping-progress\b/, "fd18-car-progress")
+        : source.className;
+      if (target.className !== className) target.className = className;
+      // The car rail is narrower: the partial-map buttons keep one line.
+      const narrow = target.id === "car-view-partial" || target.id === "car-download-partial";
+      const base = source.getAttribute("style");
+      const style = narrow && base !== null
+        ? `${base} padding-left: 4px !important; padding-right: 4px !important; white-space: nowrap !important;`
+        : base;
+      if (style === null) {
+        if (target.hasAttribute("style")) target.removeAttribute("style");
+      } else if (target.getAttribute("style") !== style) {
+        target.setAttribute("style", style);
+      }
+    }
+    if (box && !box.dataset.fd18Mirror) {
+      box.dataset.fd18Mirror = "1";
+      const observer = new MutationObserver(mirrorCarMappingStyles);
+      for (const node of [box, $("car-partial-actions")].filter(Boolean)) {
+        observer.observe(node, { attributes: true, subtree: true, attributeFilter: ["style", "class"] });
+      }
+    }
+  }
+
   function splitCarSidebar() {
     const navigation = $("car-panel");
     const navigationBody = navigation?.querySelector(":scope > .card-body");
@@ -448,10 +580,14 @@
     const manualBody = manual.querySelector(":scope > .card-body");
     if (!mappingBody || !localizationBody || !manualBody) return;
 
-    const mappingButton = $("car-mapping");
+    const mappingSwitch = buildCarModeSwitch("mapping");
     const mapName = $("car-map-name")?.closest(".input-action");
-    if (mappingButton) mappingBody.append(mappingButton);
-    if (mapName) mappingBody.append(mapName);
+    const teleop = buildCarTeleopSwitch();
+    mappingBody.append(...[
+      mappingSwitch, mappingSwitch?.fd18Originals, mapName, teleop, teleop?.fd18Originals,
+      $("car-mapping-progress"), $("car-partial-label"),
+      $("car-partial-sessions")?.closest(".select-row"), $("car-partial-actions"),
+    ].filter(Boolean));
 
     const oldTitle = navigation.querySelector(":scope > .card-title");
     if (!navigation.dataset.fd18Retitled) {
@@ -460,7 +596,10 @@
       navigation.dataset.fd18Retitled = "1";
     }
 
-    const localization = $("car-localization");
+    const localizationSwitch = buildCarModeSwitch("localization");
+    const localization = localizationSwitch
+      ? [localizationSwitch, localizationSwitch.fd18Originals]
+      : [$("car-localization")];
     const mapRow = $("car-maps")?.closest(".select-row");
     const mapActions = $("car-map-actions");
     const clearView = $("car-clear-view");
@@ -482,13 +621,14 @@
     const slamParams = $("car-slam-params");
     const refine = $("car-refine-icp");
     const result = $("car-result");
+    const servoOffset = $("car-servo-offset-row");
 
     if (initialLabel) initialLabel.textContent = "Initial pose";
     if (goalLabel) goalLabel.textContent = "Destination";
 
     /* Resolve every live node before any body is rebuilt. */
     localizationBody.replaceChildren(...[
-      localization, mapRow, mapActions, clearView, initialLabel, initialGrid, initialButton
+      ...localization, mapRow, mapActions, clearView, initialLabel, initialGrid, initialButton
     ].filter(Boolean));
     navigationBody.replaceChildren(...[
       goalLabel, goalGrid, preview, startStop, pauseResume,
@@ -501,8 +641,15 @@
       pair.className = "button-row";
     }
     pair.replaceChildren(...[standalone, flip].filter(Boolean));
+    let note = $("fd18-manual-note");
+    if (!note) {
+      note = document.createElement("div");
+      note.id = "fd18-manual-note";
+      note.className = "fd18-card-note";
+      note.textContent = "Specifies the transform between robot origin and car origin and sets the wheels offset.";
+    }
     manualBody.replaceChildren(...[
-      tfGrid, pair, transform,
+      note, servoOffset, tfGrid, pair, transform,
       mapFile, slamParams, refine, result
     ].filter(Boolean));
 
@@ -588,8 +735,7 @@
   function placePoseUnderViewTools() {
     const status = $("fd17-slam-statusbar");
     const pose = status?.querySelector(".pose-bar");
-    const fit = $("fit-map");
-    if (!status || !pose || !fit) return;
+    if (!status || !pose) return;
 
     let semantic = $("fd20-semantic-readout");
     if (!semantic) {
@@ -612,9 +758,11 @@
     pose.style.setProperty("position", "absolute", "important");
     pose.style.setProperty("top", "50%", "important");
     pose.style.setProperty("transform", "translateY(-50%)", "important");
+    // X / Y / Yaw sit as far from the bar's right end as SEMANTICS sits
+    // from its left end.
     const statusRect = status.getBoundingClientRect();
-    const fitRect = fit.getBoundingClientRect();
-    const right = Math.max(0, Math.round(statusRect.right - fitRect.right));
+    const semanticRect = semantic.getBoundingClientRect();
+    const right = Math.max(0, Math.round(semanticRect.left - statusRect.left));
     pose.style.setProperty("right", `${right}px`, "important");
     pose.style.setProperty("left", "auto", "important");
   }
@@ -776,9 +924,16 @@
     const carGo = $("car-go");
     const carNav = () => (typeof window.carNavState === "function" ? window.carNavState() : "idle");
     if (carSwitch && carGo) {
-      plans.push([carSwitch, () => ({
-        mode: carNav() !== "idle" ? "right-amber" : carGo.disabled ? "none" : "left-green",
-      })]);
+      // Stop is usable only with a previewed or running route.
+      plans.push([carSwitch, () => {
+        const routing = carNav() !== "idle";
+        return {
+          mode: routing ? "right-amber" : carGo.disabled ? "none" : "left-green",
+          leftEnabled: !carGo.disabled,
+          rightEnabled: routing || !carGo.disabled,
+          manageDisabled: true,
+        };
+      }]);
     }
     const carPause = $("fd18-car-pause-switch");
     if (carPause) {
@@ -1610,6 +1765,7 @@
     placePoseUnderViewTools();
     copyMappingPauseIcons();
     installTeleopSwitch();
+    mirrorCarMappingStyles();
     registerBusyProxies();
     installRunStateSync();
     installCarOnlineChip();

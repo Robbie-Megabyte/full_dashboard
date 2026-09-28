@@ -22,7 +22,7 @@ head_camera:
   physical_path: null
 
 external_camera:
-  enable_zmq: false
+  enable_zmq: true
   zmq_port: 55558
   enable_webrtc: true
   webrtc_port: 60004

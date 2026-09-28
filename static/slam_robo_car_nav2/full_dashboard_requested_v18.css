@@ -741,12 +741,17 @@ body.stitch-major-resizing-v1931 .app-shell > .stitch-major-v1924 {
 .control-panel:not(.car-side) .fd20-yolo-toggle {
     display: inline-flex !important;
     align-items: center !important;
-    gap: 5px !important;
+    gap: 4px !important;
+    width: max-content !important;
+    height: max-content !important;
     min-width: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
     background: transparent !important;
+    box-shadow: none !important;
+    transform: none !important;
+    white-space: nowrap !important;
     color: #a1a1aa !important;
     font-family: "Plus Jakarta Sans", system-ui, sans-serif !important;
     font-size: 9px !important;
@@ -950,7 +955,7 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
     background: var(--fd21-live-camera-body-bg) !important;
 }
 
-.control-panel:not(.car-side) .fd21-camera-card-body video {
+.control-panel:not(.car-side) .fd21-camera-card-body :is(video, img) {
     display: block !important;
     width: 100% !important;
     height: 100% !important;
@@ -998,13 +1003,13 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
     display: grid !important;
     place-items: center !important;
 }
-.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body > video {
+.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body > :is(video, img) {
     position: absolute !important;
     inset: 0 !important;
     z-index: 2 !important;
 }
 /* The idle reticle stays visible until slam_camera.js receives a stream. */
-.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body > video:not(.is-live) {
+.fd21-camera-stack.stitch-live-v12#view-live .fd21-camera-card-body > :is(video, img):not(.is-live) {
     opacity: 0 !important;
 }
 .fd21-camera-card-header:has(.fd23-live-title-icon) .fd21-camera-dot {
@@ -1082,7 +1087,7 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
     aspect-ratio: auto !important;
 }
 
-.control-panel:not(.car-side) .fd21-camera-card-body > video {
+.control-panel:not(.car-side) .fd21-camera-card-body > :is(video, img) {
     width: 100% !important;
     height: 100% !important;
     object-fit: contain !important;
@@ -1434,18 +1439,19 @@ html.fd21-backend-offline .fd19-viewer-wrap .render-count {
     right: 8px !important;
     width: 10px !important;
     height: 10px !important;
-    margin-top: -6px !important;
-    box-sizing: content-box !important;
-    border: 1.5px solid currentColor !important;
-    border-right-color: transparent !important;
+    margin-top: -5px !important;
+    box-sizing: border-box !important;
+    border: 1.6px solid color-mix(in srgb, currentColor 22%, transparent) !important;
+    border-top-color: currentColor !important;
     border-radius: 50% !important;
-    opacity: .85 !important;
+    opacity: 1 !important;
     pointer-events: none !important;
-    animation: fd18-busy-spin .7s linear infinite !important;
+    animation: fd18-busy-spin .75s linear infinite !important;
 }
 
+/* Same ring as the Live tab buttons. */
 @keyframes fd18-busy-spin {
-    to { transform: rotate(360deg); }
+    to { rotate: 360deg; }
 }
 
 
@@ -1497,3 +1503,217 @@ html body .control-panel :is(#preview-route, #car-preview):disabled {
     line-height: 1 !important;
     letter-spacing: .005em !important;
 }
+
+
+/* ============================================================
+   Robot Mapping: the map name sits under the switches with the
+   same 8 px gap as in Car Mapping (no "Map name" label).
+   ============================================================ */
+html body .control-panel .input-action:has(#map-name) {
+    margin-top: -13px !important;
+}
+
+/* ============================================================
+   Car Mapping captures: same rows as the robot Mapping card.
+   ============================================================ */
+html body #car-mapping-progress > div {
+    border: 0 !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    height: 18px !important;
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+}
+html body #car-mapping-progress :is(span, b) {
+    font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 14.3px !important;
+    margin-top: 0 !important;
+}
+html body #car-mapping-progress span { color: rgb(135, 144, 153) !important; }
+html body #car-mapping-progress b { color: rgb(196, 203, 208) !important; }
+
+/* Manual Correction: short explanation under the title, in the typography
+   of the Mapping "Session" / "Latest capture" labels. */
+html body #fd18-manual-note {
+    font-family: Inter, "Segoe UI", Roboto, Helvetica, Arial, sans-serif !important;
+    font-size: 11px !important;
+    font-weight: 400 !important;
+    line-height: 14.3px !important;
+    color: rgb(135, 144, 153) !important;
+    margin: 0 !important;
+}
+html body #car-mapping-progress {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 5px !important;
+    margin-top: 9px !important;
+}
+html body #car-mapping-progress > div {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) auto !important;
+    align-items: center !important;
+    gap: 12px !important;
+}
+html body #car-mapping-progress span { display: block !important; }
+html body #car-mapping-progress b {
+    display: block !important;
+    justify-self: end !important;
+    text-align: right !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+
+/* ============================================================
+   SLAM camera windows = Live camera windows: 44 px title bar with
+   the status dot, centred icon + title in the Live typography, and
+   the Live window proportions.
+   ============================================================ */
+html body #view-live.fd21-camera-stack .fd21-camera-card {
+    aspect-ratio: 290 / 218 !important;
+    height: auto !important;
+    display: flex !important;
+    flex-direction: column !important;
+}
+html body #view-live.fd21-camera-stack .fd21-camera-card > .fd21-camera-card-body {
+    flex: 1 1 auto !important;
+    min-height: 0 !important;
+    height: auto !important;
+}
+html body #view-live.fd21-camera-stack .fd21-camera-card-header {
+    position: relative !important;
+    box-sizing: border-box !important;
+    height: 44px !important;
+    min-height: 44px !important;
+    flex: 0 0 44px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 7px !important;
+    padding: 0 16px !important;
+    background: rgb(33, 33, 33) !important;
+    border-bottom: 1px solid rgb(51, 51, 51) !important;
+}
+html body #view-live.fd21-camera-stack .fd21-camera-card-header strong {
+    font-family: "Plus Jakarta Sans", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+    letter-spacing: .6px !important;
+    line-height: 16px !important;
+    color: rgb(226, 226, 226) !important;
+}
+html body #view-live.fd21-camera-stack .fd21-camera-card-header .fd23-live-title-icon,
+html body #view-live.fd21-camera-stack .fd21-camera-card-header .fd23-live-title-icon svg {
+    display: inline-flex !important;
+    width: 14px !important;
+    height: 14px !important;
+    flex: 0 0 14px !important;
+    color: rgb(161, 161, 170) !important;
+    stroke: rgb(161, 161, 170) !important;
+    opacity: 1 !important;
+}
+html body #view-live.fd21-camera-stack .fd21-camera-card-header .fd21-camera-dot { display: none !important; }
+html body #view-live.fd21-camera-stack .fd21-camera-card-header::before {
+    content: "" !important;
+    position: absolute !important;
+    left: 10px !important;
+    top: 50% !important;
+    width: 5px !important;
+    height: 5px !important;
+    transform: translateY(-50%) !important;
+    border-radius: 999px !important;
+    background: #f59e0b !important;
+    box-shadow: 0 0 7px rgba(245, 158, 11, .62) !important;
+}
+@keyframes fd24-camera-dot-live {
+    0%, 100% { opacity: .78; box-shadow: 0 0 6px rgba(52, 211, 153, .42); }
+    50% { opacity: 1; box-shadow: 0 0 9px rgba(52, 211, 153, .72); }
+}
+html body #view-live.fd21-camera-stack .fd21-camera-card:has(:is(video, img).is-live) .fd21-camera-card-header::before {
+    background: #34d399 !important;
+    box-shadow: 0 0 8px rgba(52, 211, 153, .68) !important;
+    animation: fd24-camera-dot-live 2s ease-in-out infinite !important;
+}
+
+
+/* ============================================================
+   Loading buttons with an icon: the ring takes the icon's place
+   (as in the Live tab) instead of sitting at the right edge.
+   ============================================================ */
+html body .fd18-busy:has(> [aria-hidden="true"])::after {
+    display: none !important;
+}
+html body .fd18-busy > [aria-hidden="true"] {
+    display: inline-block !important;
+    box-sizing: border-box !important;
+    width: 10px !important;
+    height: 10px !important;
+    min-width: 10px !important;
+    flex: 0 0 10px !important;
+    margin-right: 6px !important;
+    font-size: 0 !important;
+    color: inherit !important;
+    background: none !important;
+    -webkit-mask: none !important;
+    mask: none !important;
+    border: 1.6px solid color-mix(in srgb, currentColor 22%, transparent) !important;
+    border-top-color: currentColor !important;
+    border-radius: 50% !important;
+    transform: none !important;
+    animation: fd18-busy-spin .75s linear infinite !important;
+}
+html body .fd18-busy > [aria-hidden="true"]::before,
+html body .fd18-busy > [aria-hidden="true"]::after {
+    display: none !important;
+}
+/* Icon-only buttons (↻): the ring replaces the whole glyph, centred. */
+html body .icon-btn.fd18-busy {
+    color: inherit !important;
+    font-size: 0 !important;
+}
+html body .icon-btn.fd18-busy::after {
+    right: auto !important;
+    left: 50% !important;
+    margin-left: -5px !important;
+    font-size: 12px !important;
+}
+
+
+/* SLAM YOLO checkbox = Live YOLO checkbox (the generic SLAM input box styling
+   made it look different once checked). */
+html body label.fd-live-yolo-toggle input[type="checkbox"] {
+    appearance: auto !important;
+    width: 14px !important;
+    height: 14px !important;
+    min-height: 0 !important;
+    padding: 0 !important;
+    background: transparent !important;
+    border: 0 !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    accent-color: rgb(152, 217, 130) !important;
+    color: rgb(203, 213, 225) !important;
+}
+
+
+/* CAR ONLINE / OFFLINE: fixed colors in the style of the other buttons
+   (green = Preview, amber = Stop). The Live palette it used to follow
+   changes with the VR controller state. */
+html body #fd18-car-online-chip.good {
+    color: rgb(142, 203, 127) !important;
+    background: rgba(142, 203, 127, .07) !important;
+    border-color: rgba(142, 203, 127, .46) !important;
+    box-shadow: none !important;
+}
+html body #fd18-car-online-chip.warn {
+    color: rgb(245, 158, 11) !important;
+    background: rgba(245, 158, 11, .055) !important;
+    border-color: rgba(245, 158, 11, .38) !important;
+    box-shadow: none !important;
+}
+
+/* The empty legacy pick host must not push X / Y / Yaw away from the right end. */
+html body #fd17-slam-statusbar .pose-bar #fd166CenterPickHost:empty{display:none!important;width:0!important;min-width:0!important;margin:0!important;}

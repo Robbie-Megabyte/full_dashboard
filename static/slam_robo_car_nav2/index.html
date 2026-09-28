@@ -196,9 +196,9 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
 
 <!-- Consolidated dashboard presentation plus requested SLAM-only adjustments. -->
 <link rel="stylesheet" href="./full_dashboard_slam_single_owner_v17.css?v=17">
-  <link rel="stylesheet" href="./full_dashboard_requested_v18.css?v=18-21">
+  <link rel="stylesheet" href="./full_dashboard_requested_v18.css?v=18-32">
 <script src="./full_dashboard_slam_single_owner_v17.js?v=17"></script>
-  <script src="./full_dashboard_requested_v18.js?v=18-21"></script>
+  <script src="./full_dashboard_requested_v18.js?v=18-30"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -223,9 +223,8 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
               <button id="pause-map" class="btn btn-muted">Ⅱ Pause</button>
               <button id="stop-map" class="btn btn-danger">■ Stop</button>
             </div>
-            <div class="field-label">Final map name</div>
             <div class="input-action">
-              <input id="map-name" value="harta_noua" maxlength="64" autocomplete="off">
+              <input id="map-name" placeholder="Map name" maxlength="64" autocomplete="off">
               <button id="save-map" class="btn btn-success">Save</button>
             </div>
             <div class="mapping-progress">
@@ -329,7 +328,7 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
           <div class="card-body">
             <div class="perception-actions" aria-label="Camera perception controls">
               <button id="semantic-clear" class="btn btn-muted" type="button">Clear objects</button>
-              <label class="fd20-yolo-toggle">
+              <label class="fd20-yolo-toggle fd-live-yolo-toggle" title="SLAM-only object detection" data-yolo-owner="slam">
                 <input id="yolo-toggle" type="checkbox">
                 <span>YOLO</span>
               </label>
@@ -342,7 +341,7 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
                   <strong>ROBOT RGB</strong>
                 </header>
                 <div class="fd21-camera-card-body">
-                  <video id="camera-color" autoplay muted playsinline aria-label="Robot RGB camera"></video>
+                  <img id="camera-color" alt="Robot RGB camera" draggable="false">
                 </div>
               </section>
 
@@ -352,7 +351,7 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
                   <strong>DEPTH</strong>
                 </header>
                 <div class="fd21-camera-card-body">
-                  <video id="camera-depth" autoplay muted playsinline aria-label="Depth camera"></video>
+                  <img id="camera-depth" alt="Depth camera" draggable="false">
                 </div>
               </section>
             </div>
@@ -430,16 +429,18 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
             <div id="car-status" class="route-summary" role="status">Car disconnected</div>
             <label class="field-label">Click map for
               <select id="car-pick-mode">
-                <option value="g1-pose">Robot initial pose</option>
-                <option value="g1" selected>Robot destination</option>
+                <option value="g1-pose" selected>Robot initial pose</option>
+                <option value="g1">Robot destination</option>
                 <option value="car-pose">Car initial pose</option>
                 <option value="car-goal">Car destination</option>
               </select>
             </label>
             <p class="help">Click and drag for position and direction. For car-tf, orientation follows the drag direction.</p>
             <div class="button-row">
-              <button class="btn btn-muted" id="car-mapping">Car mapping</button>
-              <button class="btn btn-purple" id="car-localization">Car localization</button>
+              <button class="btn btn-muted" id="car-mapping">Enter mapping</button>
+              <button class="btn btn-purple" id="car-localization">Enter localization</button>
+              <button class="btn btn-danger" id="car-mapping-stop" disabled>Stop mapping</button>
+              <button class="btn btn-danger" id="car-localization-stop" disabled>Stop localization</button>
             </div>
             <button class="btn btn-danger btn-full" id="car-stop">Stop car Nav2</button>
             <div class="select-row"><select id="car-maps"></select><button class="icon-btn" id="car-refresh-maps" title="Reload list">↻</button></div>
@@ -450,11 +451,30 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
             <button id="car-clear-view" class="btn btn-muted btn-full">Clear visualization</button>
             <input id="car-map-file" value="/root/humble_ws/harta_masina_1.yaml" aria-label="Car YAML map">
             <input id="car-slam-params" value="/root/humble_ws/custom_params.yaml" aria-label="Car SLAM parameters">
-            <div class="input-action"><input id="car-map-name" placeholder="Car map name"><button class="btn btn-success" id="car-save-map">Save</button></div>
+            <div class="input-action"><input id="car-map-name" placeholder="Map name" maxlength="64" autocomplete="off"><button class="btn btn-success" id="car-save-map" disabled>Save</button></div>
+            <div class="button-row" id="car-teleop-row">
+              <button class="btn btn-success" id="car-enable-teleop" disabled>Enter teleop</button>
+              <button class="btn btn-danger" id="car-disable-teleop" disabled>Stop teleop</button>
+            </div>
+            <div class="fd18-car-progress" id="car-mapping-progress">
+              <div><span>Session</span><b id="car-session-name">—</b></div>
+              <div><span>Latest capture</span><b id="car-last-snapshot">—</b></div>
+              <div><span>Captures every 5 s</span><b id="car-snapshots">0</b></div>
+            </div>
+            <div class="field-label" id="car-partial-label">Partial-map sessions</div>
+            <div class="select-row" id="car-partial-row">
+              <select id="car-partial-sessions"><option value="">No saved sessions</option></select>
+              <button id="car-refresh-partials" class="icon-btn" title="Reload sessions">↻</button>
+            </div>
+            <div class="button-row" id="car-partial-actions">
+              <button id="car-view-partial" class="btn btn-muted fd-reset-style-v7 fd-mode-button-v8">View latest capture</button>
+              <button id="car-download-partial" class="btn btn-muted fd-reset-style-v7 fd-mode-button-v8">Download latest</button>
+            </div>
             <div class="button-row">
               <button class="btn btn-muted btn-full" id="car-align">Align</button>
             </div>
             <p class="help">Runs directly on the geometry of both maps (visual features, with automatic geometric refinement if needed) — no manual positioning is required beforehand.</p>
+            <label class="range-label" id="car-servo-offset-row"><span>Wheel offset <b id="car-servo-offset-value" class="fd152-xr-value fd16-xr-value">90</b></span><input id="car-servo-offset" type="range" min="50" max="150" step="1" value="90" class="fd15-range fd13-range"></label>
             <div class="field-label">Manual correction (optional)</div>
             <div class="field-grid three">
               <label>X (m)<input id="car-tf-x" type="number" value="0" step=".01"></label>
@@ -493,19 +513,16 @@ input:focus, select:focus { border-color: var(--blue); box-shadow: 0 0 0 2px rgb
             <div class="readiness neutral" id="car-result">Car commands do not control G1.</div>
           </div>
         </section>
-        <section class="event-card" id="ws-card">
-          <div class="event-title"><span>WebSocket</span><button id="clear-ws-log">Clear</button></div>
-          <pre id="ws-log">Connecting to the runtime event stream…</pre>
-        </section>
       </div>
     </aside>
   </div>
   <div id="toast" class="toast"></div>
   <script src="./runtime_messages_en.js?v=1"></script>
-  <script src="./app.js?v=fd25-ui-1"></script>
-  <script src="./car.js?v=robot-car-v3-1"></script>
-  <script src="./slam_camera.js?v=1"></script>
-  <script src="./runtime_events.js?v=1"></script>
+  <script src="./app.js?v=fd25-ui-3"></script>
+  <script src="./car.js?v=robot-car-v3-2"></script>
+  <script src="./car_mapping_extras.js?v=4-reverse-steering"></script>
+  <script src="./slam_camera.js?v=4"></script>
+  <script src="./runtime_events.js?v=4"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/build/three.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/controls/OrbitControls.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/three@0.147.0/examples/js/loaders/OBJLoader.js"></script>

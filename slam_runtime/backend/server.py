@@ -1356,6 +1356,7 @@ async def camera_status():
 @app.get("/api/camera/{kind}")
 async def camera_image(kind: str):
     from fastapi.responses import Response as HttpResponse
+    camera.want_frames()
     frame = camera.frame(kind)
     if not frame:
         raise HTTPException(503, "Camera nu a livrat încă un cadru")
@@ -1391,6 +1392,8 @@ async def toggle_yolo(body: dict = Body(default={}), x_dashboard_token: str = He
     if not YOLO_AVAILABLE:
         raise HTTPException(503, "ultralytics nu este instalat")
     enabled = camera.set_yolo_enabled(body.get("enabled", not camera.yolo_enabled()))
+    if enabled:
+        camera.want_frames()
     return {"success": True, "enabled": enabled}
 
 
@@ -1883,6 +1886,8 @@ async def read_robot_fsm() -> dict[str, Any]:
         reported_mode = (
             "damp" if fsm_id == 1
             else "ready" if fsm_id == 4
+            else "zero_torque" if fsm_id == 0
+            else "walk" if fsm_id == 501
             else "locomotion" if fsm_id in LOCOMOTION_FSMS
             else None
         )
@@ -2922,6 +2927,75 @@ async def stop_navigation(x_dashboard_token: str = Header(default="")):
     return await stop_nav2_navigation(ros(), "Ruta Nav2 a fost oprită")
 
 
+async def motion_service_name() -> Optional[str]:
+    """CheckMode without validation: "" once Developer mode released it."""
+    result = await command(1001, {}, timeout=3.0, service="motion_switcher")
+    if not result.get("success"):
+        return None
+    payload = (result.get("response") or {}).get("payload") or {}
+    return str(payload.get("name") or "").strip().lower()
+
+
+async def ensure_motion_service() -> dict[str, Any]:
+    """After Developer mode, give the robot back to the AI motion service."""
+    if await motion_service_name():
+        return {"success": True}
+    selected = await command(1002, {"name": "ai"}, timeout=5.0, service="motion_switcher")
+    if not selected.get("success"):
+        return {**selected, "error": f"SelectMode ai failed: {selected.get('error', '')}"}
+    deadline = time.monotonic() + 3.0
+    while time.monotonic() < deadline:
+        if await motion_service_name() == "ai":
+            return {"success": True}
+        await asyncio.sleep(0.15)
+    return {"success": False, "error": "The motion service did not return to AI"}
+
+
+async def release_motion_service() -> dict[str, Any]:
+    """Developer mode: release the Unitree high-level motion service."""
+    if await motion_service_name() == "":
+        return {"success": True, "fsm_id": None}
+    released = await command(1003, {}, timeout=5.0, service="motion_switcher")
+    if not released.get("success"):
+        return {**released, "error": f"ReleaseMode failed: {released.get('error', '')}"}
+    deadline = time.monotonic() + 3.0
+    while time.monotonic() < deadline:
+        if await motion_service_name() == "":
+            return {"success": True, "fsm_id": None}
+        await asyncio.sleep(0.15)
+    return {"success": False, "error": "The motion service was not released"}
+
+
+async def activate_walk_mode() -> dict[str, Any]:
+    """WALK (FSM 501) starts from standing, as RUN does."""
+    current = await read_robot_fsm()
+    if current.get("success") and int(current["fsm_id"]) not in ({4} | LOCOMOTION_FSMS):
+        ready = await set_and_confirm_fsm(4, {4}, timeout=9.0)
+        if not ready.get("success"):
+            return {**ready, "error": f"READY before WALK failed: {ready.get('error', '')}"}
+    return await set_and_confirm_fsm(501, {501}, timeout=9.0)
+
+
+_robot_mode_read = {"at": 0.0}
+
+
+@app.get("/api/robot/mode")
+async def get_robot_mode(x_dashboard_token: str = Header(default="")):
+    """Current mode read from the robot (read-only APIs, at most every 2 s)."""
+    authorize(x_dashboard_token)
+    node = ros()
+    if time.monotonic() - _robot_mode_read["at"] > 2.0:
+        _robot_mode_read["at"] = time.monotonic()
+        if await motion_service_name() == "":
+            with node.lock:
+                node.robot_mode = "dev"
+                node.robot_fsm = None
+        else:
+            await read_robot_fsm()
+    state = node.state()
+    return {"success": True, "mode": state.get("robot_mode"), "fsm": state.get("robot_fsm")}
+
+
 @app.post("/api/robot/mode")
 async def set_robot_mode(
     body: dict = Body(...), x_dashboard_token: str = Header(default="")
@@ -2929,9 +3003,10 @@ async def set_robot_mode(
     authorize(x_dashboard_token)
     mode = str(body.get("mode") or "").strip().lower()
     password = str(body.get("password") or "")
-    fsm_by_mode = {"damp": 1, "ready": 4, "run": None}
+    # FSM ids as the pipeline team's mode controller uses them on this G1.
+    fsm_by_mode = {"damp": 1, "ready": 4, "zero_torque": 0, "walk": 501, "run": None, "dev": None}
     if mode not in fsm_by_mode:
-        raise HTTPException(400, "Mod invalid; folosește damp, ready sau run")
+        raise HTTPException(400, "Invalid mode; use damp, ready, zero_torque, walk, run or dev")
     if not secrets.compare_digest(password, "123"):
         raise HTTPException(403, "Parolă incorectă pentru schimbarea modului")
     node = ros()
@@ -2940,22 +3015,35 @@ async def set_robot_mode(
         return stopped
     node.motion_conflict = ""
     # Mutation middleware already serializes HTTP mode changes with route starts.
-    if mode == "run":
-        result = await activate_run_mode()
+    if mode == "dev":
+        result = await release_motion_service()
     else:
-        requested = int(fsm_by_mode[mode])
-        result = await set_and_confirm_fsm(requested, {requested}, timeout=9.0)
+        # Every other mode needs the AI motion service (Developer released it).
+        result = await ensure_motion_service()
+        if result.get("success"):
+            if mode == "run":
+                result = await activate_run_mode()
+            elif mode == "walk":
+                result = await activate_walk_mode()
+            else:
+                requested = int(fsm_by_mode[mode])
+                result = await set_and_confirm_fsm(requested, {requested}, timeout=9.0)
     if result.get("success"):
         with node.lock:
             node.robot_mode = mode
             node.run_profile_accepted = mode == "run"
-            node.robot_fsm = int(result["fsm_id"])
+            # Developer mode has no locomotion FSM.
+            node.robot_fsm = None if result.get("fsm_id") is None else int(result["fsm_id"])
     return {
         **result,
         "mode": mode if result.get("success") else node.state()["robot_mode"],
         "fsm": result.get("fsm_id"),
         "message": (
-            f"FSM {result.get('fsm_id')} citit; cererea {mode.upper()} acceptată"
+            (
+                "Developer mode: motion service released"
+                if mode == "dev"
+                else f"FSM {result.get('fsm_id')} read; {mode.upper().replace('_', ' ')} accepted"
+            )
             if result.get("success") else result.get("error")
         ),
     }

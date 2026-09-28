@@ -1,6 +1,5 @@
 import { G1Twin } from './g1_model.js?v=V21_7_REVERT_ORIGINAL_LOOK';
 import { PointCloud3D } from './pointcloud_view.js';
-import { SlamWorld3D } from './slam_view.js?v=slam-semantic-v2209';
 
 (()=>{
 'use strict';
@@ -30,6 +29,10 @@ let cameraProcessPollBusy=false;
 let cameraProcessActionBusy=false;
 let cameraViewsActionBusy=false;
 let cameraYoloActionBusy=false;
+// Camera pose teleoperation runs its control loop on the companion PC. While
+// that stack is active, suspend dashboard-only GPU/video consumers so browser
+// previews cannot compete with motion tracking and MuJoCo.
+let cameraTeleopPriorityMode=false;
 
 const CAMERA_VIEW_ORDER=Object.freeze([
   'rgb',
@@ -161,25 +164,13 @@ let pointCloudFetchBusy=false;
 let pointCloudPollTimer=null;
 let selectedJointIndex=18;
 
-const slamViewer=SlamWorld3D.init($('slamCanvas'));
-let slamMapLoaded=false;
-let slamMapLoading=false;
-let slamStatusBusy=false;
-let slamCloudBusy=false;
-let slamLastCloudSequence=-1;
-let slamLatestStatus=null;
-let slamInitialSelecting=false;
-let slamInitialDraft=null;
-let slamInitialBusy=false;
 
 function switchView(name){
-  if(!['live','slam','inspect','bacalbasa'].includes(name)) return;
+  if(!['live','slam','inspect'].includes(name)) return;
   currentView=name;
   document.querySelectorAll('.view').forEach(v=>v.classList.toggle('active',v.id===`view-${name}`));
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.view===name));
-  slamViewer.setVisible(name==='slam');
-  G1Twin.setRenderVisible(name==='live');
-  if(name==='slam')ensureSlamMap();
+  G1Twin.setRenderVisible(name==='live'&&!cameraTeleopPriorityMode);
 }
 document.querySelectorAll('.tab').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.view)));
 document.querySelectorAll('[data-view-jump]').forEach(b=>b.addEventListener('click',()=>switchView(b.dataset.viewJump)));
@@ -1431,11 +1422,11 @@ function stitchCameraRestoreSvgV1952(){
             stroke-linejoin="round"
             aria-hidden="true"
         >
-            <path d="M4 14h6v6"/>
-            <path d="M3 21l7-7"/>
+            <path d="M10 4v6H4"/>
+            <path d="M3 3l7 7"/>
 
-            <path d="M20 10h-6V4"/>
-            <path d="M21 3l-7 7"/>
+            <path d="M14 20v-6h6"/>
+            <path d="M21 21l-7-7"/>
         </svg>
     `;
 }
@@ -5201,6 +5192,8 @@ function setCameraTileState(
 }
 
 function pointCloudActive(){
+  if(cameraTeleopPriorityMode)return false;
+
   if(!activeCameraViews.includes('pointcloud')){
     return false;
   }
@@ -6641,6 +6634,37 @@ function stopCamera({silent=false}={}){
   renderCameraGrid();
 }
 
+/* CAMERA_TELEOP_RESOURCE_PRIORITY_V1
+ *
+ * Configure starts the companion-PC tracking/simulation stack. From then
+ * until Stop, camera teleop owns the browser's rendering budget: robot WebRTC
+ * decoders, point-cloud polling, and the decorative G1 twin are paused. The
+ * robot camera backend stays warm and the normal watchdog reconnects views
+ * automatically after camera teleop stops.
+ */
+window.fullDashSetCameraTeleopPriorityV1=enabled=>{
+  const next=Boolean(enabled);
+  if(cameraTeleopPriorityMode===next)return;
+
+  cameraTeleopPriorityMode=next;
+  G1Twin.setRenderVisible(currentView==='live'&&!next);
+
+  if(next){
+    for(const id of Array.from(cameraPeers.keys())){
+      closeCameraPeer(id,{resetState:false});
+    }
+    if(pointCloudPollTimer){
+      clearTimeout(pointCloudPollTimer);
+      pointCloudPollTimer=null;
+    }
+    PointCloud3D.setVisible(false);
+  }else{
+    syncPointCloudRuntime();
+  }
+
+  syncCameraConnectionState();
+};
+
 async function startAndConnectCamera(){
   if(cameraProcessActionBusy||cameraConnecting)return;
 
@@ -7618,6 +7642,38 @@ function fullDashVisibleRobotViewsV2(){
 
 
 /*
+ * Workspace changes while the cameras are connected: ask the camera server
+ * for exactly the robot views on the workspace, close the peers of views
+ * that left it, and let the camera watchdog connect the new ones (the point
+ * cloud starts polling as soon as it is an active view).
+ */
+let fullDashWorkspaceApplyV3=Promise.resolve();
+function fullDashApplyWorkspaceViewsV3(){
+  fullDashWorkspaceApplyV3=fullDashWorkspaceApplyV3.then(async()=>{
+    const wanted=fullDashVisibleRobotViewsV2();
+    if(!wanted.length)return;
+    try{
+      await fullDashCameraPostV2('/api/camera/passive/prepare',{views:wanted});
+      for(let attempt=0;attempt<40;attempt++){
+        const status=await pollCameraProcess();
+        const actual=normalizeCameraViews(status?.web_views_actual||[]);
+        if(wanted.every(id=>actual.includes(id)))break;
+        await new Promise(resolve=>setTimeout(resolve,250));
+      }
+    }catch(error){
+      console.warn('Camera workspace update failed.',error);
+    }
+    for(const id of [...cameraPeers.keys()]){
+      if(!wanted.includes(id))closeCameraPeer(id,{resetState:false});
+    }
+    activeCameraViews=wanted.slice();
+    renderCameraGrid();
+    syncPointCloudRuntime();
+  });
+  return fullDashWorkspaceApplyV3;
+}
+
+/*
  * Override only the Full Dash Connect action.
  */
 startAndConnectCamera=async function(){
@@ -7728,8 +7784,11 @@ startAndConnectCamera=async function(){
 
 
     /*
-     * SERIAL connection is intentional.
+     * SERIAL connection is intentional. One view that is not ready or fails
+     * no longer leaves the others unconnected: it is skipped here and the
+     * camera watchdog below connects it as soon as it can.
      */
+    let connectedAny=false;
     for(const id of ids){
 
       const ready=
@@ -7738,14 +7797,22 @@ startAndConnectCamera=async function(){
         );
 
       if(!ready){
-        throw new Error(
-          `${cameraModeLabel(id)} publisher is not ready.`
-        );
+        console.warn(`${cameraModeLabel(id)} publisher is not ready yet.`);
+        continue;
       }
 
-      await fullDashConnectOneV3(
-        id
-      );
+      try{
+        await fullDashConnectOneV3(
+          id
+        );
+        connectedAny=true;
+      }catch(error){
+        console.warn(`${cameraModeLabel(id)} connection failed; retrying later.`,error);
+      }
+    }
+
+    if(ids.length&&!connectedAny){
+      throw new Error('No camera view could be connected.');
     }
 
 
@@ -7848,6 +7915,72 @@ $('cameraConnectBtn').addEventListener(
   },
 );
 
+/*
+ * Cameras are on by default and kept on: connect when the dashboard opens,
+ * then every 5 s connect any workspace robot view that has no peer (a view
+ * that was not ready, failed, or was lost). Disconnect turns this off until
+ * Connect is pressed again.
+ */
+let fullDashCamerasWantedV3=true;
+document.getElementById('cameraConnectBtn')?.addEventListener('click',()=>{
+  fullDashCamerasWantedV3=true;
+},true);
+document.getElementById('cameraStopBtn')?.addEventListener('click',()=>{
+  fullDashCamerasWantedV3=false;
+},true);
+
+function fullDashCameraWatchdogV3(){
+  if(
+    stitchCameraUiPreviewV142()
+    ||!fullDashCamerasWantedV3
+    ||fullDashCameraBusyV2
+    ||cameraTeleopPriorityMode
+  )return;
+  if(!fullDashCameraConnectedV2){
+    startAndConnectCamera();
+    return;
+  }
+  for(const id of activeWebRtcViews()){
+    const pc=cameraPeers.get(id)?.pc;
+    const dead=!pc||['failed','closed','disconnected'].includes(pc.connectionState);
+    if(dead&&!cameraPeerConnecting.has(id)){
+      fullDashConnectOneV3(id).catch(error=>{
+        console.warn(`${cameraModeLabel(id)} reconnect failed.`,error);
+      });
+      // One view per round; the camera server takes offers serially.
+      return;
+    }
+  }
+}
+setTimeout(fullDashCameraWatchdogV3,2500);
+setInterval(fullDashCameraWatchdogV3,5000);
+
+/*
+ * Long operations in progress, for the Live tab loading rings
+ * (live_button_busy.js): camera connect (also the automatic one at start-up)
+ * and the VR controller start/stop.
+ */
+window.fullDashBusyV1=()=>({
+  cameraConnectBtn:fullDashCameraBusyV2&&!fullDashCameraConnectedV2,
+  controllerConfigureBtn:controllerActionBusy&&controllerStatus?.state==='STOPPED',
+  controllerStopBtn:controllerStatus?.state==='STOPPING'
+    ||(controllerActionBusy&&controllerStatus?.state!=='STOPPED'),
+});
+
+/*
+ * Puts a docked camera view in the first free workspace slot (as dragging
+ * its dock icon would). Used to show Raw Camera when camera teleop is found.
+ */
+window.fullDashShowCameraViewV1=id=>{
+  stitchCameraInitializeSlotsV151();
+  if(!stitchCameraParkedV151.has(id))return stitchCameraSlotByIdV151.has(id);
+  if(stitchCameraMaximizeStateV1949)return false;
+  for(let slot=0;slot<6;slot++){
+    if(stitchCameraSlotEmptyV151(slot,id))return stitchCameraRestoreV151(id,slot);
+  }
+  return false;
+};
+
 $('cameraStopBtn').addEventListener(
   'click',
   ()=>{
@@ -7923,65 +8056,29 @@ function renderRobot(t){
 }
 
 G1Twin.init($('robotTwinCanvas'),(i)=>{selectedJointIndex=i;renderSelectedJoint(latestEnv?.telemetry||{});});
-G1Twin.setRenderVisible(currentView==='live');
+G1Twin.setRenderVisible(currentView==='live'&&!cameraTeleopPriorityMode);
 
-const slamRobotModel=G1Twin.createSceneReplica();
-
-if(slamRobotModel){
-
-  /*
-   * BACALBASA_SLAM_ROBOT_AMBER_V2209
-   *
-   * This replica belongs only to the SLAM scene.
-   * Clone materials first so the normal Live twin is untouched.
-   */
-
-  slamRobotModel.traverse?.(node=>{
-
-    if(!node?.material){
-      return;
-    }
-
-    const tintMaterial=material=>{
-
-      if(!material?.clone){
-        return material;
-      }
-
-      const clone=material.clone();
-
-      if(clone.color?.setHex){
-        clone.color.setHex(0xd39a22);
-      }
-
-      return clone;
-    };
-
-    if(Array.isArray(node.material)){
-
-      node.material=
-        node.material.map(
-          tintMaterial
-        );
-
-    }else{
-
-      node.material=
-        tintMaterial(
-          node.material
-        );
-    }
-  });
-
-  slamViewer.setRobotModel(
-    slamRobotModel
-  );
-}
 G1Twin.selectJoint(selectedJointIndex);
 $('ghostToggle').addEventListener('change',e=>G1Twin.setGhostVisible(e.target.checked));
 $('jointToggle').addEventListener('change',e=>G1Twin.setJointsVisible(e.target.checked));
 $('healthToggle').addEventListener('change',e=>{G1Twin.setHealthVisible(e.target.checked);$('healthLegendPrimary').classList.toggle('hidden',!e.target.checked);renderSelectedJoint(latestEnv?.telemetry||{});});
-$('healthModeSelect').addEventListener('change',e=>{G1Twin.setHealthMode(e.target.value);renderSelectedJoint(latestEnv?.telemetry||{});const hs=G1Twin.getHealthSummary();$('robotHealthSummary').textContent=hs?.label||'—';setTone($('robotHealthSummary'),hs?.severity>=3?'bad':hs?.severity>=1?'warn':Number.isFinite(hs?.severity)?'good':null);});
+/* The health legend names the bands of the selected mode (g1_model.js
+   levelFromTemp / levelFromTorqueUtil); Composite shows the worst of both. */
+const HEALTH_BANDS={
+  temperature:['<70 °C','70–80 °C','80–90 °C','≥90 °C'],
+  torque:['<50% τ','50–75% τ','75–90% τ','≥90% τ'],
+};
+function renderHealthLegend(mode){
+  const names=['normal','watch','high','very high'];
+  $('healthLegendPrimary')?.querySelectorAll(':scope > span').forEach((item,i)=>{
+    const dot=item.querySelector('i');
+    if(!dot)return;
+    const band=HEALTH_BANDS[mode]?.[i];
+    item.replaceChildren(dot,document.createTextNode(band?`${names[i]} ${band}`:names[i]));
+  });
+}
+renderHealthLegend($('healthModeSelect')?.value||'composite');
+$('healthModeSelect').addEventListener('change',e=>{G1Twin.setHealthMode(e.target.value);renderHealthLegend(e.target.value);renderSelectedJoint(latestEnv?.telemetry||{});const hs=G1Twin.getHealthSummary();$('robotHealthSummary').textContent=hs?.label||'—';setTone($('robotHealthSummary'),hs?.severity>=3?'bad':hs?.severity>=1?'warn':Number.isFinite(hs?.severity)?'good':null);});
 $('twinResetBtn').addEventListener('click',()=>G1Twin.resetView());
 
 /* ---------- Hands / events / status ---------- */
@@ -8535,300 +8632,6 @@ $('serviceFilter')?.addEventListener('input',renderServiceList);
 $('serviceStateFilter')?.addEventListener('change',renderServiceList);
 $('servicePolicyFilter')?.addEventListener('change',renderServiceList);
 
-async function ensureSlamMap(){
-  if(slamMapLoaded||slamMapLoading)return;
-  slamMapLoading=true;
-  const overlay=$('slamOverlay');
-  overlay.classList.remove('hidden');
-  overlay.querySelector('strong').textContent='Loading laboratory map…';
-
-  try{
-    const response=await fetch('/api/slam/map',{cache:'no-store'});
-    if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    const result=slamViewer.loadAsciiPcd(await response.text());
-    slamMapLoaded=true;
-    $('slamMapMeta').textContent=
-      `${result.points.toLocaleString()} visible points · ${result.spanX.toFixed(1)} × ${result.spanY.toFixed(1)} m`;
-    overlay.classList.add('hidden');
-  }catch(error){
-    overlay.querySelector('strong').textContent='Laboratory map unavailable';
-    overlay.querySelector('span').textContent=String(error.message||error);
-    $('slamMapMeta').textContent='load failed';
-  }finally{
-    slamMapLoading=false;
-  }
-}
-
-function setSlamInitialResult(message,tone=null){
-  const element=$('slamInitialResult');
-  element.textContent=message||'';
-  setTone(element,tone);
-}
-
-function cancelSlamInitialSelection(){
-  slamInitialSelecting=false;
-  slamInitialDraft=null;
-  slamViewer.clearInitialPoseSelection();
-
-  $('slamInitialSelection').textContent='No position selected';
-  $('slamInitialStartBtn').classList.remove('hidden');
-  $('slamInitialConfirmBtn').classList.add('hidden');
-  $('slamInitialCancelBtn').classList.add('hidden');
-  $('slamInitialConfirmBtn').disabled=true;
-
-  renderSlamInitialization(slamLatestStatus||{});
-}
-
-async function beginSlamInitialSelection(){
-  if(slamInitialBusy)return;
-
-  if(!slamMapLoaded){
-    await ensureSlamMap();
-    if(!slamMapLoaded){
-      setSlamInitialResult(
-        'The saved map must load before selecting a pose.',
-        'bad'
-      );
-      return;
-    }
-  }
-
-  if(slamLatestStatus?.localized){
-    const proceed=window.confirm(
-      'The robot is currently localized. Replace its current '
-      +'localization with a new approximate pose?'
-    );
-    if(!proceed)return;
-  }
-
-  slamInitialSelecting=true;
-  slamInitialDraft=null;
-
-  $('slamInitialStartBtn').classList.add('hidden');
-  $('slamInitialConfirmBtn').classList.remove('hidden');
-  $('slamInitialCancelBtn').classList.remove('hidden');
-  $('slamInitialConfirmBtn').disabled=true;
-  $('slamInitialSelection').textContent='Click and drag on the map';
-  setSlamInitialResult(
-    'Click the robot position, then drag toward its forward direction.',
-    'warn'
-  );
-
-  slamViewer.beginInitialPoseSelection(pose=>{
-    slamInitialDraft=pose;
-    $('slamInitialSelection').textContent=
-      `X ${pose.x.toFixed(2)} m · Y ${pose.y.toFixed(2)} m · `
-      +`heading ${(pose.yaw*180/Math.PI).toFixed(1)}°`;
-    $('slamInitialConfirmBtn').disabled=false;
-  });
-}
-
-async function confirmSlamInitialPose(){
-  if(slamInitialBusy||!slamInitialDraft)return;
-
-  if(!currentManagementKey()){
-    showManagementKeyPrompt(
-      'Enter the management key to initialize the robot pose.',
-      ()=>confirmSlamInitialPose()
-    );
-    return;
-  }
-
-  const pose={...slamInitialDraft};
-  const confirmed=window.confirm(
-    `Initialize the robot at X ${pose.x.toFixed(2)} m, `
-    +`Y ${pose.y.toFixed(2)} m, heading `
-    +`${(pose.yaw*180/Math.PI).toFixed(1)}°?`
-  );
-  if(!confirmed)return;
-
-  slamInitialBusy=true;
-  $('slamInitialConfirmBtn').disabled=true;
-  $('slamInitialCancelBtn').disabled=true;
-  setSlamInitialResult('Sending initial pose…','warn');
-
-  try{
-    await controllerPost('/api/slam/initialize',pose);
-
-    slamInitialSelecting=false;
-    slamViewer.finishInitialPoseSelection(true);
-    $('slamInitialStartBtn').classList.remove('hidden');
-    $('slamInitialConfirmBtn').classList.add('hidden');
-    $('slamInitialCancelBtn').classList.add('hidden');
-    setSlamInitialResult(
-      'Request sent. Waiting for native SLAM confirmation…',
-      'warn'
-    );
-  }catch(error){
-    setSlamInitialResult(
-      `Initialization failed: ${error.message||error}`,
-      'bad'
-    );
-    $('slamInitialConfirmBtn').disabled=false;
-    $('slamInitialCancelBtn').disabled=false;
-  }finally{
-    slamInitialBusy=false;
-  }
-}
-
-function renderSlamInitialization(status){
-  slamLatestStatus=status;
-
-  const initialization=status?.initialization||{};
-  const state=String(initialization.state||'IDLE');
-  const active=state==='PUBLISHED'||state==='ACCEPTED';
-
-  if(!slamInitialSelecting){
-    const start=$('slamInitialStartBtn');
-    start.classList.remove('hidden');
-    start.textContent=status?.localized?
-      'Reset robot position':'Set robot position';
-    start.disabled=(
-      slamInitialBusy
-      || active
-      || !status?.worker_online
-    );
-  }
-
-  if(slamInitialSelecting)return;
-
-  if(state==='PUBLISHED'){
-    setSlamInitialResult(
-      'Initial pose published. Waiting for API 1804…',
-      'warn'
-    );
-  }else if(state==='ACCEPTED'){
-    setSlamInitialResult(
-      'Native SLAM accepted the pose. Waiting for localization…',
-      'warn'
-    );
-  }else if(state==='LOCALIZED'){
-    setSlamInitialResult('Localization confirmed.','good');
-    slamInitialDraft=null;
-    slamViewer.clearInitialPoseSelection();
-  }else if(state==='REJECTED'){
-    setSlamInitialResult(
-      `Initialization rejected: ${initialization.error||'unknown error'}`,
-      'bad'
-    );
-  }else if(state==='TIMEOUT'){
-    setSlamInitialResult(
-      `Initialization timed out: ${initialization.error||'no fresh pose'}`,
-      'bad'
-    );
-  }else if(!status?.worker_online){
-    setSlamInitialResult('SLAM worker is offline.','bad');
-  }else if(!status?.localized){
-    setSlamInitialResult(
-      'Select the robot’s approximate map position and heading.',
-      'warn'
-    );
-  }else{
-    setSlamInitialResult(
-      'Localization is active. Reset only if the displayed pose is wrong.',
-      'good'
-    );
-  }
-}
-
-function renderSlamStatus(status){
-  const state=String(status?.state||'OFFLINE');
-  const tone=state==='LOCALIZED'?'good':
-    state==='UNLOCALIZED'?'warn':'bad';
-
-  setChip($('slamStateChip'),state,tone);
-  $('slamLocalizationState').textContent=state;
-  setTone($('slamLocalizationState'),tone);
-
-  const nativeMap=status?.native_map||{};
-  $('slamMapIdentity').textContent=nativeMap.matches?
-    'VERIFIED':'NOT VERIFIED';
-  setTone($('slamMapIdentity'),nativeMap.matches?'good':'bad');
-
-  const pose=nativeMap.matches?status?.pose:null;
-  const localized=Boolean(status?.localized&&pose);
-  $('slamPose').textContent=pose?
-    `X ${n(pose.x,2,' m')} · Y ${n(pose.y,2,' m')}`:'—';
-  $('slamYaw').textContent=pose?
-    n(Number(pose.yaw)*180/Math.PI,1,'°'):'—';
-  $('slamPoseSource').textContent=status?.pose_source||'—';
-
-  slamViewer.setRobotPose(pose,localized);
-  renderSlamInitialization(status);
-
-  const cloud=status?.cloud||{};
-  const cloudText=cloud.online?
-    `${Number(cloud.points||0).toLocaleString()} pts · #${cloud.sequence}`:
-    cloud.sequence?
-      `STALE · ${(Number(cloud.age_s)||0).toFixed(1)} s`:
-      'WAITING';
-  $('slamCloudMeta').textContent=cloudText;
-  setTone($('slamCloudMeta'),cloud.online?'good':cloud.sequence?'warn':null);
-  slamViewer.setLiveFresh(Boolean(cloud.online));
-
-  if(
-    currentView==='slam'
-    && Number(cloud.sequence)>0
-    && Number(cloud.sequence)!==slamLastCloudSequence
-  ){
-    fetchSlamCloud(Number(cloud.sequence));
-  }
-}
-
-async function fetchSlamCloud(sequence){
-  if(slamCloudBusy)return;
-  slamCloudBusy=true;
-  try{
-    const response=await fetch(
-      `/api/slam/cloud?sequence=${encodeURIComponent(sequence)}`,
-      {cache:'no-store'}
-    );
-    if(response.status===204)return;
-    if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    slamViewer.setLiveCloud(await response.arrayBuffer());
-    slamLastCloudSequence=sequence;
-  }catch(error){
-    console.debug('SLAM cloud unavailable',error);
-  }finally{
-    slamCloudBusy=false;
-  }
-}
-
-async function pollSlamStatus(){
-  if(slamStatusBusy)return;
-  slamStatusBusy=true;
-  try{
-    const response=await fetch('/api/slam/status',{cache:'no-store'});
-    if(!response.ok)throw new Error(`HTTP ${response.status}`);
-    renderSlamStatus(await response.json());
-  }catch(error){
-    setChip($('slamStateChip'),'SLAM OFFLINE','bad');
-    // Preserve the last verified pose during a transient HTTP failure.
-    slamViewer.setLiveFresh(false);
-  }finally{
-    slamStatusBusy=false;
-  }
-}
-
-$('slamResetView').addEventListener('click',()=>slamViewer.resetView());
-$('slamInitialStartBtn').addEventListener(
-  'click',
-  ()=>beginSlamInitialSelection()
-);
-$('slamInitialConfirmBtn').addEventListener(
-  'click',
-  ()=>confirmSlamInitialPose()
-);
-$('slamInitialCancelBtn').addEventListener(
-  'click',
-  ()=>cancelSlamInitialSelection()
-);
-$('slamMapToggle').addEventListener('change',event=>
-  slamViewer.setMapEnabled(event.target.checked));
-$('slamLiveToggle').addEventListener('change',event=>
-  slamViewer.setLiveEnabled(event.target.checked));
-$('slamRobotToggle').addEventListener('change',event=>
-  slamViewer.setRobotEnabled(event.target.checked));
 
 let systemBusy=false;
 async function pollSystem(){
@@ -10266,10 +10069,15 @@ function stitchCameraLocalViewStateV151(
     }
 
 
+    /*
+     * The real dashboard applies the workspace through the same passive
+     * camera path as Connect (no management key), so a view placed on the
+     * workspace starts and one docked stops.
+     */
     Promise.resolve(
-        toggleCameraView(
-            id
-        )
+        localPreview
+            ? toggleCameraView(id)
+            : fullDashApplyWorkspaceViewsV3()
     )
     .finally(
         ()=>{
@@ -11536,8 +11344,6 @@ else{
 
   pollServiceControl();
 
-  pollSlamStatus();
-
   bootstrapManagementKey();
 
   setInterval(poll,250);
@@ -11550,8 +11356,6 @@ else{
 
   setInterval(pollCameraProcess,750);
 
-  setInterval(pollSlamStatus,100);
-
   setInterval(pollServiceControl,2000);
 }
 
@@ -11562,8 +11366,8 @@ else{
 // FULL_DASH_STATUS_PALETTE_V1
 function syncFullDashStatusPalette(){
   const root=document.documentElement;
-  const good=$('controllerConfigureBtn');
-  const warn=$('controllerStopBtn');
+  const good=document.getElementById('controllerConfigureBtn');
+  const warn=document.getElementById('controllerStopBtn');
 
   if(!root||!good||!warn)return;
 

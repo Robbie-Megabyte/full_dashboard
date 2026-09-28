@@ -11266,7 +11266,10 @@ function fullDashSwapRobotRgbIconsV7() {
             return;
         }
 
-        const existing = node.querySelector('svg');
+        // Never the maximize/restore icon, which lives in the same header.
+        const existing = [...node.querySelectorAll('svg')].find(
+            svg => !svg.closest('[data-camera-maximize-v1952]')
+        );
 
         if (existing) {
             existing.outerHTML = FULL_DASH_RGB_ICON_SMALL_V7;
@@ -11996,8 +11999,11 @@ if (document.readyState === 'loading') {
 
             if (head) {
 
+                // The maximize/restore icon is never a candidate.
                 const candidates =
-                    [...head.querySelectorAll("svg")];
+                    [...head.querySelectorAll("svg")].filter(
+                        svg => !svg.closest("[data-camera-maximize-v1952]")
+                    );
 
 
                 for (const svg of candidates) {
@@ -18384,9 +18390,10 @@ if (document.readyState === 'loading') {
         );
 
 
+        // The process state chip is not shown (requested removal).
         offline.style.setProperty(
             "display",
-            "inline-flex",
+            "none",
             "important"
         );
 

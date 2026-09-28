@@ -63,7 +63,9 @@ SLAM_RUNTIME_PROXY_PREFIX = "/slam-runtime"
 CAMERA_TELEOP_PREFIX = "/api/camera-teleop"
 CAMERA_TELEOP_PORT = int(os.environ.get("G1_CAMERA_TELEOP_COMPANION_PORT", "8088"))
 CAMERA_TELEOP_GET_ROUTES = {
-    "/health": ("/api/health", 1.5),
+    # The companion may be socket-activated: the first request waits while it
+    # starts. A PC without it refuses the connection at once.
+    "/health": ("/api/health", 15.0),
     "/status": ("/api/status", 3.0),
 }
 CAMERA_TELEOP_POST_ROUTES = {
@@ -71,119 +73,6 @@ CAMERA_TELEOP_POST_ROUTES = {
     "/enter": ("/api/system/robot/start", 120.0),
     "/stop": ("/api/system/robot/stop", 120.0),
 }
-
-SLAM_STATE_DIR = Path(
-    os.environ.get(
-        "G1_DASHBOARD_SLAM_STATE_DIR",
-        f"/tmp/g1_dashboard_slam_{os.getuid()}",
-    )
-)
-SLAM_STATUS_PATH = SLAM_STATE_DIR / "status.json"
-SLAM_CLOUD_PATH = SLAM_STATE_DIR / "live_cloud_f32.bin"
-SLAM_INITIALIZE_PATH = SLAM_STATE_DIR / "initialize_request.json"
-SLAM_INITIALIZE_SCHEMA = "g1_dashboard.slam.initialize.v1"
-SLAM_MAP_PATH = Path(
-    os.environ.get(
-        "G1_DASHBOARD_SLAM_MAP",
-        str(Path.home() / "g1_ws/map/harta_buna_2707.pcd"),
-    )
-).expanduser()
-
-
-def slam_status_snapshot() -> dict[str, Any]:
-    fallback = {
-        "schema": "g1_dashboard.slam.v1",
-        "worker_online": False,
-        "state": "OFFLINE",
-        "localized": False,
-        "pose": None,
-        "pose_source": None,
-        "map": {
-            "path": str(SLAM_MAP_PATH),
-            "available": SLAM_MAP_PATH.is_file(),
-        },
-        "cloud": {
-            "online": False,
-            "points": 0,
-            "sequence": 0,
-        },
-    }
-
-    try:
-        stat = SLAM_STATUS_PATH.stat()
-        if stat.st_size <= 0 or stat.st_size > 65536:
-            raise ValueError("invalid SLAM status size")
-        payload = json.loads(
-            SLAM_STATUS_PATH.read_text(encoding="utf-8")
-        )
-        if (
-            not isinstance(payload, dict)
-            or payload.get("schema") != "g1_dashboard.slam.v1"
-        ):
-            raise ValueError("invalid SLAM status schema")
-    except Exception as exc:
-        fallback["error"] = str(exc)
-        return fallback
-
-    age = max(0.0, time.time() - stat.st_mtime)
-    payload["status_age_s"] = round(age, 3)
-    payload["worker_online"] = age <= 2.0
-    if not payload["worker_online"]:
-        payload["state"] = "OFFLINE"
-        payload["localized"] = False
-        cloud = payload.get("cloud")
-        if isinstance(cloud, dict):
-            cloud["online"] = False
-    return payload
-
-
-def write_slam_initialize_request(
-    payload: dict[str, Any],
-) -> dict[str, Any]:
-    status = slam_status_snapshot()
-    if not status.get("worker_online"):
-        raise RuntimeError("SLAM worker is offline")
-
-    current = status.get("initialization")
-    if (
-        isinstance(current, dict)
-        and current.get("state") in {"PUBLISHED", "ACCEPTED"}
-    ):
-        raise RuntimeError("a SLAM initialization request is already active")
-
-    x = finite_number(payload.get("x"))
-    y = finite_number(payload.get("y"))
-    yaw = finite_number(payload.get("yaw"))
-    if x is None or y is None or yaw is None:
-        raise ValueError("x, y and yaw must be finite numbers")
-    if abs(x) > 100.0 or abs(y) > 100.0:
-        raise ValueError("initial position exceeds the map limit")
-
-    yaw = math.atan2(math.sin(yaw), math.cos(yaw))
-    request_id = int(time.time_ns() % 2147483646) + 1
-    request = {
-        "schema": SLAM_INITIALIZE_SCHEMA,
-        "request_id": request_id,
-        "created_unix_ns": time.time_ns(),
-        "pose": {
-            "x": x,
-            "y": y,
-            "yaw": yaw,
-        },
-    }
-
-    SLAM_STATE_DIR.mkdir(parents=True, exist_ok=True)
-    temporary = SLAM_INITIALIZE_PATH.with_name(
-        f".{SLAM_INITIALIZE_PATH.name}."
-        f"{os.getpid()}.{threading.get_ident()}.tmp"
-    )
-    temporary.write_text(
-        json.dumps(request, separators=(",", ":"), sort_keys=True),
-        encoding="utf-8",
-    )
-    os.replace(temporary, SLAM_INITIALIZE_PATH)
-    return request
-
 
 def now_s() -> float:
     return time.time()
@@ -1606,7 +1495,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
         if (
             self.path.startswith("/api/pose")
             or self.path.startswith("/api/camera/pointcloud")
-            or self.path.startswith("/api/slam/cloud")
         ):
             return
         print(f"HTTP {self.client_address[0]} - {fmt % args}")
@@ -2473,63 +2361,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 lines = 80
             self._send_json(HTTPStatus.OK, manager.camera_log_tail(lines))
             return
-        if path == "/api/slam/status":
-            self._send_json(HTTPStatus.OK, slam_status_snapshot())
-            return
-        if path == "/api/slam/map":
-            try:
-                if not SLAM_MAP_PATH.is_file():
-                    raise FileNotFoundError(str(SLAM_MAP_PATH))
-                body = SLAM_MAP_PATH.read_bytes()
-            except OSError as exc:
-                self._send_json(
-                    HTTPStatus.NOT_FOUND,
-                    {"error": f"SLAM map unavailable: {exc}"},
-                )
-                return
-            self._send_bytes(
-                HTTPStatus.OK,
-                body,
-                "application/vnd.pointcloud",
-                cache=False,
-            )
-            return
-        if path == "/api/slam/cloud":
-            status = slam_status_snapshot()
-            cloud = status.get("cloud")
-            if (
-                not status.get("worker_online")
-                or not isinstance(cloud, dict)
-                or not cloud.get("online")
-            ):
-                self._send_bytes(
-                    HTTPStatus.NO_CONTENT,
-                    b"",
-                    "application/octet-stream",
-                    cache=False,
-                )
-                return
-            try:
-                packet = SLAM_CLOUD_PATH.read_bytes()
-                if not packet or len(packet) % 12:
-                    raise ValueError(
-                        "SLAM cloud must contain packed float32 XYZ triples"
-                    )
-                if len(packet) > 12 * 50000:
-                    raise ValueError("SLAM cloud exceeds the configured limit")
-            except (OSError, ValueError) as exc:
-                self._send_json(
-                    HTTPStatus.SERVICE_UNAVAILABLE,
-                    {"error": f"SLAM cloud unavailable: {exc}"},
-                )
-                return
-            self._send_bytes(
-                HTTPStatus.OK,
-                packet,
-                "application/vnd.g1.slam-cloud-f32",
-                cache=False,
-            )
-            return
         if path == "/api/services/control":
             client: ServiceActionClient = self.server.service_action_client  # type: ignore[attr-defined]
             policy = load_policy()
@@ -2564,15 +2395,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                     "camera_point_view_orbit_control": True,
                     "camera_pointcloud_browser_webgl": True,
                     "camera_pointcloud_transport": "latest-only binary G1PC over same-origin HTTP",
-                    "slam_worker_isolated": True,
-                    "slam_worker_control": (
-                        "authenticated local-file relay; API 1804 only"
-                    ),
-                    "slam_initial_pose_endpoint": "/api/slam/initialize",
-                    "slam_saved_map_endpoint": "/api/slam/map",
-                    "slam_live_cloud_endpoint": "/api/slam/cloud",
-                    "slam_status_endpoint": "/api/slam/status",
-                    "slam_map": str(SLAM_MAP_PATH),
                     "slam_runtime_proxy_endpoint": SLAM_RUNTIME_PROXY_PREFIX,
                     "unitree_service_actions": bool(self.server.service_actions_enabled),  # type: ignore[attr-defined]
                     "unitree_service_actions_authenticated": True,
@@ -3182,7 +3004,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
             "/api/camera/yolo",
             "/api/camera/view",
             "/api/services/set",
-            "/api/slam/initialize",
         ):
             self._send_json(HTTPStatus.METHOD_NOT_ALLOWED, {
                 "error": "unsupported POST; authenticated endpoints are controller auth/start/stop/action, camera start/stop/mode/views/yolo/view, and allowlisted service set"
@@ -3212,15 +3033,6 @@ class DashboardHandler(BaseHTTPRequestHandler):
                 self._send_json(
                     HTTPStatus.ACCEPTED if accepted else HTTPStatus.CONFLICT,
                     {"ok": accepted, "action": response, "controller": manager.status()},
-                )
-            elif path == "/api/slam/initialize":
-                request = write_slam_initialize_request(payload)
-                self._send_json(
-                    HTTPStatus.ACCEPTED,
-                    {
-                        "ok": True,
-                        "initialization": request,
-                    },
                 )
             elif path == "/api/services/set":
                 if not self.server.service_actions_enabled:  # type: ignore[attr-defined]
@@ -3813,13 +3625,6 @@ def main() -> int:
                 str(target / "start_slam_runtime_proxy_target.sh"),
             )
 
-            # Backward-compatible cleanup for a recorded observer from the
-            # pre-integration dashboard. The cmdline check prevents broad kills.
-            result["slam_observer"] = _stop_recorded_dashboard_process(
-                "slam",
-                str(target / "g1_dashboard_slam_worker.py"),
-            )
-
             result["monitor"] = _stop_recorded_dashboard_process(
                 "monitor",
                 str(target / "g1_dashboard_system_monitor.py"),
@@ -3830,7 +3635,7 @@ def main() -> int:
                 "g1_quest_fullbody_sender.py",
             )
 
-            for key in ("slam", "slam_observer", "monitor", "robot_sender"):
+            for key in ("slam", "monitor", "robot_sender"):
                 state = str(
                     (result.get(key) or {}).get("state", "")
                 )

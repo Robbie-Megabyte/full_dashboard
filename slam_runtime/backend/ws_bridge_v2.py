@@ -51,7 +51,8 @@ from rclpy.time import Time
 from nav_msgs.msg import OccupancyGrid, Odometry, Path
 from nav2_msgs.action import ComputePathToPose
 from sensor_msgs.msg import LaserScan
-from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped
+from geometry_msgs.msg import PoseStamped, PoseWithCovarianceStamped, Twist
+from action_msgs.srv import CancelGoal
 from tf2_ros import Buffer, TransformException, TransformListener
 
 import websockets
@@ -71,6 +72,12 @@ PATH_TOPICS = tuple(dict.fromkeys(
     ).split(",") if topic.strip()
 ))
 MAP_FRAME = os.environ.get("CAR_MAP_FRAME", "map")
+# Dashboard keyboard teleop. The dashboard repeats the held command every
+# 100 ms; without a fresh one for TELEOP_TIMEOUT_SEC the car is stopped.
+TELEOP_TOPIC = os.environ.get("CAR_TELEOP_TOPIC", "/cmd_vel")
+TELEOP_TIMEOUT_SEC = 0.5
+TELEOP_MAX_LINEAR = 0.6
+TELEOP_MAX_ANGULAR = 1.5
 BASE_FRAME = os.environ.get("CAR_BASE_FRAME", "scan")
 RECONNECT_INTERVAL_SEC = 3.0
 # -------------------------------------------------------------------------
@@ -453,7 +460,9 @@ class CarMapManager:
             cmd = [
                 "ros2", "run", "nav2_map_server", "map_saver_cli",
                 "-f", target_prefix,
-                "--ros-args", "-p", "save_map_timeout:=6000",
+                # Humble declares save_map_timeout as a double (seconds); an integer
+                # value makes map_saver_cli refuse to start.
+                "--ros-args", "-p", "save_map_timeout:=10.0",
             ]
             res = subprocess.run(cmd, capture_output=True, text=True, timeout=15)
             yaml_path = f"{target_prefix}.yaml"
@@ -507,6 +516,15 @@ class WsBridgeNode(Node):
             self, ComputePathToPose, '/compute_path_to_pose'
         )
         self._server_commands: "queue.Queue[dict]" = queue.Queue(maxsize=10)
+        self._teleop_pub = self.create_publisher(Twist, TELEOP_TOPIC, 10)
+        self._teleop_lock = threading.Lock()
+        self._teleop_command = None  # (linear, angular, received monotonic)
+        self._teleop_moving = False
+        # Dashboard Stop: cancel every NavigateToPose goal (bt_navigator runs
+        # all the time), keeping the mapping/localization mode running.
+        self._nav_cancel_client = self.create_client(
+            CancelGoal, '/navigate_to_pose/_action/cancel_goal'
+        )
 
         # The supplied navigation stack publishes map -> odom (AMCL),
         # odom -> scan (odom_bc), and scan -> laser (static transform).
@@ -659,8 +677,25 @@ class WsBridgeNode(Node):
         self._latest_map_data = map_data
         self._enqueue('/map', map_data)
 
+    def _publish_teleop(self):
+        with self._teleop_lock:
+            command = self._teleop_command
+        fresh = (
+            command is not None
+            and time.monotonic() - command[2] < TELEOP_TIMEOUT_SEC
+        )
+        if not fresh and not self._teleop_moving:
+            return
+        twist = Twist()
+        if fresh:
+            twist.linear.x = command[0]
+            twist.angular.z = command[1]
+        self._teleop_pub.publish(twist)
+        self._teleop_moving = fresh and (command[0] != 0.0 or command[1] != 0.0)
+
     def _process_pending_tf_data(self):
         self._process_server_commands()
+        self._publish_teleop()
         self._mode_manager.periodic_check()
         if self._pending_odom is not None:
             msg = self._pending_odom
@@ -786,6 +821,16 @@ class WsBridgeNode(Node):
             except json.JSONDecodeError:
                 self.get_logger().warn(f'Received non-JSON WS message: {raw!r}')
                 continue
+            if isinstance(data, dict) and data.get('type') == 'cmd_vel':
+                # Only the newest teleop command matters; it bypasses the queue.
+                try:
+                    linear = max(-TELEOP_MAX_LINEAR, min(TELEOP_MAX_LINEAR, float(data.get('linear', 0.0))))
+                    angular = max(-TELEOP_MAX_ANGULAR, min(TELEOP_MAX_ANGULAR, float(data.get('angular', 0.0))))
+                except (TypeError, ValueError):
+                    continue
+                with self._teleop_lock:
+                    self._teleop_command = (linear, angular, time.monotonic())
+                continue
             try:
                 self._server_commands.put_nowait(data)
             except queue.Full:
@@ -812,10 +857,41 @@ class WsBridgeNode(Node):
                     map_name=data.get('map_name', ''),
                     map_dir=data.get('map_dir', '/root/humble_ws'),
                 )
+            elif command_type == 'cancel_navigation':
+                self._cancel_navigation(data.get('request_id'))
             elif command_type == 'list_maps':
                 self._map_manager.broadcast_maps_list()
             elif command_type == 'load_map_for_stitching':
                 self._map_manager.load_map_async(data.get('map_file', ''))
+
+    def _cancel_navigation(self, request_id=None):
+        # Brake at once: zero velocity for TELEOP_TIMEOUT_SEC while Nav2 stops.
+        with self._teleop_lock:
+            self._teleop_command = (0.0, 0.0, time.monotonic())
+        self._teleop_moving = True
+        if not self._nav_cancel_client.service_is_ready():
+            # Nav2 is only active with a mode running; nothing to cancel.
+            self._enqueue('/navigation_status', {
+                'status': 'cancelled', 'request_id': request_id, 'goals': 0,
+            })
+            return
+        # An empty GoalInfo (zero id and stamp) cancels all goals.
+        future = self._nav_cancel_client.call_async(CancelGoal.Request())
+
+        def done(result_future):
+            try:
+                response = result_future.result()
+                self._enqueue('/navigation_status', {
+                    'status': 'cancelled', 'request_id': request_id,
+                    'goals': len(response.goals_canceling),
+                })
+            except Exception as exc:
+                self._enqueue('/navigation_status', {
+                    'status': 'error', 'request_id': request_id, 'error': str(exc),
+                })
+
+        future.add_done_callback(done)
+        self.get_logger().info('Dashboard Stop: cancelling navigation goals')
 
     def _handle_goal_pose(self, data: dict):
         """

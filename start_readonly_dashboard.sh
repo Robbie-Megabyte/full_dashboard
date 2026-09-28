@@ -6,8 +6,6 @@ RUN="$TARGET/run"
 G1XR_PY="$HOME/miniconda3/envs/g1_xr/bin/python"
 SENDER="$HOME/g1_quest_fullbody_sender.py"
 
-SLAM_STATE="/tmp/g1_dashboard_slam_$(id -u)"
-SLAM_MAP="$HOME/g1_ws/map/harta_buna_2707.pcd"
 SLAM_RUNTIME="$HOME/bacalbasa_slam_runtime"
 SLAM_RUNTIME_TOKEN="$RUN/slam_runtime_token"
 
@@ -31,16 +29,6 @@ then
     echo "PASS: controller autostart guard"
 else
     echo "FAIL: controller autostart guard missing"
-    SAFE=0
-fi
-
-if grep -q \
-    'BACALBASA_PARALLEL_SLAM_READ_ONLY_GUARD' \
-    "$TARGET/g1_dashboard_slam_worker.py"
-then
-    echo "PASS: SLAM Initial Pose guard"
-else
-    echo "FAIL: SLAM read-only guard missing"
     SAFE=0
 fi
 
@@ -337,8 +325,6 @@ PY_SERVICE
             G1_DASHBOARD_INSPIRE_HELPER="/usr/local/libexec/g1-dashboard/g1_dashboard_inspire_helper.py" \
             G1_DASHBOARD_CONTROLLER_SCRIPT="$HOME/xr_teleoperate_g1demo/teleop/g1_locomotion_xr_handover_live_v6_7_4_symmetric_thumb_control_dashboard_telemetry_v1_8.py" \
             G1_DASHBOARD_CONTROLLER_PYTHON="$HOME/miniconda3/envs/g1_xr/bin/python" \
-            G1_DASHBOARD_SLAM_STATE_DIR="$SLAM_STATE" \
-            G1_DASHBOARD_SLAM_MAP="$SLAM_MAP" \
             G1_SLAM_RUNTIME_HOST="127.0.0.1" \
             G1_SLAM_RUNTIME_PORT="3003" \
             G1_SLAM_RUNTIME_TOKEN_FILE="$SLAM_RUNTIME_TOKEN" \
@@ -366,26 +352,6 @@ PY_SERVICE
 
     echo "----- SLAM RUNTIME (ROS 2 / NAV2) -----"
 
-    # Retire only the exact legacy passive observer previously owned by this
-    # dashboard. It must not run beside the authoritative runtime engine.
-    OLD_PASSIVE="$(cat "$RUN/slam.pid" 2>/dev/null || true)"
-    if [ -n "$OLD_PASSIVE" ] && kill -0 "$OLD_PASSIVE" 2>/dev/null; then
-        PASSIVE_CMD="$(tr '\0' ' ' < "/proc/$OLD_PASSIVE/cmdline" 2>/dev/null || true)"
-        case "$PASSIVE_CMD" in
-          *"$TARGET/g1_dashboard_slam_worker.py"*)
-            kill -TERM "$OLD_PASSIVE" 2>/dev/null || true
-            for _ in $(seq 1 30); do
-                kill -0 "$OLD_PASSIVE" 2>/dev/null || break
-                sleep 0.10
-            done
-            echo "stopped legacy passive SLAM observer PID $OLD_PASSIVE"
-            ;;
-          *)
-            echo "WARNING: slam.pid does not belong to the legacy passive observer"
-            ;;
-        esac
-    fi
-    rm -f "$RUN/slam.pid"
 
     SLAM_RUNTIME_PID="$(cat "$RUN/slam_runtime.pid" 2>/dev/null || true)"
     SLAM_RUNTIME_RUNNING=0

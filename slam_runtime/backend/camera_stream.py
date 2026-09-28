@@ -19,6 +19,11 @@ MAX_PACKET = 8 * 1024 * 1024
 YOLO_MODEL_SIZE = "yolov8s"
 YOLO_CONFIDENCE = 0.20
 YOLO_MODEL_PATH = Path(os.environ.get("G1_YOLO_MODEL", "/home/unitree/yolov8s.pt")).expanduser()
+# In the Full Dashboard the RealSense is owned by its camera server, which
+# sends raw frames to this receiver only while this file is fresh (see
+# SlamRuntimeFeed in g1_dashboard_teleimager_modes_runner.py).
+FRAMES_WANTED_PATH = Path(f"/tmp/g1_slam_camera_wanted_{os.getuid()}")
+
 _YOLO_PALETTE = [
     (0, 220, 255), (255, 80, 0), (0, 255, 100), (200, 0, 255),
     (255, 200, 0), (0, 150, 255), (255, 0, 150), (0, 255, 220),
@@ -68,6 +73,20 @@ class CameraStream:
         self.stopping.clear()
         self.thread = threading.Thread(target=self._run, name="realsense-receiver", daemon=True)
         self.thread.start()
+        threading.Thread(target=self._keep_wanted_while_yolo, name="camera-wanted", daemon=True).start()
+
+    def want_frames(self):
+        """Ask the frame source for frames for the next few seconds."""
+        try:
+            FRAMES_WANTED_PATH.touch()
+        except OSError:
+            pass
+
+    def _keep_wanted_while_yolo(self):
+        # SLAM YOLO also feeds the semantic map when nobody watches the video.
+        while not self.stopping.wait(1.0):
+            if self._yolo_enabled:
+                self.want_frames()
 
     def stop(self):
         self.stopping.set()

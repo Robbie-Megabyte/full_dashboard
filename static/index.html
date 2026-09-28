@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>G1 Teleop Control Center</title>
   <link rel="icon" href="data:," />
-  <link rel="stylesheet" href="/static/styles.css?v=camera-teleop-v7" />
+  <link rel="stylesheet" href="/static/styles.css?v=camera-teleop-v18" />
   <link
     rel="stylesheet"
     href="/static/stitch_live_v12.css?v=controller-ui-v16"
@@ -44,10 +44,6 @@
   <link rel="stylesheet" href="/static/stitch_interface_consistency_v1954.css?v=1954" />
   <link rel="stylesheet" href="/static/bacalbasa_ui_v2000.css?v=2105" />
 
-  <link rel="stylesheet" href="/static/bacalbasa_slam_v2200.css?v=2210-clean1" />
-  <script defer src="/static/bacalbasa_slam_v2201.js?v=slam-final-clean1"></script>
-  <link rel="stylesheet" href="/static/bacalbasa_slam_v2215.css?v=2216-1" />
-  <script defer src="/static/bacalbasa_slam_v2215.js?v=slam-final-clean1"></script>
   <link rel="stylesheet" href="/static/bacalbasa_ui_core.css?v=1-11">
 
   <script id="bacaSlamCanonicalStartupWidthV13">
@@ -1234,6 +1230,15 @@
             </div>
 
 
+            <input
+              id="liveRobotModePassword"
+              class="robot-mode-password-v1"
+              type="password"
+              inputmode="numeric"
+              autocomplete="off"
+              placeholder="Robot mode password"
+              aria-label="Robot mode password"
+            >
             <div class="robot-mode-current-v11">
               <span>Current mode</span>
               <strong id="liveRobotModeCurrent">—</strong>
@@ -1248,23 +1253,28 @@
 
               <button
                 type="button"
-                class="robot-mode-v11 robot-mode-v11-green"
-                data-live-robot-mode="developer"
-                disabled
-              >
-                Dev
-              </button>
-
-              <button
-                type="button"
                 class="robot-mode-v11 robot-mode-v11-neutral"
                 data-live-robot-mode="damp"
                 disabled
               >
-                Damping
+                Damp
               </button>
-
-
+              <button
+                type="button"
+                class="robot-mode-v11 robot-mode-v11-neutral"
+                data-live-robot-mode="ready"
+                disabled
+              >
+                Ready
+              </button>
+              <button
+                type="button"
+                class="robot-mode-v11 robot-mode-v11-neutral"
+                data-live-robot-mode="dev"
+                disabled
+              >
+                Dev
+              </button>
               <button
                 type="button"
                 class="robot-mode-v11 robot-mode-v11-neutral"
@@ -1273,33 +1283,21 @@
               >
                 Zero Torque
               </button>
-
               <button
                 type="button"
-                class="robot-mode-v11 robot-mode-v11-green"
+                class="robot-mode-v11 robot-mode-v11-neutral"
                 data-live-robot-mode="walk"
                 disabled
               >
                 Walk
               </button>
-
-
               <button
                 type="button"
-                class="robot-mode-v11 robot-mode-v11-green"
+                class="robot-mode-v11 robot-mode-v11-neutral"
                 data-live-robot-mode="run"
                 disabled
               >
                 Run
-              </button>
-
-              <button
-                type="button"
-                class="robot-mode-v11 robot-mode-v11-green"
-                data-live-robot-mode="climb"
-                disabled
-              >
-                Climb
               </button>
 
             </div>
@@ -1362,344 +1360,6 @@
         </div>
 
 
-      <div class="slam-layout">
-        <section class="panel slam-world-panel baca-ui-major-panel">
-          <div class="panel-head slam-head baca-ui-primary-row">
-<div class="panel-title-line">
-              <strong id="slamLabTitleV2209" class="baca-slam-heading-v2201">Laboratory Point Cloud</strong>
-              <span id="slamMapMeta" class="dim">map not loaded</span>
-            </div>
-
-<div class="baca-slam-top-layers-v17" aria-label="SLAM layers">
-              <label class="toggle baca-slam-live-toggle-v2206 baca-ui-check"><input id="slamMapToggle" type="checkbox" checked><span>Saved lab map</span></label>
-              <label class="toggle baca-slam-live-toggle-v2206 baca-ui-check"><input id="slamLiveToggle" type="checkbox" checked><span>Live relocation cloud</span></label>
-              <label class="toggle baca-slam-live-toggle-v2206 baca-ui-check"><input id="slamRobotToggle" type="checkbox" checked><span>Localized robot</span></label>
-            </div>
-
-            <div class="slam-head-actions baca-ui-primary-actions">
-              <span id="slamStateChip" class="chip">SLAM —</span>
-              <button
-                id="slamResetView"
-                class="ghost-btn baca-ui-reset-action"
-              >Reset view</button>
-            </div>
-          </div>
-
-          <div class="slam-stage">
-            <canvas id="slamCanvas" aria-label="Live laboratory SLAM point cloud"></canvas>
-                        <div id="slamOverlay" class="slam-overlay baca-slam-idle-v2215">
-
-              <svg
-                class="baca-slam-map-orbit-v2215"
-                viewBox="0 0 900 520"
-                aria-hidden="true"
-              >
-
-                <defs>
-
-                  <linearGradient
-                    id="bacaMapLine2215"
-                    x1="0"
-                    y1="0"
-                    x2="1"
-                    y2="1"
-                  >
-                    <stop
-                      offset="0%"
-                      stop-color="#3f8f69"
-                      stop-opacity=".18"
-                    />
-                    <stop
-                      offset="48%"
-                      stop-color="#79cf84"
-                      stop-opacity=".88"
-                    />
-                    <stop
-                      offset="100%"
-                      stop-color="#2e7058"
-                      stop-opacity=".14"
-                    />
-                  </linearGradient>
-
-                  <radialGradient
-                    id="bacaNodeGlow2215"
-                    cx="50%"
-                    cy="50%"
-                    r="50%"
-                  >
-                    <stop
-                      offset="0%"
-                      stop-color="#8ed681"
-                      stop-opacity=".32"
-                    />
-                    <stop
-                      offset="100%"
-                      stop-color="#8ed681"
-                      stop-opacity="0"
-                    />
-                  </radialGradient>
-
-                </defs>
-
-
-                <!-- broad survey field -->
-
-                <ellipse
-                  class="baca-slam-field-v2215"
-                  cx="450"
-                  cy="250"
-                  rx="295"
-                  ry="175"
-                />
-
-
-                <!-- rotating survey orbits -->
-
-                <g class="baca-slam-orbit-a-v2215">
-
-                  <ellipse
-                    cx="450"
-                    cy="250"
-                    rx="270"
-                    ry="151"
-                    class="baca-slam-orbit-v2215"
-                  />
-
-                  <path
-                    class="baca-slam-orbit-bright-v2215"
-                    d="
-                      M245 151
-                      C325 83 461 70 575 107
-                      C626 123 668 149 698 183
-                    "
-                  />
-
-                </g>
-
-
-                <g class="baca-slam-orbit-b-v2215">
-
-                  <ellipse
-                    cx="450"
-                    cy="250"
-                    rx="226"
-                    ry="126"
-                    class="baca-slam-orbit-v2215"
-                  />
-
-                  <path
-                    class="baca-slam-orbit-amber-v2215"
-                    d="
-                      M270 298
-                      C317 352 406 378 496 369
-                      C567 362 624 335 657 297
-                    "
-                  />
-
-                </g>
-
-
-                <!-- top-down reconstructed map -->
-
-                <g class="baca-slam-cartography-v2215">
-
-                  <path
-                    class="baca-slam-contour-v2215 contour-a"
-                    d="
-                      M275 277
-                      L310 203
-                      L379 174
-                      L432 189
-                      L489 157
-                      L570 182
-                      L621 232
-                      L603 290
-                      L549 314
-                      L502 301
-                      L452 332
-                      L384 311
-                      L329 329
-                      Z
-                    "
-                  />
-
-                  <path
-                    class="baca-slam-contour-v2215 contour-b"
-                    d="
-                      M312 273
-                      L340 220
-                      L390 201
-                      L433 214
-                      L484 188
-                      L542 207
-                      L580 239
-                      L564 276
-                      L521 292
-                      L480 282
-                      L439 305
-                      L389 288
-                      L348 300
-                      Z
-                    "
-                  />
-
-                  <path
-                    class="baca-slam-contour-v2215 contour-c"
-                    d="
-                      M352 263
-                      L374 230
-                      L407 221
-                      L439 233
-                      L476 214
-                      L516 228
-                      L543 250
-                      L524 270
-                      L490 276
-                      L458 265
-                      L428 282
-                      L394 270
-                      Z
-                    "
-                  />
-
-                </g>
-
-
-                <!-- animated surveyed route -->
-
-                <path
-                  class="baca-slam-route-v2215"
-                  d="
-                    M292 284
-                    C333 256 347 211 399 210
-                    C449 209 449 256 494 257
-                    C550 259 565 216 612 235
-                  "
-                />
-
-
-                <!-- moving scan arm -->
-
-                <g class="baca-slam-scanner-v2215">
-
-                  <line
-                    x1="450"
-                    y1="250"
-                    x2="680"
-                    y2="250"
-                    class="baca-slam-scan-line-v2215"
-                  />
-
-                  <circle
-                    cx="681"
-                    cy="250"
-                    r="4"
-                    class="baca-slam-scan-tip-v2215"
-                  />
-
-                </g>
-
-
-                <!-- location nodes -->
-
-                <g class="baca-slam-nodes-v2215">
-
-                  <circle cx="330" cy="237" r="4" class="baca-slam-node-v2215 n1"/>
-                  <circle cx="389" cy="188" r="3" class="baca-slam-node-v2215 n2"/>
-                  <circle cx="534" cy="207" r="4" class="baca-slam-node-v2215 n3"/>
-                  <circle cx="583" cy="277" r="3" class="baca-slam-node-v2215 n4"/>
-                  <circle cx="402" cy="305" r="3" class="baca-slam-node-v2215 n5"/>
-
-                </g>
-
-
-                <!-- robot / origin indicator -->
-
-                <g class="baca-slam-origin-v2215">
-
-                  <circle
-                    cx="450"
-                    cy="250"
-                    r="32"
-                    class="baca-slam-origin-ring-v2215"
-                  />
-
-                  <circle
-                    cx="450"
-                    cy="250"
-                    r="9"
-                    class="baca-slam-origin-dot-v2215"
-                  />
-
-                  <path
-                    d="M450 250 L489 226"
-                    class="baca-slam-heading-v2215"
-                  />
-
-                </g>
-
-              </svg>
-
-              <strong>Laboratory map unavailable</strong>
-              <span>HTTP 404</span>
-
-            </div>
-            <div class="slam-layer-legend baca-slam-map-legend-v2210">
-              <span><i class="slam-map-dot"></i>Saved PCD</span>
-              <span><i class="slam-live-dot"></i>Live Mid360</span>
-              <span><i class="slam-robot-dot"></i>G1 + heading</span>
-            </div>
-          </div>
-        </section>
-
-        <aside class="slam-sidebar baca-ui-right-rail">
-          <section class="panel slam-status-panel baca-ui-rail-card">
-            <div class="panel-head"><strong id="slamLocalizationTitleV2209" class="baca-slam-heading-v2201">Localization</strong></div>
-            <div class="kv-list">
-              <div><span>State</span><strong id="slamLocalizationState">—</strong></div>
-              <div><span>Pose</span><strong id="slamPose">—</strong></div>
-              <div><span>Heading</span><strong id="slamYaw">—</strong></div>
-              <div><span>Pose source</span><strong id="slamPoseSource">—</strong></div>
-              <div><span>Map identity</span><strong id="slamMapIdentity">—</strong></div>
-              <div><span>Live cloud</span><strong id="slamCloudMeta">—</strong></div>
-            </div>
-          </section>
-
-
-
-          <section class="panel slam-initial-pose-panel baca-ui-rail-card">
-            <div class="panel-head">
-              <strong class="baca-slam-heading-v2201">Initial Pose</strong>
-            </div>
-            <div id="slamInitialSelection" class="slam-initial-selection baca-ui-action-field">
-              No position selected
-            </div>
-            <div class="slam-initial-actions">
-              <button id="slamInitialStartBtn" class="primary-btn baca-ui-enter-action">
-                Set robot position
-              </button>
-              <button
-                id="slamInitialConfirmBtn"
-                class="primary-btn hidden"
-                disabled
-              >
-                Confirm pose
-              </button>
-              <button
-                id="slamInitialCancelBtn"
-                class="ghost-btn hidden"
-              >
-                Cancel
-              </button>
-            </div>
-            <div
-              id="slamInitialResult"
-              class="slam-initial-result hidden baca-slam-hidden-result-v2210"
-              aria-live="polite"
-            ></div>
-          </section>
-        </aside>
-      </div>
     </section>
 
     <!-- INSPECT VIEW: deeper read-only robot/system diagnostics -->
@@ -1955,8 +1615,8 @@
   </div>
 
   <script src="/static/bacalbasa_ui_v2000.js?v=2104"></script>
-<script type="module" src="/static/app.js?v=V21_8_CAMERA_TELEOP"></script>
-  <script src="/static/stitch_live_v12.js?v=camera-teleop-v3"></script>
+<script type="module" src="/static/app.js?v=V22_CLEAN_2"></script>
+  <script src="/static/stitch_live_v12.js?v=camera-teleop-v6"></script>
 
   <script src="/static/stitch_bacalbasa_shell_v1917.js?v=live-startup-clean5-rollback1"></script>
 
@@ -1967,7 +1627,6 @@
 
   <script src="/static/stitch_final_polish_v1945.js?v=1945"></script>
   <script defer src="/static/bacalbasa_inspect_layout_v16.js?v=1-18"></script>
-  <script defer src="/static/bacalbasa_slam_initial_rail_parity.js?v=1-0"></script>
   <script defer src="/static/bacalbasa_inspect_resize_v111.js?v=1-1"></script>
   <script defer src="/static/bacalbasa_inspect_service_v124.js?v=1-28"></script>
 
@@ -3294,10 +2953,11 @@ body.stitch-live-v12 #view-live
   src="/static/bacalbasa_runtime_sync_v20_3.js?v=20-3-runtime-1"
 ></script>
 
-  <script src="/static/live_button_busy.js?v=1"></script>
-  <script src="/static/camera_teleop_integration.js?v=10"></script>
+  <script src="/static/live_button_busy.js?v=2"></script>
+  <script src="/static/live_robot_modes.js?v=1"></script>
+  <script src="/static/camera_teleop_integration.js?v=15"></script>
   <script src="/static/bacalbasa_browser_lease_v20_7.js?v=21-2b-eventsource"></script>
-  <script src="/static/fd_final_header_action.js?v=3"></script>
+  <script src="/static/fd_final_header_action.js?v=4"></script>
 </body>
 </html>
 

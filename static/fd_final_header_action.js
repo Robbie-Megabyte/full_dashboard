@@ -15,8 +15,9 @@
     #fd-final-close.fd-busy::after {
       content: ""; position: absolute; top: 50%; left: 50%;
       width: 11px; height: 11px; margin: -7px 0 0 -7px;
-      border: 1.5px solid rgb(245,158,11); border-right-color: transparent; border-radius: 50%;
-      animation: fd-close-spin .7s linear infinite;
+      box-sizing: border-box; border-radius: 50%;
+      border: 1.6px solid rgba(245,158,11,.22); border-top-color: rgb(245,158,11);
+      animation: fd-close-spin .75s linear infinite;
     }
     @keyframes fd-close-spin { to { transform: rotate(360deg); } }
   `;

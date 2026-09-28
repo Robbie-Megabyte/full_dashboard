@@ -19,6 +19,17 @@
     lastClick = {button, at: performance.now()};
   }, true);
 
+  // Operations that outlast their request (reported by app.js).
+  window.setInterval(() => {
+    const busy = typeof window.fullDashBusyV1 === "function" ? window.fullDashBusyV1() : {};
+    for (const [id, on] of Object.entries(busy)) {
+      const button = document.getElementById(id);
+      if (!button || button.classList.contains("fd-state-busy") === Boolean(on)) continue;
+      button.classList.toggle("fd-state-busy", Boolean(on));
+      button.setAttribute("aria-busy", on ? "true" : "false");
+    }
+  }, 200);
+
   const baseFetch = window.fetch.bind(window);
 
   window.fetch = function fetchWithButtonBusy(resource, options = {}) {

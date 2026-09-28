@@ -169,19 +169,49 @@ let activeTeleopKey = null;
 let teleopWasEnabled = false;
 
 /* FD19 — imported perception/backend contract from dashboard_robo_car_nav2. */
-let yoloEnabled = false;
+// This state belongs only to the SLAM runtime. Live-tab YOLO is owned by the
+// Full Dashboard camera manager and uses a different endpoint/process.
+let slamYoloEnabled = false;
 let perceptionRefreshRunning = false;
 let semanticObjects = [];
 let semanticRenderSignature = "";
 window.latestSemanticChairMessage = null;
 
 function updateYoloUI(cameraStatus) {
-  yoloEnabled = Boolean(cameraStatus.yolo_enabled);
+  slamYoloEnabled = Boolean(cameraStatus.yolo_enabled);
   const input = $("yolo-toggle");
   if (!input) return;
-  input.checked = yoloEnabled;
+  input.checked = slamYoloEnabled;
   input.disabled = !cameraStatus.yolo_available;
   input.closest(".fd20-yolo-toggle")?.classList.toggle("is-disabled", input.disabled);
+  syncLiveYoloStyle();
+}
+
+function syncLiveYoloStyle() {
+  const target = document.querySelector(".fd-live-yolo-toggle");
+  if (!target || target.dataset.liveStyleSynced === "true") return;
+  try {
+    const source = window.parent?.document?.getElementById("stitchYoloProxyV1923");
+    const sourceInput = source?.querySelector("input");
+    const targetInput = target.querySelector("input");
+    if (!source || !sourceInput || !targetInput) return;
+
+    const labelStyle = window.parent.getComputedStyle(source);
+    for (const property of [
+      "font-family", "font-size", "font-weight", "font-style", "line-height",
+      "letter-spacing", "text-transform", "color", "opacity",
+    ]) {
+      target.style.setProperty(property, labelStyle.getPropertyValue(property), "important");
+    }
+
+    const inputStyle = window.parent.getComputedStyle(sourceInput);
+    for (const property of ["width", "height", "margin", "accent-color"]) {
+      targetInput.style.setProperty(property, inputStyle.getPropertyValue(property), "important");
+    }
+    target.dataset.liveStyleSynced = "true";
+  } catch (_error) {
+    // Standalone SLAM still uses the matching CSS fallback.
+  }
 }
 
 function updateSemanticUI(message) {
@@ -332,7 +362,24 @@ async function api(path, options = {}) {
   const headers = { ...(options.headers || {}) };
   if (token) headers["X-Dashboard-Token"] = token;
   if (options.body && !headers["Content-Type"]) headers["Content-Type"] = "application/json";
-  const response = await fetch(runtimePath(path), { ...options, headers, cache: "no-store" });
+  const request = () => fetch(runtimePath(path), {
+    ...options,
+    headers,
+    cache: "no-store",
+    credentials: "same-origin",
+  });
+  let response = await request();
+  const method = String(options.method || "GET").toUpperCase();
+  if (response.status === 401 && !["GET", "HEAD"].includes(method)) {
+    // The SLAM iframe can load before the parent finishes establishing the
+    // trusted dashboard cookie. Bootstrap once, then replay the exact action.
+    await fetch("/api/session/bootstrap", {
+      method: "POST",
+      cache: "no-store",
+      credentials: "same-origin",
+    });
+    response = await request();
+  }
   let body;
   try {
     body = await response.json();
@@ -463,7 +510,8 @@ async function refreshState() {
     $("start-map").disabled = mappingActive;
     $("pause-map").disabled = !mappingActive;
     $("stop-map").disabled = !mappingActive;
-    $("save-map").disabled = !mappingActive;
+    // A map is saved only under a name (one character is enough).
+    $("save-map").disabled = !mappingActive || !$("map-name").value.trim();
     $("pause-map").textContent =
       next.mapping_paused
         ? "▶ Resume"
@@ -1066,6 +1114,10 @@ $("stop-map").addEventListener("click", async (event) => {
   if (result) await refreshMaps();
 });
 
+$("map-name").addEventListener("input", () => {
+  $("save-map").disabled = state?.mode !== "mapping" || !$("map-name").value.trim();
+});
+
 $("save-map").addEventListener("click", async (event) => {
   const name = $("map-name").value.trim();
   if (!name) return toast("Enter a map name", true);
@@ -1444,9 +1496,9 @@ $("yolo-toggle")?.addEventListener("change", async (event) => {
       method: "POST",
       body: JSON.stringify({ enabled: requested }),
     });
-    yoloEnabled = Boolean(result?.enabled ?? requested);
+    slamYoloEnabled = Boolean(result?.enabled ?? requested);
   } catch (error) {
-    input.checked = yoloEnabled;
+    input.checked = slamYoloEnabled;
     if (typeof toast === "function") toast(error.message, true);
   } finally {
     await refreshPerception();
@@ -1454,7 +1506,26 @@ $("yolo-toggle")?.addEventListener("change", async (event) => {
 });
 
 $("semantic-clear")?.addEventListener("click", async (event) => {
-  await action(event.currentTarget, "Clearing…", () => api("/api/semantic/chairs", { method: "DELETE" }));
+  await action(event.currentTarget, "Clearing…", async () => {
+    // If SLAM YOLO remains enabled it immediately redetects the same objects,
+    // making Clear look broken. Stop only this SLAM detector, then clear its
+    // semantic tracker. Live-tab YOLO is intentionally untouched.
+    const wasEnabled = slamYoloEnabled;
+    if (wasEnabled) {
+      await api("/api/yolo/toggle", {
+        method: "POST",
+        body: JSON.stringify({ enabled: false }),
+      });
+      slamYoloEnabled = false;
+    }
+    const result = await api("/api/semantic/chairs", { method: "DELETE" });
+    return {
+      ...result,
+      message: wasEnabled
+        ? "Objects cleared · SLAM YOLO off"
+        : "Objects cleared",
+    };
+  });
   await refreshPerception();
 });
 

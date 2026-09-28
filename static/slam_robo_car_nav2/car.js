@@ -85,7 +85,7 @@
       return { text: `Car mapping ${status}${cells ? ` · ${cells} map cells` : ' · waiting for the first /map'}`, ready: status === 'running' && cells > 0 };
     }
     if (mode !== 'localization') {
-      return { text: 'Car connected · no mode active · press Car localization (or Car mapping)', ready: false };
+      return { text: 'Car connected · no mode active · press Enter Localization (or Enter Mapping)', ready: false };
     }
     if (status !== 'running') return { text: `Car localization ${status}…`, ready: false };
     if (!hasPose) return { text: 'Car localization running · set Car initial pose on the map and press Load & Localize', ready: false };
@@ -183,12 +183,16 @@
   const mode = name => post('/api/car/mode', {mode:name, map_file:$('car-map-file').value, slam_params_file:$('car-slam-params').value});
   bind('car-mapping', () => mode('mapping'));
   bind('car-localization', () => mode('localization'));
-  // Stop also forgets the previous route: its preview, the route drawn from the
-  // car's last plan and the route state, as the robot side does.
+  // Stop Mapping / Stop Localization end the car mode.
+  bind('car-mapping-stop', () => mode('stop'));
+  bind('car-localization-stop', () => mode('stop'));
+  // Navigation Stop cancels the car's Nav2 goal (its localization keeps
+  // running) and forgets the previous route: its preview, the route drawn
+  // from the car's last plan and the route state, as the robot side does.
   let hiddenRoute = null;  // signature of the route removed by Stop
   window.carRouteVisible = () => Boolean(car.path?.length) && layerSignature(car.path) !== hiddenRoute;
   bind('car-stop', async () => {
-    const result = await mode('stop');
+    const result = await post('/api/car/navigation/cancel');
     previewId = null;
     $('car-go').disabled = true;
     hiddenRoute = car.path?.length ? layerSignature(car.path) : null;
@@ -234,7 +238,7 @@
   $('car-view-map').addEventListener('click', () => {
     const points = car.map_points || [];
     if (!points.length) {
-      toast('No car map is loaded; select a map and press Car localization', true);
+      toast('No car map is loaded; select a map and press Enter Localization', true);
       return;
     }
     window.carMapCleared = false;
@@ -250,7 +254,7 @@
   $('car-download-map').addEventListener('click', () => {
     const points = car.map_points || [];
     if (!points.length) {
-      toast('No car map is loaded; select a map and press Car localization', true);
+      toast('No car map is loaded; select a map and press Enter Localization', true);
       return;
     }
     const t = car.transform || { x: 0, y: 0, yaw: 0 };
@@ -318,7 +322,7 @@
   // initial pose sent in any other mode is silently ignored by the car.
   bind('car-initial-pose', async () => {
     if (car.current_mode !== 'localization') {
-      throw new Error(`Start Car localization first (the car is in mode "${car.current_mode || 'none'}"); then send the pose.`);
+      throw new Error(`Press Enter Localization first (the car is in mode "${car.current_mode || 'none'}"); then send the pose.`);
     }
     requireUsableAlignment();
     return post('/api/car/initial_pose', pose('car-pose'));
